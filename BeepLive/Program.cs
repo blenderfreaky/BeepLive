@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK;
+using System;
 
 namespace BeepLive
 {
@@ -6,7 +7,8 @@ namespace BeepLive
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            using BeepLive beepLive = new BeepLive(500, 500);
+            beepLive.Run(1d/60);
         }
     }
 }
