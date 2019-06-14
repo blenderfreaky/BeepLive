@@ -1,12 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenTK.NetStandard" Version="1.0.7-prerelease" />
+    <PackageReference Include="SFML.Net" Version="2.5.0" />
+    <PackageReference Include="UltimateQuadTree" Version="1.0.3" />
   </ItemGroup>
 
 </Project>

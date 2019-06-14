@@ -1,37 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
+using SFML.Graphics;
+using SFML.System;
+using UltimateQuadTree;
 
 namespace BeepLive
 {
-    public class BeepLive : GameWindow
+    public class BeepLive
     {
-        public BeepLive(int width, int height) : base(width, height) { }
+        public RenderWindow Window;
+        private readonly Map _map;
 
-        protected override void OnLoad(EventArgs e)
+        public BeepLive()
         {
-            base.OnLoad(e);
-            // Set background color
-            GL.ClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+            var mode = new SFML.Window.VideoMode(800, 600);
+            this.Window = new RenderWindow(mode, "SFML works!");
+
+            Window.KeyPressed += Window_KeyPressed;
+
+
+            var circle = new CircleShape(100f)
+            {
+                FillColor = Color.Blue
+            };
+            var voxel = new RectangleShape(new Vector2f(10, 10));
+
+            // Start the game loop
+            while (Window.IsOpen)
+            {
+                // Process events
+                Window.DispatchEvents();
+                Window.Draw(circle);
+
+                // Finally, display the rendered frame on screen
+                Window.Display();
+            }
+
+            _map = new Map();
         }
 
-        protected override void OnUpdateFrame(FrameEventArgs e)
+
+        /// <summary>
+        /// Function called when a key is pressed
+        /// </summary>
+        private void Window_KeyPressed(object sender, SFML.Window.KeyEventArgs e)
         {
-            base.OnUpdateFrame(e);
-        }
-
-        protected override void OnRenderFrame(FrameEventArgs e)
-        {
-            base.OnRenderFrame(e);
-
-            GL.Clear(ClearBufferMask.ColorBufferBit);
-
-            GL.Begin(BeginMode.)
-
-            SwapBuffers();
+            var window = (SFML.Window.Window)sender;
+            if (e.Code == SFML.Window.Keyboard.Key.Escape)
+            {
+                window.Close();
+            }
         }
     }
 }
