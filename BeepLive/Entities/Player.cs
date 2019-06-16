@@ -1,32 +1,38 @@
 ﻿using BeepLive.World;
+using SFML.Graphics;
 using SFML.System;
 using System;
-using SFML.Graphics;
 
 namespace BeepLive.Entities
 {
     public class Player : Entity
     {
         public int Size { get; set; }
+        public sealed override Vector2f Position
+        {
+            get => ((RectangleShape)Shape).Position;
+            set => ((RectangleShape)Shape).Position = value;
+        }
 
         public float Health;
 
         public Player(Map map, Vector2f position, int size)
         {
+            Shape = new RectangleShape
+            {
+                Position = position,
+                Size = new Vector2f(size, size),
+                FillColor = Color.Red
+            };
+
             Map = map;
             Position = position;
             Size = size;
-
-            Shape = new RectangleShape
-            {
-                Position = Position,
-                Size = new Vector2f(Size, Size),
-            };
         }
 
         public override void Step()
         {
-            CollisionCheck();
+            //CollisionCheck();
             //TODO check surrounding chunks
 
             Velocity += Map.PhysicalEnvironment.Gravity;
@@ -39,7 +45,7 @@ namespace BeepLive.Entities
         {
             switch (Map.PhysicalEnvironment.CollisionResponseMode)
             {
-                case CollisionResponseMode.Panic:
+                case CollisionResponseMode.NoClip:
 
                     break;
                 case CollisionResponseMode.Raise:

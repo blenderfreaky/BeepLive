@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
 using SFML.System;
 
 namespace BeepLive.World
@@ -8,15 +8,7 @@ namespace BeepLive.World
         public float AirResistance;
         public Vector2f Gravity;
         public CollisionResponseMode CollisionResponseMode;
-    }
 
-    public enum CollisionResponseMode
-    {
-        [Description("")]
-        Panic,
-        [Description("Move object up vertically")]
-        Raise,
-        [Description("Move object to direction with least collisions")]
-        LeastResistance,
+        public List<VoxelType> VoxelTypes;
     }
 }

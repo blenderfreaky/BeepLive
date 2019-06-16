@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BeepLive
+﻿namespace BeepLive
 {
     class Program
     {

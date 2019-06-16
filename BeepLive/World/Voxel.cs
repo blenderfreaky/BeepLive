@@ -5,22 +5,26 @@ namespace BeepLive.World
 {
     public struct Voxel
     {
-        public Vector2f Position;
+        public Map Map;
         public VoxelType VoxelType;
         public bool IsAir;
-        public RectangleShape Shape;
 
-        public Voxel(Vector2f position, VoxelType voxelType, float voxelScale)
+        public Voxel(Map map, Color color)
         {
-            Position = position;
-            VoxelType = voxelType;
-            IsAir = voxelType == null;
-
-            Shape = new RectangleShape(new Vector2f(voxelScale, voxelScale))
-            {
-                Position = position,
-                FillColor = Color.Blue,
-            };
+            Map = map;
+            IsAir = color == map.BackgroundColor;
+            VoxelType = IsAir
+                ? null
+                : map.PhysicalEnvironment.VoxelTypes.Find(t => t.OwnerTeam.TeamColor == color);
         }
+
+        public Voxel(Map map, VoxelType voxelType = null)
+        {
+            Map = map;
+            IsAir = voxelType == null;
+            VoxelType = voxelType;
+        }
+
+        public Color Color => VoxelType.OwnerTeam.TeamColor;
     }
 }

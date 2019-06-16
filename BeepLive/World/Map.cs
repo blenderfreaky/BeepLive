@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using BeepLive.Entities;
-using SFML.Graphics;
+﻿using BeepLive.Entities;
 using SFML.System;
+using System;
+using System.Collections.Generic;
+using SFML.Graphics;
+using SimplexNoise;
 
 namespace BeepLive.World
 {
@@ -10,12 +11,23 @@ namespace BeepLive.World
     {
         public PhysicalEnvironment PhysicalEnvironment;
         public List<Entity> Entities;
-        public int ChunkSize;
+        public uint ChunkSize;
         public int MapWidth, MapHeight;
-        public float VoxelScale;
         public Chunk[,] Chunks;
+        public Color BackgroundColor;
 
-        public Map(int chunkSize, int mapWidth, int mapHeight, float voxelScale)
+        public Map()
+        {
+            PhysicalEnvironment = new PhysicalEnvironment
+            {
+                VoxelTypes = new List<VoxelType>(),
+            };
+
+            Entities = new List<Entity>();
+        }
+
+        #region Fluent API
+        private Map SetSize(int mapWidth, int mapHeight)
         {
             if (mapWidth <= 0) throw new ArgumentOutOfRangeException(nameof(mapWidth));
             MapWidth = mapWidth;
@@ -23,46 +35,93 @@ namespace BeepLive.World
             MapHeight = mapHeight;
             Chunks = new Chunk[mapWidth, mapHeight];
 
+            return this;
+        }
+
+        private Map SetChunkSize(uint chunkSize)
+        {
             if (chunkSize <= 0) throw new ArgumentOutOfRangeException(nameof(chunkSize));
             ChunkSize = chunkSize;
 
-            VoxelScale = voxelScale;
+            return this;
+        }
 
-            for (int chunkI = 0; chunkI < MapWidth; chunkI++)
+        public Map SetAirResistance(float airResistance)
+        {
+            PhysicalEnvironment.AirResistance = airResistance;
+
+            return this;
+        }
+
+        public Map SetGravity(float x, float y)
+        {
+            PhysicalEnvironment.Gravity = new Vector2f(x, y);
+
+            return this;
+        }
+
+        public Map SetCollisionResponseMode(CollisionResponseMode collisionResponseMode)
+        {
+            PhysicalEnvironment.CollisionResponseMode = collisionResponseMode;
+
+            return this;
+        }
+
+        public Map GenerateMap(VoxelType ground, int groundLevel, float scale)
+        {
+            for (uint chunkI = 0; chunkI < MapWidth; chunkI++)
             {
-                for (int chunkJ = 0; chunkJ < MapHeight; chunkJ++)
+                for (uint chunkJ = 0; chunkJ < MapHeight; chunkJ++)
                 {
                     Chunk chunk = Chunks[chunkI, chunkJ] = new Chunk(this);
 
-                    for (int voxelI = 0; voxelI < ChunkSize; voxelI++)
+                    for (uint voxelI = 0; voxelI < ChunkSize; voxelI++)
                     {
-                        for (int voxelJ = 0; voxelJ < ChunkSize; voxelJ++)
+                        for (uint voxelJ = 0; voxelJ < ChunkSize; voxelJ++)
                         {
-                            chunk.Voxels[voxelI, voxelJ] = 
-                                 new Voxel(new Vector2f(chunkI * ChunkSize + voxelI,
-                                    chunkJ * ChunkSize + voxelJ) * VoxelScale,
-                                null, VoxelScale);
+                            bool isAir = chunkJ * ChunkSize + voxelJ > groundLevel - Noise.CalcPixel1D(
+                                         (int) (chunkI * ChunkSize + voxelI),
+                                         scale);
+
+                            chunk[voxelI, voxelJ] = 
+                                isAir
+                                ? new Voxel(this, ground)
+                                : new Voxel(this);
                         }
                     }
                 }
             }
 
-            Entities = new List<Entity>();
+            return this;
         }
 
-        public void Step()
+        public Map AddPlayer(Vector2f position, int size)
         {
-            Entities.ForEach(e => e.Step());
+            Entities.Add(new Player(this, position, size));
+
+            return this;
         }
+
+        public Map AddProjectile(Vector2f position, Vector2f velocity)
+        {
+            Entities.Add(new Projectile(this, position, velocity));
+
+            return this;
+        }
+        #endregion
+
+        public void Step() => Entities.ForEach(e => e.Step());
 
         public Vector2i GetChunkIndex(Vector2f position) =>
-            new Vector2i((int)MathF.Floor(position.X / VoxelScale), (int)MathF.Floor(position.Y / VoxelScale));
+            new Vector2i((int)MathF.Floor(position.X), (int)MathF.Floor(position.Y));
 
-        public Chunk GetChunk(Vector2f position) =>
-            Chunks[(int)MathF.Floor(position.X / VoxelScale), (int)MathF.Floor(position.Y / VoxelScale)];
+        public Chunk GetChunk(Vector2f position)
+        {
+            int i = (int)MathF.Floor(position.X);
+            int j = (int)MathF.Floor(position.Y);
+            return i < 0 || j < 0 || i >= MapWidth || j >= MapHeight ? null : Chunks[i, j];
+        }
 
-        public Voxel GetVoxel(Vector2f position) =>
-            Chunks[(int)MathF.Floor(position.X / VoxelScale), (int)MathF.Floor(position.Y / VoxelScale)]
-                .GetVoxel(position / VoxelScale);
+        public Voxel GetVoxel(Vector2f position) => GetChunk(position)?.GetVoxel(position) ?? new Voxel(this, null);
     }
 }

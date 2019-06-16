@@ -1,4 +1,6 @@
-﻿namespace BeepLive.World
+﻿using SFML.Graphics;
+
+namespace BeepLive.World
 {
     public class VoxelType
     {

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+﻿using System.Collections.Generic;
+using System.IO;
 using BeepLive.Entities;
 using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
+using System.Threading;
 
 namespace BeepLive
 {
@@ -14,32 +13,29 @@ namespace BeepLive
     {
         public RenderWindow Window;
         public Map Map;
+        public List<Team> Teams;
 
         public BeepLive()
         {
             var mode = new VideoMode(800, 600);
-            Window = new RenderWindow(mode, "BeepLive");
+            Window = new RenderWindow(mode, "Map");
 
             Window.KeyPressed += Window_KeyPressed;
             Window.MouseButtonPressed += Window_MousePressed;
 
-            Map = new Map(128, 8, 4, 1)
-            {
-                PhysicalEnvironment = new PhysicalEnvironment
-                {
-                    AirResistance = 0.99f,
-                    Gravity = new Vector2f(0, -1f),
-                    CollisionResponseMode = CollisionResponseMode.LeastResistance,
-                }
-            };
-            Map.Entities.Add(new Player(Map, new Vector2f(50, 50), 10));
-            Map.Entities.Add(new Projectile(new Vector2f(100, 50), new Vector2f(0, 0)));
+            Map = new Map()
+                .SetAirResistance(0.99f)
+                .SetGravity(0, 1)
+                .GenerateMap(new VoxelType(), 100, 0.01f)
+                .AddPlayer(new Vector2f(50, 10), 10)
+                .AddProjectile( new Vector2f(100, 50), new Vector2f(0, 0));
 
-            using var physicsTimer = new Timer(_ => Map.Step(), null, 0, 1000/60);
+            using var physicsTimer = new Timer(_ => Map.Step(), null, 1000, 1000 / 60);
 
             while (Window.IsOpen)
             {
                 Window.DispatchEvents();
+                Window.Clear(Color.Black);
 
                 GameLoop();
 
@@ -53,14 +49,13 @@ namespace BeepLive
             {
                 for (int chunkJ = 0; chunkJ < Map.MapHeight; chunkJ++)
                 {
-                    for (int voxelI = 0; voxelI < Map.ChunkSize; voxelI++)
-                    {
-                        for (int voxelJ = 0; voxelJ < Map.ChunkSize; voxelJ++)
-                        {
-                            Window.Draw(Map.Chunks[chunkI, chunkJ].Voxels[voxelI, voxelJ].Shape);
-                        }
-                    }
+                    Window.Draw(Map.Chunks[chunkI, chunkJ].Sprite);
                 }
+            }
+
+            foreach (Entity entity in Map.Entities)
+            {
+                Window.Draw(entity.Shape);
             }
         }
 
