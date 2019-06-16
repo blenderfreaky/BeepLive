@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using BeepLive.Entities;
+using System.Threading;
 using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
-using System.Threading;
 
 namespace BeepLive
 {
     public class BeepLive
     {
-        public RenderWindow Window;
         public Map Map;
         public List<Team> Teams;
+        public RenderWindow Window;
 
         public BeepLive()
         {
@@ -35,10 +33,11 @@ namespace BeepLive
                 .GenerateMap(new VoxelType
                 {
                     Color = new Color(127, 127, 127),
-                    Resistance = 0.99f
+                    Resistance = 0.002f
                 }, 100, 0.01f, 20f)
                 .AddPlayer(new Vector2f(50, 10), 10)
-                .AddProjectile(new Vector2f(100, 50), new Vector2f(0, 0), 2);
+                .AddProjectile(new Vector2f(100, 50), new Vector2f(0, 0), 2, 2)
+                .AddClusterProjectile(new Vector2f(100, 50), new Vector2f(10, 0), 10, 4, 20, 2, 10, 5);
 
             using var physicsTimer = new Timer(_ => Map.Step(), null, 1000, 1000 / 60);
 
@@ -56,33 +55,24 @@ namespace BeepLive
         private void GameLoop()
         {
             for (int chunkI = 0; chunkI < Map.MapWidth; chunkI++)
+            for (int chunkJ = 0; chunkJ < Map.MapHeight; chunkJ++)
             {
-                for (int chunkJ = 0; chunkJ < Map.MapHeight; chunkJ++)
-                {
-                    Chunk chunk = Map.Chunks[chunkI, chunkJ];
-                    chunk.Update();
-                    Window.Draw(chunk.Sprite);
-                }
+                var chunk = Map.Chunks[chunkI, chunkJ];
+                chunk.Update();
+                Window.Draw(chunk.Sprite);
             }
 
-            foreach (Entity entity in Map.Entities)
-            {
-                Window.Draw(entity.Shape);
-            }
+            foreach (var entity in Map.Entities.ToArray()) Window.Draw(entity.Shape);
         }
 
         private static void Window_KeyPressed(object sender, KeyEventArgs e)
         {
-            var window = (Window)sender;
-            if (e.Code == Keyboard.Key.Escape)
-            {
-                window.Close();
-            }
+            var window = (Window) sender;
+            if (e.Code == Keyboard.Key.Escape) window.Close();
         }
 
         private void Window_MousePressed(object sender, MouseButtonEventArgs e)
         {
-
         }
 
         private void Window_Closed(object sender, EventArgs e)

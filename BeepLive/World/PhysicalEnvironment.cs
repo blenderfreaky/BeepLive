@@ -6,8 +6,8 @@ namespace BeepLive.World
     public class PhysicalEnvironment
     {
         public float AirResistance;
-        public Vector2f Gravity;
         public CollisionResponseMode CollisionResponseMode;
+        public Vector2f Gravity;
 
         public List<VoxelType> VoxelTypes;
 

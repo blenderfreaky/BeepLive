@@ -1,18 +1,13 @@
-﻿using BeepLive.World;
+﻿using System;
+using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
-using System;
 
 namespace BeepLive.Entities
 {
     public class Player : Entity
     {
-        public int Size { get; set; }
-        public sealed override Vector2f Position
-        {
-            get => ((RectangleShape)Shape).Position;
-            set => ((RectangleShape)Shape).Position = value;
-        }
+        private Vector2f _lastSafePosition;
 
         public float Health;
 
@@ -30,6 +25,14 @@ namespace BeepLive.Entities
             Size = size;
         }
 
+        public int Size { get; set; }
+
+        public sealed override Vector2f Position
+        {
+            get => ((RectangleShape) Shape).Position;
+            set => ((RectangleShape) Shape).Position = value;
+        }
+
         public override void Step()
         {
             CollisionCheck();
@@ -39,8 +42,6 @@ namespace BeepLive.Entities
 
             Position += Velocity;
         }
-
-        private Vector2f _lastSafePosition;
 
         public void CollisionCheck()
         {
@@ -53,15 +54,9 @@ namespace BeepLive.Entities
                     bool collides = false;
 
                     for (int i = 0; i < Size; i++)
-                    {
-                        for (int j = 0; j < Size; j++)
-                        {
-                            if (!GetVoxel(i, j).IsAir)
-                            {
-                                collides = true;
-                            }
-                        }
-                    }
+                    for (int j = 0; j < Size; j++)
+                        if (!GetVoxel(i, j).IsAir)
+                            collides = true;
 
                     if (collides)
                     {
@@ -76,21 +71,19 @@ namespace BeepLive.Entities
                     break;
                 case CollisionResponseMode.LeastResistance:
                     // The center of mass of voxels intersecting the player
-                    Vector2f center = new Vector2f(0, 0);
+                    var center = new Vector2f(0, 0);
                     // The amount of voxels intersecting the Player
                     int collisionCount = 0;
 
                     for (int i = 0; i < Size; i++)
+                    for (int j = 0; j < Size; j++)
                     {
-                        for (int j = 0; j < Size; j++)
-                        {
-                            if (GetVoxel(i, j).IsAir) continue;
+                        if (GetVoxel(i, j).IsAir) continue;
 
-                            center.X += i;
-                            center.Y += j;
+                        center.X += i;
+                        center.Y += j;
 
-                            collisionCount++;
-                        }
+                        collisionCount++;
                     }
 
                     center /= collisionCount;

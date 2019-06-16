@@ -1,5 +1,4 @@
 ﻿using SFML.Graphics;
-using SFML.System;
 
 namespace BeepLive.World
 {

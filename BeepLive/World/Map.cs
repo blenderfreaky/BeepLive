@@ -1,29 +1,57 @@
-﻿using BeepLive.Entities;
+﻿using System;
+using System.Collections.Generic;
+using BeepLive.Entities;
 using SFML.Graphics;
 using SFML.System;
 using SimplexNoise;
-using System;
-using System.Collections.Generic;
 
 namespace BeepLive.World
 {
     public class Map
     {
-        public PhysicalEnvironment PhysicalEnvironment;
-        public List<Entity> Entities;
-        public uint ChunkSize;
-        public int MapWidth, MapHeight;
-        public Chunk[,] Chunks;
         public Color BackgroundColor;
+        public Chunk[,] Chunks;
+        public uint ChunkSize;
+        public List<Entity> Entities;
+        public int MapWidth, MapHeight;
+        public PhysicalEnvironment PhysicalEnvironment;
+        public Random Random;
 
         public Map()
         {
             PhysicalEnvironment = new PhysicalEnvironment();
 
             Entities = new List<Entity>();
+
+            Random = new Random();
+        }
+
+        public void Step()
+        {
+            // Make array to avoid concurrent modification exception; Make temporary clone to be able to modify the original
+            Entities.ToArray().ForEach(e => e.Step());
+        }
+
+        public Vector2i GetChunkIndex(Vector2f position)
+        {
+            return new Vector2i((int) MathF.Floor(position.X), (int) MathF.Floor(position.Y));
+        }
+
+        public Chunk GetChunk(Vector2f position, out Vector2f chunkPosition)
+        {
+            int i = (int) MathF.Floor(position.X / ChunkSize);
+            int j = (int) MathF.Floor(position.Y / ChunkSize);
+            chunkPosition = new Vector2f(i * ChunkSize, j * ChunkSize);
+            return i < 0 || j < 0 || i >= MapWidth || j >= MapHeight ? null : Chunks[i, j];
+        }
+
+        public Voxel GetVoxel(Vector2f position)
+        {
+            return GetChunk(position, out var chunkPosition)?.GetVoxel(position - chunkPosition) ?? new Voxel(this);
         }
 
         #region Fluent API
+
         public Map SetSize(int mapWidth, int mapHeight)
         {
             if (mapWidth <= 0) throw new ArgumentOutOfRangeException(nameof(mapWidth));
@@ -76,27 +104,25 @@ namespace BeepLive.World
             PhysicalEnvironment.VoxelTypes.Add(ground);
 
             for (uint chunkI = 0; chunkI < MapWidth; chunkI++)
+            for (uint chunkJ = 0; chunkJ < MapHeight; chunkJ++)
             {
-                for (uint chunkJ = 0; chunkJ < MapHeight; chunkJ++)
+                var chunk = Chunks[chunkI, chunkJ] =
+                    new Chunk(this, new Vector2f(chunkI * ChunkSize, chunkJ * ChunkSize));
+
+                for (uint voxelI = 0; voxelI < ChunkSize; voxelI++)
                 {
-                    Chunk chunk = Chunks[chunkI, chunkJ] =
-                        new Chunk(this, new Vector2f(chunkI * ChunkSize, chunkJ * ChunkSize));
+                    float height = Noise.CalcPixel1D(
+                                       (int) (chunkI * ChunkSize + voxelI),
+                                       scale) * heightScale / 128f;
 
-                    for (uint voxelI = 0; voxelI < ChunkSize; voxelI++)
+                    for (uint voxelJ = 0; voxelJ < ChunkSize; voxelJ++)
                     {
-                        float height = Noise.CalcPixel1D(
-                                           (int)(chunkI * ChunkSize + voxelI),
-                                           scale) * heightScale / 128f;
+                        bool isAir = chunkJ * ChunkSize + voxelJ - groundLevel < height;
 
-                        for (uint voxelJ = 0; voxelJ < ChunkSize; voxelJ++)
-                        {
-                            bool isAir = chunkJ * ChunkSize + voxelJ - groundLevel < height;
-
-                            chunk[voxelI, voxelJ] =
-                                isAir
+                        chunk[voxelI, voxelJ] =
+                            isAir
                                 ? new Voxel(this)
                                 : new Voxel(this, ground);
-                        }
                     }
                 }
             }
@@ -111,27 +137,23 @@ namespace BeepLive.World
             return this;
         }
 
-        public Map AddProjectile(Vector2f position, Vector2f velocity, float radius)
+        public Map AddProjectile(Vector2f position, Vector2f velocity, float radius, float lowestSpeed)
         {
-            Entities.Add(new Projectile(this, position, velocity, radius));
+            Entities.Add(new Projectile(this, position, velocity, radius, lowestSpeed));
 
             return this;
         }
-        #endregion
 
-        public void Step() => Entities.ForEach(e => e.Step());
-
-        public Vector2i GetChunkIndex(Vector2f position) =>
-            new Vector2i((int)MathF.Floor(position.X), (int)MathF.Floor(position.Y));
-
-        public Chunk GetChunk(Vector2f position, out Vector2f chunkPosition)
+        public Map AddClusterProjectile(Vector2f position, Vector2f velocity, float lowestSpeed, float radius,
+            int childCount,
+            int childRadius, float explosionPower, float childLowestSpeed)
         {
-            int i = (int)MathF.Floor(position.X / ChunkSize);
-            int j = (int)MathF.Floor(position.Y / ChunkSize);
-            chunkPosition = new Vector2f(i * ChunkSize, j * ChunkSize);
-            return i < 0 || j < 0 || i >= MapWidth || j >= MapHeight ? null : Chunks[i, j];
+            Entities.Add(new ClusterProjectile<Projectile>(this, position, velocity, radius, lowestSpeed,
+                childCount, childRadius, explosionPower, childLowestSpeed));
+
+            return this;
         }
 
-        public Voxel GetVoxel(Vector2f position) => GetChunk(position, out Vector2f chunkPosition)?.GetVoxel(position - chunkPosition) ?? new Voxel(this, null);
+        #endregion
     }
 }
