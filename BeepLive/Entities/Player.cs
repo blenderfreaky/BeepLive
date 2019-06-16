@@ -32,14 +32,15 @@ namespace BeepLive.Entities
 
         public override void Step()
         {
-            //CollisionCheck();
-            //TODO check surrounding chunks
+            CollisionCheck();
 
             Velocity += Map.PhysicalEnvironment.Gravity;
             Velocity *= Map.PhysicalEnvironment.AirResistance;
 
             Position += Velocity;
         }
+
+        private Vector2f _lastSafePosition;
 
         public void CollisionCheck()
         {
@@ -49,16 +50,27 @@ namespace BeepLive.Entities
 
                     break;
                 case CollisionResponseMode.Raise:
-                    if (Functional.Evaluate(() =>
+                    bool collides = false;
+
+                    for (int i = 0; i < Size; i++)
                     {
-                        for (int i = 0; i < Size; i++)
-                            for (int j = 0; j < Size; j++)
-                                if (!GetVoxel(i, j).IsAir)
-                                    return true;
-                        return false;
-                    }))
+                        for (int j = 0; j < Size; j++)
+                        {
+                            if (!GetVoxel(i, j).IsAir)
+                            {
+                                collides = true;
+                            }
+                        }
+                    }
+
+                    if (collides)
                     {
-                        Velocity += new Vector2f(0, 1);
+                        Position = _lastSafePosition;
+                        Velocity *= -0.5f;
+                    }
+                    else
+                    {
+                        _lastSafePosition = Position;
                     }
 
                     break;

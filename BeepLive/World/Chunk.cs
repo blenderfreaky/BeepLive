@@ -11,21 +11,15 @@ namespace BeepLive.World
         public Image Voxels;
         public Sprite Sprite;
 
-        public Chunk(Map map)
+        public Chunk(Map map, Vector2f offset)
         {
             Map = map;
 
             Voxels = new Image(map.ChunkSize, map.ChunkSize);
-            Sprite = new Sprite(new Texture(Voxels)) { Texture = { Smooth = true } };
+            Sprite = new Sprite(new Texture(Voxels)) { Texture = { Smooth = true }, Position = offset };
         }
 
-        public Chunk(Map map, byte[] content)
-        {
-            Map = map;
-
-            Voxels = new Image(map.ChunkSize, map.ChunkSize, content);
-            Sprite = new Sprite(new Texture(Voxels)) { Texture = { Smooth = true } };
-        }
+        public void Update() => Sprite.Texture.Update(Voxels);
 
         public Voxel this[uint x, uint y]
         {

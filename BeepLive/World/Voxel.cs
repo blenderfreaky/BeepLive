@@ -15,7 +15,7 @@ namespace BeepLive.World
             IsAir = color == map.BackgroundColor;
             VoxelType = IsAir
                 ? null
-                : map.PhysicalEnvironment.VoxelTypes.Find(t => t.OwnerTeam.TeamColor == color);
+                : map.PhysicalEnvironment.VoxelTypes.Find(t => t.Color == color);
         }
 
         public Voxel(Map map, VoxelType voxelType = null)
@@ -25,6 +25,6 @@ namespace BeepLive.World
             VoxelType = voxelType;
         }
 
-        public Color Color => VoxelType.OwnerTeam.TeamColor;
+        public Color Color => VoxelType?.Color ?? Map.BackgroundColor;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using BeepLive.Entities;
 using BeepLive.World;
@@ -22,13 +23,22 @@ namespace BeepLive
 
             Window.KeyPressed += Window_KeyPressed;
             Window.MouseButtonPressed += Window_MousePressed;
+            Window.Closed += Window_Closed;
 
             Map = new Map()
                 .SetAirResistance(0.99f)
                 .SetGravity(0, 1)
-                .GenerateMap(new VoxelType(), 100, 0.01f)
+                .SetSize(8, 4)
+                .SetChunkSize(128)
+                .SetCollisionResponseMode(CollisionResponseMode.Raise)
+                .SetBackgroundColor(new Color(0, 0, 0))
+                .GenerateMap(new VoxelType
+                {
+                    Color = new Color(127, 127, 127),
+                    Resistance = 0.99f
+                }, 100, 0.01f, 20f)
                 .AddPlayer(new Vector2f(50, 10), 10)
-                .AddProjectile( new Vector2f(100, 50), new Vector2f(0, 0));
+                .AddProjectile(new Vector2f(100, 50), new Vector2f(0, 0), 2);
 
             using var physicsTimer = new Timer(_ => Map.Step(), null, 1000, 1000 / 60);
 
@@ -49,7 +59,9 @@ namespace BeepLive
             {
                 for (int chunkJ = 0; chunkJ < Map.MapHeight; chunkJ++)
                 {
-                    Window.Draw(Map.Chunks[chunkI, chunkJ].Sprite);
+                    Chunk chunk = Map.Chunks[chunkI, chunkJ];
+                    chunk.Update();
+                    Window.Draw(chunk.Sprite);
                 }
             }
 
@@ -71,6 +83,11 @@ namespace BeepLive
         private void Window_MousePressed(object sender, MouseButtonEventArgs e)
         {
 
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Window.Close();
         }
     }
 }

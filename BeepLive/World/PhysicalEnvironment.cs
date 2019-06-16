@@ -10,5 +10,10 @@ namespace BeepLive.World
         public CollisionResponseMode CollisionResponseMode;
 
         public List<VoxelType> VoxelTypes;
+
+        public PhysicalEnvironment()
+        {
+            VoxelTypes = new List<VoxelType>();
+        }
     }
 }

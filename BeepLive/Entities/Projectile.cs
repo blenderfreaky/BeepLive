@@ -1,7 +1,7 @@
-﻿using System.Security.Cryptography;
-using BeepLive.World;
+﻿using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
+using System;
 
 namespace BeepLive.Entities
 {
@@ -18,39 +18,47 @@ namespace BeepLive.Entities
             set => CircleShape.Position = value;
         }
 
-        public Projectile(Map map, Vector2f position, Vector2f velocity)
+        public float Radius;
+
+        public Projectile(Map map, Vector2f position, Vector2f velocity, float radius)
         {
             Shape = new CircleShape
             {
                 Position = position,
-                Radius = 10,
+                Radius = radius,
                 FillColor = Color.Yellow,
             };
 
             Map = map;
             Position = position;
             Velocity = velocity;
+            Radius = radius;
         }
 
         public override void Step()
         {
-            Chunk chunk = Map.GetChunk(Position);
-
-            if (chunk != null)
-            {
-                Vector2u index = chunk.GetVoxelIndex(Position);
-                Voxel voxel = chunk[index.X, index.Y];
-
-                chunk[index.X, index.Y] = new Voxel(Map, voxel.VoxelType);
-
-                Velocity += Map.PhysicalEnvironment.Gravity;
-                Velocity *= voxel.IsAir
-                    ? Map.PhysicalEnvironment.AirResistance
-                    : voxel.VoxelType.Resistance;
-            }
+            Voxel voxel = Map.GetVoxel(Position);
 
             Velocity += Map.PhysicalEnvironment.Gravity;
-            Velocity *= Map.PhysicalEnvironment.AirResistance;
+            Velocity *= voxel.IsAir
+                ? Map.PhysicalEnvironment.AirResistance
+                : voxel.VoxelType.Resistance;
+
+            float dist = MathF.Sqrt(Velocity.X * Velocity.X + Velocity.Y * Velocity.Y);
+            Vector2f front = Velocity / dist;
+            Vector2f left = new Vector2f(front.Y, -front.X);
+            for (float x = 0; x < dist; x++)
+            {
+                for (float y = -Radius; y <= Radius; y++)
+                {
+                    Vector2f position = Position + front * x + left * y;
+
+                    Chunk chunk = Map.GetChunk(position, out Vector2f chunkPosition);
+                    if (chunk == null) continue;
+                    chunk[(uint)MathF.Floor(position.X - chunkPosition.X), 
+                        (uint)MathF.Floor(position.Y - chunkPosition.Y)] = new Voxel(Map);
+                }
+            }
 
             Position += Velocity;
         }
