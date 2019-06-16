@@ -1,56 +1,81 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using BeepLive.Entities;
+using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
-using UltimateQuadTree;
+using SFML.Window;
 
 namespace BeepLive
 {
     public class BeepLive
     {
         public RenderWindow Window;
-        private readonly Map _map;
+        public Map Map;
 
         public BeepLive()
         {
-            var mode = new SFML.Window.VideoMode(800, 600);
-            this.Window = new RenderWindow(mode, "SFML works!");
+            var mode = new VideoMode(800, 600);
+            Window = new RenderWindow(mode, "BeepLive");
 
             Window.KeyPressed += Window_KeyPressed;
+            Window.MouseButtonPressed += Window_MousePressed;
 
-
-            var circle = new CircleShape(100f)
+            Map = new Map(128, 8, 4, 1)
             {
-                FillColor = Color.Blue
+                PhysicalEnvironment = new PhysicalEnvironment
+                {
+                    AirResistance = 0.99f,
+                    Gravity = new Vector2f(0, -1f),
+                    CollisionResponseMode = CollisionResponseMode.LeastResistance,
+                }
             };
-            var voxel = new RectangleShape(new Vector2f(10, 10));
+            Map.Entities.Add(new Player(Map, new Vector2f(50, 50), 10));
+            Map.Entities.Add(new Projectile(new Vector2f(100, 50), new Vector2f(0, 0)));
 
-            // Start the game loop
+            using var physicsTimer = new Timer(_ => Map.Step(), null, 0, 1000/60);
+
             while (Window.IsOpen)
             {
-                // Process events
                 Window.DispatchEvents();
-                Window.Draw(circle);
 
-                // Finally, display the rendered frame on screen
+                GameLoop();
+
                 Window.Display();
             }
-
-            _map = new Map();
         }
 
-
-        /// <summary>
-        /// Function called when a key is pressed
-        /// </summary>
-        private void Window_KeyPressed(object sender, SFML.Window.KeyEventArgs e)
+        private void GameLoop()
         {
-            var window = (SFML.Window.Window)sender;
-            if (e.Code == SFML.Window.Keyboard.Key.Escape)
+            for (int chunkI = 0; chunkI < Map.MapWidth; chunkI++)
+            {
+                for (int chunkJ = 0; chunkJ < Map.MapHeight; chunkJ++)
+                {
+                    for (int voxelI = 0; voxelI < Map.ChunkSize; voxelI++)
+                    {
+                        for (int voxelJ = 0; voxelJ < Map.ChunkSize; voxelJ++)
+                        {
+                            Window.Draw(Map.Chunks[chunkI, chunkJ].Voxels[voxelI, voxelJ].Shape);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void Window_KeyPressed(object sender, KeyEventArgs e)
+        {
+            var window = (Window)sender;
+            if (e.Code == Keyboard.Key.Escape)
             {
                 window.Close();
             }
+        }
+
+        private void Window_MousePressed(object sender, MouseButtonEventArgs e)
+        {
+
         }
     }
 }

@@ -6,7 +6,7 @@ namespace BeepLive
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var beepLive = new BeepLive();
         }
     }
 }
