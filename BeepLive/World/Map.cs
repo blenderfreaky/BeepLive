@@ -24,6 +24,7 @@ namespace BeepLive.World
             PhysicalEnvironment = new PhysicalEnvironment();
 
             Entities = new List<Entity>();
+            Players =new List<Player>();
 
             Random = new Random();
         }
