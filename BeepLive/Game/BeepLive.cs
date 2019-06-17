@@ -81,13 +81,13 @@ namespace BeepLive.Game
             if (!_shakeTimer.IsRunning) return;
             
             // ReSharper disable once PossibleLossOfFraction
-            float fulfillment = _shakeTimer.ElapsedMilliseconds / _shakeDuration;
+            float fulfillment = (float)(_shakeTimer.ElapsedMilliseconds / (double)_shakeDuration);
             if (fulfillment < 1f)
             {
                 Vector2f direction = new Vector2f((float) (_random.NextDouble() * 2 - 1),
                     (float) (_random.NextDouble() * 2 - 1));
                 direction /= MathF.Sqrt(direction.X * direction.X + direction.Y * direction.Y);
-                _view.Center = _center + direction * _shakeMagnitude * (1 - fulfillment);
+                _view.Center = _center + direction * _shakeMagnitude * (1f - fulfillment);
             }
             else
             {
@@ -122,10 +122,11 @@ namespace BeepLive.Game
             foreach (var entity in entities.Where(entity => !entity.Alive)) Window.Draw(entity.Shape);
         }
 
-        private static void Window_KeyPressed(object sender, KeyEventArgs e)
+        private void Window_KeyPressed(object sender, KeyEventArgs e)
         {
             Window window = (Window) sender;
             if (e.Code == Keyboard.Key.Escape) window.Close();
+            //TriggerShake(10f, 1000);
         }
 
         private void Window_MousePressed(object sender, MouseButtonEventArgs e)
