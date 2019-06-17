@@ -5,13 +5,13 @@ using System.Xml.Serialization;
 namespace BeepLive.Config
 {
     // https://stackoverflow.com/questions/11447529/convert-an-object-to-an-xml-string/21685169
-    internal class XML
+    internal static class XML
     {
-        public string ToXML()
+        public static string ToXML<T>(T elem)
         {
             using StringWriter stringWriter = new StringWriter();
-            XmlSerializer serializer = new XmlSerializer(GetType());
-            serializer.Serialize(stringWriter, this);
+            XmlSerializer serializer = new XmlSerializer(elem.GetType());
+            serializer.Serialize(stringWriter, elem);
 
             return stringWriter.ToString();
         }

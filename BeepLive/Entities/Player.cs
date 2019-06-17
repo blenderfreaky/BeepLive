@@ -12,8 +12,6 @@ namespace BeepLive.Entities
         public float Health;
         public string Name;
 
-        public Boundary Boundary => new Boundary {Min = Position, Max = Position + new Vector2f(Size, Size)};
-
         public Player(Map map, Vector2f position, int size)
         {
             Shape = new RectangleShape
@@ -28,6 +26,21 @@ namespace BeepLive.Entities
             Size = size;
         }
 
+        internal Player(Map map)
+        {
+            Map = map;
+        }
+
+        public Boundary Boundary => new Boundary {Min = Position, Max = Position + new Vector2f(Size, Size)};
+
+        public int Size { get; set; }
+
+        public sealed override Vector2f Position
+        {
+            get => ((RectangleShape) Shape).Position;
+            set => ((RectangleShape) Shape).Position = value;
+        }
+
         internal void GenerateShape()
         {
             Shape = new RectangleShape
@@ -36,19 +49,6 @@ namespace BeepLive.Entities
                 Size = new Vector2f(Size, Size),
                 FillColor = Color.Red
             };
-        }
-
-        internal Player(Map map)
-        {
-            Map = map;
-        }
-
-        public int Size { get; set; }
-
-        public sealed override Vector2f Position
-        {
-            get => ((RectangleShape) Shape).Position;
-            set => ((RectangleShape) Shape).Position = value;
         }
 
         public override void Step()
@@ -69,10 +69,10 @@ namespace BeepLive.Entities
 
                     break;
                 case CollisionResponseMode.Raise:
-                    bool collides = false;
+                    var collides = false;
 
-                    for (int i = 0; i < Size; i++)
-                    for (int j = 0; j < Size; j++)
+                    for (var i = 0; i < Size; i++)
+                    for (var j = 0; j < Size; j++)
                         if (!GetVoxel(i, j).IsAir)
                             collides = true;
 
@@ -91,10 +91,10 @@ namespace BeepLive.Entities
                     // The center of mass of voxels intersecting the player
                     Vector2f center = new Vector2f(0, 0);
                     // The amount of voxels intersecting the Player
-                    int collisionCount = 0;
+                    var collisionCount = 0;
 
-                    for (int i = 0; i < Size; i++)
-                    for (int j = 0; j < Size; j++)
+                    for (var i = 0; i < Size; i++)
+                    for (var j = 0; j < Size; j++)
                     {
                         if (GetVoxel(i, j).IsAir) continue;
 
@@ -114,6 +114,12 @@ namespace BeepLive.Entities
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!Disposed) ((RectangleShape) Shape).Dispose();
+            base.Dispose(disposing);
         }
 
         #region Fluent API
@@ -145,16 +151,7 @@ namespace BeepLive.Entities
 
             return this;
         }
- 
-        #endregion
 
-        protected override void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-                ((RectangleShape)Shape).Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        #endregion
     }
 }

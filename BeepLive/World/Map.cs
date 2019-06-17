@@ -7,16 +7,11 @@ using SimplexNoise;
 
 namespace BeepLive.World
 {
-    public class Map
+    public partial class Map
     {
-        public Color BackgroundColor;
         public Chunk[,] Chunks;
-        public uint ChunkSize;
         public List<Entity> Entities;
         public List<Player> Players;
-        public Boundary EntityBoundary;
-        public int MapWidth, MapHeight;
-        public PhysicalEnvironment PhysicalEnvironment;
         public Random Random;
 
         public Map()
@@ -24,7 +19,7 @@ namespace BeepLive.World
             PhysicalEnvironment = new PhysicalEnvironment();
 
             Entities = new List<Entity>();
-            Players =new List<Player>();
+            Players = new List<Player>();
 
             Random = new Random();
         }
@@ -45,15 +40,16 @@ namespace BeepLive.World
 
         public Chunk GetChunk(Vector2f position, out Vector2f chunkPosition)
         {
-            int i = (int) MathF.Floor(position.X / ChunkSize);
-            int j = (int) MathF.Floor(position.Y / ChunkSize);
+            var i = (int) MathF.Floor(position.X / ChunkSize);
+            var j = (int) MathF.Floor(position.Y / ChunkSize);
             chunkPosition = new Vector2f(i * ChunkSize, j * ChunkSize);
             return i < 0 || j < 0 || i >= MapWidth || j >= MapHeight ? null : Chunks[i, j];
         }
 
         public Voxel GetVoxel(Vector2f position)
         {
-            return GetChunk(position, out Vector2f chunkPosition)?.GetVoxel(position - chunkPosition) ?? new Voxel(this);
+            return GetChunk(position, out Vector2f chunkPosition)?.GetVoxel(position - chunkPosition) ??
+                   new Voxel(this);
         }
 
         #region Fluent API
@@ -136,8 +132,8 @@ namespace BeepLive.World
                 for (uint voxelI = 0; voxelI < ChunkSize; voxelI++)
                 {
                     float height = Noise.CalcPixel1D(
-                                     (int) (chunkI * ChunkSize + voxelI),
-                                     scale) * heightScale / 128f;
+                                       (int) (chunkI * ChunkSize + voxelI),
+                                       scale) * heightScale / 128f;
 
                     for (uint voxelJ = 0; voxelJ < ChunkSize; voxelJ++)
                     {

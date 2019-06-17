@@ -82,12 +82,10 @@ namespace BeepLive.Entities
             Map.Entities.Remove(this);
             Dispose(true);
         }
+
         protected override void Dispose(bool disposing)
         {
-            if (!this.disposed)
-            {
-                CircleShape.Dispose();
-            }
+            if (!Disposed) CircleShape.Dispose();
             base.Dispose(disposing);
         }
     }

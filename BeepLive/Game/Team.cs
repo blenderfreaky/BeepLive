@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using BeepLive.Entities;
-using BeepLive.World;
 using SFML.Graphics;
-using SFML.System;
 
-namespace BeepLive
+namespace BeepLive.Game
 {
     public class Team
     {
         public BeepLive BeepLive;
-        public Color TeamColor;
         public List<Player> Players;
+        public Color TeamColor;
 
         public Team(BeepLive beepLive)
         {
