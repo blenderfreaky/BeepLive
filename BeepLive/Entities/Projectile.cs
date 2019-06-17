@@ -47,16 +47,16 @@ namespace BeepLive.Entities
         {
             Voxel voxel = Map.GetVoxel(Position);
 
-            Velocity += Map.PhysicalEnvironment.Gravity;
+            Velocity += Map.Config.PhysicalEnvironment.Gravity;
             Velocity *= voxel.IsAir
-                ? Map.PhysicalEnvironment.AirResistance
+                ? Map.Config.PhysicalEnvironment.AirResistance
                 : voxel.VoxelType.Resistance;
 
             float dist = MathF.Sqrt(Velocity.X * Velocity.X + Velocity.Y * Velocity.Y);
 
             if (dist < LowestSpeed ||
                 LifeTime++ > MaxLifeTime ||
-                !Map.EntityBoundary.Contains(Position) ||
+                !Map.Config.EntityBoundary.Contains(Position) ||
                 Map.Players.Any(p => p.Boundary.Contains(Position)))
                 Die();
 

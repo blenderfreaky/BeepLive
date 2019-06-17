@@ -48,8 +48,8 @@ namespace BeepLive.Game
 
         private void GameLoop()
         {
-            for (var chunkI = 0; chunkI < Map.MapWidth; chunkI++)
-            for (var chunkJ = 0; chunkJ < Map.MapHeight; chunkJ++)
+            for (var chunkI = 0; chunkI < Map.Config.MapWidth; chunkI++)
+            for (var chunkJ = 0; chunkJ < Map.Config.MapHeight; chunkJ++)
             {
                 Chunk chunk = Map.Chunks[chunkI, chunkJ];
                 chunk.Update();

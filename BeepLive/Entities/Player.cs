@@ -55,15 +55,15 @@ namespace BeepLive.Entities
         {
             CollisionCheck();
 
-            Velocity += Map.PhysicalEnvironment.Gravity;
-            Velocity *= Map.PhysicalEnvironment.AirResistance;
+            Velocity += Map.Config.PhysicalEnvironment.Gravity;
+            Velocity *= Map.Config.PhysicalEnvironment.AirResistance;
 
             Position += Velocity;
         }
 
         public void CollisionCheck()
         {
-            switch (Map.PhysicalEnvironment.CollisionResponseMode)
+            switch (Map.Config.PhysicalEnvironment.CollisionResponseMode)
             {
                 case CollisionResponseMode.NoClip:
 

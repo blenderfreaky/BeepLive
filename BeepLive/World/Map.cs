@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BeepLive.Config;
 using BeepLive.Entities;
 using SFML.Graphics;
 using SFML.System;
@@ -7,7 +8,7 @@ using SimplexNoise;
 
 namespace BeepLive.World
 {
-    public partial class Map
+    public class Map
     {
         public Chunk[,] Chunks;
         public List<Entity> Entities;
@@ -16,8 +17,6 @@ namespace BeepLive.World
 
         public Map()
         {
-            PhysicalEnvironment = new PhysicalEnvironment();
-
             Entities = new List<Entity>();
             Players = new List<Player>();
 
@@ -40,10 +39,10 @@ namespace BeepLive.World
 
         public Chunk GetChunk(Vector2f position, out Vector2f chunkPosition)
         {
-            var i = (int) MathF.Floor(position.X / ChunkSize);
-            var j = (int) MathF.Floor(position.Y / ChunkSize);
-            chunkPosition = new Vector2f(i * ChunkSize, j * ChunkSize);
-            return i < 0 || j < 0 || i >= MapWidth || j >= MapHeight ? null : Chunks[i, j];
+            var i = (int) MathF.Floor(position.X / Config.ChunkSize);
+            var j = (int) MathF.Floor(position.Y / Config.ChunkSize);
+            chunkPosition = new Vector2f(i * Config.ChunkSize, j * Config.ChunkSize);
+            return i < 0 || j < 0 || i >= Config.MapWidth || j >= Config.MapHeight ? null : Chunks[i, j];
         }
 
         public Voxel GetVoxel(Vector2f position)
@@ -52,92 +51,38 @@ namespace BeepLive.World
                    new Voxel(this);
         }
 
+        public MapConfig Config;
+
         #region Fluent API
 
-        public Map SetSize(int mapWidth, int mapHeight)
+        public Map SetConfig(Func<MapConfig,MapConfig> configMaker)
         {
-            if (mapWidth <= 0) throw new ArgumentOutOfRangeException(nameof(mapWidth));
-            MapWidth = mapWidth;
-            if (mapHeight <= 0) throw new ArgumentOutOfRangeException(nameof(mapHeight));
-            MapHeight = mapHeight;
-            Chunks = new Chunk[mapWidth, mapHeight];
-
-            return this;
-        }
-
-        public Map SetChunkSize(uint chunkSize)
-        {
-            if (chunkSize <= 0) throw new ArgumentOutOfRangeException(nameof(chunkSize));
-            ChunkSize = chunkSize;
-
-            return this;
-        }
-
-        public Map SetAirResistance(float airResistance)
-        {
-            PhysicalEnvironment.AirResistance = airResistance;
-
-            return this;
-        }
-
-        public Map SetGravity(float x, float y)
-        {
-            PhysicalEnvironment.Gravity = new Vector2f(x, y);
-
-            return this;
-        }
-
-        public Map SetCollisionResponseMode(CollisionResponseMode collisionResponseMode)
-        {
-            PhysicalEnvironment.CollisionResponseMode = collisionResponseMode;
-
-            return this;
-        }
-
-        public Map SetBackgroundColor(Color color)
-        {
-            BackgroundColor = color;
-
-            return this;
-        }
-
-        public Map SetEntityBoundary(Vector2f min, Vector2f max)
-        {
-            EntityBoundary = new Boundary {Min = min, Max = max};
-
-            return this;
-        }
-
-        public Map SetEntityBoundaryAroundChunks(Vector2f min, Vector2f max)
-        {
-            EntityBoundary = new Boundary
-            {
-                Min = min,
-                Max = new Vector2f(MapWidth * ChunkSize, MapHeight * ChunkSize) + max
-            };
-
+            Config = configMaker(new MapConfig());
+            
             return this;
         }
 
         public Map GenerateMap(VoxelType ground, int groundLevel, float scale, float heightScale)
         {
-            PhysicalEnvironment.VoxelTypes.Add(ground);
+            Chunks = new Chunk[Config.MapWidth, Config.MapHeight];
 
-            for (uint chunkI = 0; chunkI < MapWidth; chunkI++)
-            for (uint chunkJ = 0; chunkJ < MapHeight; chunkJ++)
+            Config.PhysicalEnvironment.VoxelTypes.Add(ground);
+
+            for (uint chunkI = 0; chunkI < Config.MapWidth; chunkI++)
+            for (uint chunkJ = 0; chunkJ < Config.MapHeight; chunkJ++)
             {
                 Chunk chunk = Chunks[chunkI, chunkJ] =
-                    new Chunk(this, new Vector2f(chunkI * ChunkSize, chunkJ * ChunkSize));
+                    new Chunk(this, new Vector2f(chunkI * Config.ChunkSize, chunkJ * Config.ChunkSize));
 
-                for (uint voxelI = 0; voxelI < ChunkSize; voxelI++)
+                for (uint voxelI = 0; voxelI < Config.ChunkSize; voxelI++)
                 {
                     float height = Noise.CalcPixel1D(
-                                       (int) (chunkI * ChunkSize + voxelI),
+                                       (int) (chunkI * Config.ChunkSize + voxelI),
                                        scale) * heightScale / 128f;
 
-                    for (uint voxelJ = 0; voxelJ < ChunkSize; voxelJ++)
+                    for (uint voxelJ = 0; voxelJ < Config.ChunkSize; voxelJ++)
                     {
-                        bool isAir = chunkJ * ChunkSize + voxelJ - groundLevel < height;
+                        bool isAir = chunkJ * Config.ChunkSize + voxelJ - groundLevel < height;
 
                         chunk[voxelI, voxelJ] =
                             isAir

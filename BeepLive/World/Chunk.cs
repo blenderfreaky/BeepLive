@@ -17,7 +17,7 @@ namespace BeepLive.World
         {
             Map = map;
 
-            Voxels = new Image(map.ChunkSize, map.ChunkSize);
+            Voxels = new Image(map.Config.ChunkSize, map.Config.ChunkSize);
             Sprite = new Sprite(new Texture(Voxels)) {Texture = {Smooth = true}, Position = offset};
         }
 

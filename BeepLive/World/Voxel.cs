@@ -11,10 +11,10 @@ namespace BeepLive.World
         public Voxel(Map map, Color color)
         {
             Map = map;
-            IsAir = color == map.BackgroundColor;
+            IsAir = color == map.Config.BackgroundColor;
             VoxelType = IsAir
                 ? null
-                : map.PhysicalEnvironment.VoxelTypes.Find(t => t.Color == color);
+                : map.Config.PhysicalEnvironment.VoxelTypes.Find(t => t.Color == color);
         }
 
         public Voxel(Map map, VoxelType voxelType = null)
@@ -24,6 +24,6 @@ namespace BeepLive.World
             VoxelType = voxelType;
         }
 
-        public Color Color => VoxelType?.Color ?? Map.BackgroundColor;
+        public Color Color => VoxelType?.Color ?? Map.Config.BackgroundColor;
     }
 }
