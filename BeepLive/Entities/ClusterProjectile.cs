@@ -14,9 +14,8 @@ namespace BeepLive.Entities
         public float ExplosionPower;
 
         public ClusterProjectile(Map map, Vector2f position, Vector2f velocity, float radius, float lowestSpeed,
-            int maxLifeTime,
-            int childCount,
-            float childRadius, float explosionPower, float childLowestSpeed, int childMaxLifeTime) : base(map, position,
+            int maxLifeTime, int childCount, float childRadius, float explosionPower, float childLowestSpeed,
+            int childMaxLifeTime) : base(map, position,
             velocity, radius, lowestSpeed, maxLifeTime)
         {
             ChildCount = childCount;
@@ -35,7 +34,7 @@ namespace BeepLive.Entities
 
         public void Explode()
         {
-            for (int i = 0; i < ChildCount; i++)
+            for (var i = 0; i < ChildCount; i++)
             {
                 Vector2f direction = new Vector2f((float) (Map.Random.NextDouble() * 2 - 1) * ExplosionPower,
                     (float) (Map.Random.NextDouble() * 2 - 1) * ExplosionPower);

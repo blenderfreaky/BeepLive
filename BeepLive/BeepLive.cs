@@ -14,6 +14,7 @@ namespace BeepLive
     {
         public Map Map;
         public List<Team> Teams;
+        public Player LocalPlayer;
         public RenderWindow Window;
 
         public BeepLive()
@@ -39,7 +40,14 @@ namespace BeepLive
 
         public BeepLive AddTeam(Func<Team, Team> teamMaker)
         {
-            Teams.Add(teamMaker(new Team()));
+            Teams.Add(teamMaker(new Team(this)));
+
+            return this;
+        }
+
+        public BeepLive SetLocalPlayer(Player localPlayer)
+        {
+            LocalPlayer = localPlayer;
 
             return this;
         }

@@ -28,6 +28,21 @@ namespace BeepLive.Entities
             Size = size;
         }
 
+        internal void GenerateShape()
+        {
+            Shape = new RectangleShape
+            {
+                Position = Position,
+                Size = new Vector2f(Size, Size),
+                FillColor = Color.Red
+            };
+        }
+
+        internal Player(Map map)
+        {
+            Map = map;
+        }
+
         public int Size { get; set; }
 
         public sealed override Vector2f Position
@@ -100,5 +115,37 @@ namespace BeepLive.Entities
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        #region Fluent API
+
+        public Player SetSize(int size)
+        {
+            Size = size;
+
+            return this;
+        }
+
+        public Player SetPosition(Vector2f position)
+        {
+            Position = position;
+
+            return this;
+        }
+
+        public Player SetName(string name)
+        {
+            Name = name;
+
+            return this;
+        }
+
+        public Player SetHealth(float health)
+        {
+            Health = health;
+
+            return this;
+        }
+ 
+        #endregion
     }
 }
