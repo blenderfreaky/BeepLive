@@ -22,8 +22,7 @@ namespace BeepLive
                         Color = new Color(127, 127, 127),
                         Resistance = 0.002f
                     }, 100, 0.01f, 20f))
-                .AddTeam(team => team
-                    .AddPlayer())
+                .AddTeam(team => team)
             ;
 
             beepLive.Run();

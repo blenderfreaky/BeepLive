@@ -19,7 +19,7 @@ namespace BeepLive
 
         public Team AddPlayer(Func<Player, Player> playerMaker)
         {
-            Players.Add(playerMaker(new Player()));
+            //Players.Add(playerMaker(new Player()));
 
             return this;
         }
