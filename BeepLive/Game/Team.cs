@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using BeepLive.Entities;
 using BeepLive.World;
-using SFML.Graphics;
 
 namespace BeepLive.Game
 {
@@ -39,7 +38,7 @@ namespace BeepLive.Game
 
         public Team AddPlayer(Func<Player, Player> playerMaker)
         {
-            Player player = playerMaker(new Player(BeepLiveGame.Map));
+            var player = playerMaker(new Player(BeepLiveGame.Map));
             player.GenerateShape();
             Players.Add(player);
 

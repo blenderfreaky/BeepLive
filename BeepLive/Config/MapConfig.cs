@@ -8,9 +8,24 @@ namespace BeepLive.Config
 {
     public class MapConfig
     {
+        private Boundary _entityBoundary;
+
+        private Boundary _entityBoundaryChunkOffset;
         public Color BackgroundColor;
         public uint ChunkSize;
-        private Boundary _entityBoundary;
+        public float FloatingNoiseScale, FloatingNoiseThreshold, FloatingNoiseFalloff;
+        public int GroundLevel;
+        public VoxelType GroundVoxelType;
+        public float HorizontalNoiseScale, VerticalNoiseScale;
+        public int MapHeight;
+        public int MapWidth;
+        public PhysicalEnvironment PhysicalEnvironment;
+
+        public MapConfig()
+        {
+            PhysicalEnvironment = new PhysicalEnvironment();
+        }
+
         [XmlIgnore]
         public Boundary EntityBoundary
         {
@@ -26,7 +41,6 @@ namespace BeepLive.Config
             }
         }
 
-        private Boundary _entityBoundaryChunkOffset;
         public Boundary EntityBoundaryChunkOffset
         {
             get => _entityBoundaryChunkOffset;
@@ -39,18 +53,6 @@ namespace BeepLive.Config
                     Max = value.Max + new Vector2f(MapWidth * ChunkSize, MapHeight * ChunkSize),
                 };
             }
-        }
-        public int MapHeight;
-        public int MapWidth;
-        public PhysicalEnvironment PhysicalEnvironment;
-        public VoxelType GroundVoxelType;
-        public int GroundLevel;
-        public float HorizontalNoiseScale, VerticalNoiseScale;
-        public float FloatingNoiseScale, FloatingNoiseThreshold, FloatingNoiseFalloff;
-
-        public MapConfig()
-        {
-            PhysicalEnvironment = new PhysicalEnvironment();
         }
 
         #region Fluent API

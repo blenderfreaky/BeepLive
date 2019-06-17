@@ -16,6 +16,9 @@ namespace BeepLive.Game
             Teams = new List<Team>();
         }
 
-        public Timer Run() => new Timer(_ => Map.Step(), null, 1000, 1000 / 60);
+        public Timer Run()
+        {
+            return new Timer(_ => Map.Step(), null, 1000, 1000 / 60);
+        }
     }
 }

@@ -14,6 +14,12 @@ namespace BeepLive.Entities
         public Vector2f Velocity { get; set; }
         public bool Alive => Disposed;
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         public abstract void Step();
 
         public Voxel GetVoxel(float x, float y)
@@ -24,12 +30,6 @@ namespace BeepLive.Entities
         public Voxel GetVoxelUnscaled(float x, float y)
         {
             return Map.GetVoxel(Position + new Vector2f(x, y));
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)

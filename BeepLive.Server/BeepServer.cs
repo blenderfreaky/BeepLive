@@ -31,6 +31,8 @@ namespace BeepLive.Server
                 .Build();
         }
 
+        public IServer Server { get; set; }
+
         public void Start()
         {
             Server.Start();
@@ -38,12 +40,7 @@ namespace BeepLive.Server
             var beepClient = new BeepClient();
             beepClient.Client.Connect();
 
-            while (Server.Information.IsRunning)
-            {
-                Thread.Sleep(10000);
-            }
+            while (Server.Information.IsRunning) Thread.Sleep(10000);
         }
-
-        public IServer Server { get; set; }
     }
 }

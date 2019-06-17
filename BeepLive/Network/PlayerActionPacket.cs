@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using ProtoBuf;
 using SFML.System;
 
@@ -9,32 +7,27 @@ namespace BeepLive.Network
     [ProtoContract]
     public abstract class PlayerActionPacket
     {
-        [ProtoMember(1)]
-        public Guid PlayerGuid;
-        [ProtoMember(2)]
-        public Guid Secret;
+        [ProtoMember(3)] public Guid MessageGuid;
 
-        [ProtoMember(3)]
-        public Guid MessageGuid;
+        [ProtoMember(1)] public Guid PlayerGuid;
+
+        [ProtoMember(2)] public Guid Secret;
     }
 
     [ProtoContract]
     public class PlayerShot : PlayerActionPacket
     {
-        [ProtoMember(1)]
-        public bool Neutral;
-        [ProtoMember(2)]
-        public bool Destructive;
+        [ProtoMember(2)] public bool Destructive;
 
-        [ProtoMember(3)]
-        public Vector2f Direction;
+        [ProtoMember(3)] public Vector2f Direction;
+
+        [ProtoMember(1)] public bool Neutral;
     }
 
     [ProtoContract]
     public class PlayerJump : PlayerActionPacket
     {
-        [ProtoMember(1)]
-        public Vector2f Direction;
+        [ProtoMember(1)] public Vector2f Direction;
     }
 
     [ProtoContract]
@@ -44,10 +37,9 @@ namespace BeepLive.Network
         {
             Join,
             ReadyForSimulation,
-            FinishedSimulation,
+            FinishedSimulation
         }
 
-        [ProtoMember(1)]
-        public PlayerFlowType Type;
+        [ProtoMember(1)] public PlayerFlowType Type;
     }
 }

@@ -45,7 +45,7 @@ namespace BeepLive.Entities
 
         public override void Step()
         {
-            Voxel voxel = Map.GetVoxel(Position);
+            var voxel = Map.GetVoxel(Position);
 
             Velocity += Map.Config.PhysicalEnvironment.Gravity;
             Velocity *= voxel.IsAir
@@ -60,15 +60,15 @@ namespace BeepLive.Entities
                 Map.Players.Any(p => p.Boundary.Contains(Position)))
                 Die();
 
-            Vector2f front = Velocity / dist;
-            Vector2f left = new Vector2f(front.Y, -front.X);
+            var front = Velocity / dist;
+            var left = new Vector2f(front.Y, -front.X);
 
             for (float x = 0; x < dist; x += .5f)
             for (float y = -Radius; y <= Radius; y++)
             {
-                Vector2f position = Position + front * x + left * y;
+                var position = Position + front * x + left * y;
 
-                Chunk chunk = Map.GetChunk(position, out Vector2f chunkPosition);
+                var chunk = Map.GetChunk(position, out var chunkPosition);
                 if (chunk == null) continue;
                 chunk[(uint) MathF.Floor(position.X - chunkPosition.X),
                     (uint) MathF.Floor(position.Y - chunkPosition.Y)] = new Voxel(Map);

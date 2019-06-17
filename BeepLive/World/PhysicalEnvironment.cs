@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Serialization;
-using SFML.Graphics;
 using SFML.System;
 
 namespace BeepLive.World
@@ -12,8 +10,7 @@ namespace BeepLive.World
         public CollisionResponseMode CollisionResponseMode;
         public Vector2f Gravity;
 
-        [XmlIgnore]
-        public List<VoxelType> VoxelTypes;
+        [XmlIgnore] public List<VoxelType> VoxelTypes;
 
         public PhysicalEnvironment()
         {

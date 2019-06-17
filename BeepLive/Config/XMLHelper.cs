@@ -9,8 +9,8 @@ namespace BeepLive.Config
     {
         public static string ToXml<T>(T elem)
         {
-            using StringWriter stringWriter = new StringWriter();
-            XmlSerializer serializer = new XmlSerializer(elem.GetType());
+            using var stringWriter = new StringWriter();
+            var serializer = new XmlSerializer(elem.GetType());
             serializer.Serialize(stringWriter, elem);
 
             return stringWriter.ToString();
@@ -18,8 +18,8 @@ namespace BeepLive.Config
 
         public static T LoadFromXmlString<T>(string xmlText)
         {
-            using StringReader stringReader = new StringReader(xmlText);
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
+            using var stringReader = new StringReader(xmlText);
+            var serializer = new XmlSerializer(typeof(T));
 
             return serializer.Deserialize(stringReader) is T t
                 ? t

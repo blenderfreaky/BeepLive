@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using BeepLive.Config;
 using BeepLive.Entities;
-using SFML.Graphics;
 using SFML.System;
 using SimplexNoise;
 
@@ -12,6 +11,8 @@ namespace BeepLive.World
     public class Map
     {
         public Chunk[,] Chunks;
+
+        public MapConfig Config;
         public List<Entity> Entities;
         public List<Player> Players;
         public Random Random;
@@ -40,33 +41,31 @@ namespace BeepLive.World
 
         public Chunk GetChunk(Vector2f position, out Vector2f chunkPosition)
         {
-            var i = (int) MathF.Floor(position.X / Config.ChunkSize);
-            var j = (int) MathF.Floor(position.Y / Config.ChunkSize);
+            int i = (int) MathF.Floor(position.X / Config.ChunkSize);
+            int j = (int) MathF.Floor(position.Y / Config.ChunkSize);
             chunkPosition = new Vector2f(i * Config.ChunkSize, j * Config.ChunkSize);
             return i < 0 || j < 0 || i >= Config.MapWidth || j >= Config.MapHeight ? null : Chunks[i, j];
         }
 
         public Voxel GetVoxel(Vector2f position)
         {
-            return GetChunk(position, out Vector2f chunkPosition)?.GetVoxel(position - chunkPosition) ??
+            return GetChunk(position, out var chunkPosition)?.GetVoxel(position - chunkPosition) ??
                    new Voxel(this);
         }
 
-        public MapConfig Config;
-
         #region Fluent API
 
-        public Map Configure(Func<MapConfig,MapConfig> configMaker)
+        public Map Configure(Func<MapConfig, MapConfig> configMaker)
         {
             Config = configMaker(new MapConfig());
-            
+
             return this;
         }
 
         public Map LoadConfig(string path)
         {
             Config = XmlHelper.LoadFromXmlString<MapConfig>(File.ReadAllText(path));
-            
+
             return this;
         }
 
@@ -79,7 +78,7 @@ namespace BeepLive.World
             for (uint chunkI = 0; chunkI < Config.MapWidth; chunkI++)
             for (uint chunkJ = 0; chunkJ < Config.MapHeight; chunkJ++)
             {
-                Chunk chunk = Chunks[chunkI, chunkJ] =
+                var chunk = Chunks[chunkI, chunkJ] =
                     new Chunk(this, new Vector2f(chunkI * Config.ChunkSize, chunkJ * Config.ChunkSize));
 
                 for (uint voxelI = 0; voxelI < Config.ChunkSize; voxelI++)
@@ -93,10 +92,10 @@ namespace BeepLive.World
                         bool isGround = chunkJ * Config.ChunkSize + voxelJ - Config.GroundLevel > height;
 
                         bool isFloating = Noise.CalcPixel2D(
-                                              (int)(chunkI * Config.ChunkSize + voxelI),
-                                              (int)(chunkJ * Config.ChunkSize + voxelJ),
+                                              (int) (chunkI * Config.ChunkSize + voxelI),
+                                              (int) (chunkJ * Config.ChunkSize + voxelJ),
                                               Config.FloatingNoiseScale) / 128f
-                            < Config.FloatingNoiseThreshold;
+                                          < Config.FloatingNoiseThreshold;
 
                         chunk[voxelI, voxelJ] =
                             isGround || isFloating

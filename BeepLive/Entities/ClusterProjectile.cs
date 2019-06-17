@@ -34,9 +34,9 @@ namespace BeepLive.Entities
 
         public void Explode()
         {
-            for (var i = 0; i < ChildCount; i++)
+            for (int i = 0; i < ChildCount; i++)
             {
-                Vector2f direction = new Vector2f((float) (Map.Random.NextDouble() * 2 - 1) * ExplosionPower,
+                var direction = new Vector2f((float) (Map.Random.NextDouble() * 2 - 1) * ExplosionPower,
                     (float) (Map.Random.NextDouble() * 2 - 1) * ExplosionPower);
                 Map.Entities.Add(Activator.CreateInstance(typeof(TProjectile), Map, Position, Velocity + direction,
                     ChildRadius, ChildLowestSpeed, ChildMaxLifeTime) as TProjectile);
