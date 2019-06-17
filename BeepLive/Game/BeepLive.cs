@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using BeepLive.Entities;
@@ -17,16 +18,40 @@ namespace BeepLive.Game
         public List<Team> Teams;
         public RenderWindow Window;
 
+        #region Camera
+
+        private readonly View _view;
+        private Vector2f _center;
+        private float _zoom = 1;
+        private float _rotation;
+
+        #region Shake
+
+        private readonly Stopwatch _shakeTimer;
+        private long _shakeDuration; // In milliseconds
+        private float _shakeMagnitude;
+        private readonly Random _random;
+
+        #endregion
+
+        #endregion
+
         public BeepLive()
         {
             VideoMode mode = new VideoMode(800, 600);
             Window = new RenderWindow(mode, "Map");
+
+            _view = new View(new Vector2f(), new Vector2f(Window.Size.X, Window.Size.Y));
+            Window.SetView(_view);
 
             Window.KeyPressed += Window_KeyPressed;
             Window.MouseButtonPressed += Window_MousePressed;
             Window.Closed += Window_Closed;
 
             Teams = new List<Team>();
+
+            _random = new Random();
+            _shakeTimer = new Stopwatch();
         }
 
         public BeepLive Run()
@@ -38,12 +63,44 @@ namespace BeepLive.Game
                 Window.DispatchEvents();
                 Window.Clear(Color.Black);
 
+                ApplyShake();
+                _view.Size = new Vector2f(Window.Size.X * _zoom, Window.Size.Y * _zoom);
+                _view.Rotation = _rotation;
+                Window.SetView(_view);
+
                 GameLoop();
 
                 Window.Display();
             }
 
             return this;
+        }
+
+        private void ApplyShake()
+        {
+            if (!_shakeTimer.IsRunning) return;
+            
+            // ReSharper disable once PossibleLossOfFraction
+            float fulfillment = _shakeTimer.ElapsedMilliseconds / _shakeDuration;
+            if (fulfillment < 1f)
+            {
+                Vector2f direction = new Vector2f((float) (_random.NextDouble() * 2 - 1),
+                    (float) (_random.NextDouble() * 2 - 1));
+                direction /= MathF.Sqrt(direction.X * direction.X + direction.Y * direction.Y);
+                _view.Center = _center + direction * _shakeMagnitude * (1 - fulfillment);
+            }
+            else
+            {
+                _shakeTimer.Reset();
+                _view.Center = _center;
+            }
+        }
+
+        private void TriggerShake(float magnitude, long duration)
+        {
+            _shakeDuration += duration;
+            _shakeMagnitude += magnitude;
+            if (!_shakeTimer.IsRunning) _shakeTimer.Start();
         }
 
         private void GameLoop()
@@ -62,16 +119,7 @@ namespace BeepLive.Game
                 entities = Map.Entities.Where(e => !(e is null)).ToArray();
             }
 
-            foreach (Entity entity in entities)
-                try
-                {
-                    if (!entity.Alive) Window.Draw(entity.Shape);
-                }
-                catch
-                {
-                }
-
-            ;
+            foreach (var entity in entities.Where(entity => !entity.Alive)) Window.Draw(entity.Shape);
         }
 
         private static void Window_KeyPressed(object sender, KeyEventArgs e)

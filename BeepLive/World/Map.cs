@@ -65,13 +65,15 @@ namespace BeepLive.World
 
         public Map LoadConfig(string path)
         {
-            Config = XMLHelper.LoadFromXMLString<MapConfig>(File.ReadAllText(path));
+            Config = XmlHelper.LoadFromXmlString<MapConfig>(File.ReadAllText(path));
             
             return this;
         }
 
         public Map GenerateMap()
         {
+            Config.PhysicalEnvironment.VoxelTypes.Add(Config.GroundVoxelType);
+
             Chunks = new Chunk[Config.MapWidth, Config.MapHeight];
 
             for (uint chunkI = 0; chunkI < Config.MapWidth; chunkI++)
@@ -88,18 +90,18 @@ namespace BeepLive.World
 
                     for (uint voxelJ = 0; voxelJ < Config.ChunkSize; voxelJ++)
                     {
-                        bool isGround = chunkJ * Config.ChunkSize + voxelJ - Config.GroundLevel < height;
+                        bool isGround = chunkJ * Config.ChunkSize + voxelJ - Config.GroundLevel > height;
 
                         bool isFloating = Noise.CalcPixel2D(
                                               (int)(chunkI * Config.ChunkSize + voxelI),
-                                              (int)(chunkJ * Config.ChunkSize + voxelI),
+                                              (int)(chunkJ * Config.ChunkSize + voxelJ),
                                               Config.FloatingNoiseScale) / 128f
                             < Config.FloatingNoiseThreshold;
 
                         chunk[voxelI, voxelJ] =
-                            isGround
-                                ? new Voxel(this)
-                                : new Voxel(this, Config.GroundVoxelType);
+                            isGround || isFloating
+                                ? new Voxel(this, Config.GroundVoxelType)
+                                : new Voxel(this);
                     }
                 }
             }

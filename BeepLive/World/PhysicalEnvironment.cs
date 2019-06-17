@@ -12,6 +12,7 @@ namespace BeepLive.World
         public CollisionResponseMode CollisionResponseMode;
         public Vector2f Gravity;
 
+        [XmlIgnore]
         public List<VoxelType> VoxelTypes;
 
         public PhysicalEnvironment()
