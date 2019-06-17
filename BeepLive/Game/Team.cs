@@ -8,13 +8,13 @@ namespace BeepLive.Game
 {
     public class Team
     {
-        public BeepLive BeepLive;
+        public BeepLiveSfml BeepLiveSfml;
         public List<Player> Players;
         public VoxelType VoxelType;
 
-        public Team(BeepLive beepLive)
+        public Team(BeepLiveSfml beepLiveSfml)
         {
-            BeepLive = beepLive;
+            BeepLiveSfml = beepLiveSfml;
             Players = new List<Player>();
         }
 
@@ -30,7 +30,7 @@ namespace BeepLive.Game
 
         public Team AddPlayer(Func<Player, Player> playerMaker, out Player player)
         {
-            player = playerMaker(new Player(BeepLive.Map));
+            player = playerMaker(new Player(BeepLiveSfml.BeepLive.Map));
             player.GenerateShape();
             Players.Add(player);
 
@@ -39,7 +39,7 @@ namespace BeepLive.Game
 
         public Team AddPlayer(Func<Player, Player> playerMaker)
         {
-            Player player = playerMaker(new Player(BeepLive.Map));
+            Player player = playerMaker(new Player(BeepLiveSfml.BeepLive.Map));
             player.GenerateShape();
             Players.Add(player);
 

@@ -9,7 +9,7 @@ namespace BeepLive
 {
     internal class Program
     {
-        [Verb("start-client", HelpText = "Starts the client of BeepLive", Hidden = false)]
+        [Verb("start-client", HelpText = "Starts the client of BeepLiveSFML", Hidden = false)]
         public class ClientOptions
         {
             [Option('c', "config", Default = "BeepConfig.xml", Required = false, HelpText = "Path to the config file to use")]
@@ -23,16 +23,16 @@ namespace BeepLive
                 {
                     if (!File.Exists(o.ConfigPath)) File.WriteAllText(o.ConfigPath, XmlHelper.ToXml(new MapConfig()));
 
-                    Game.BeepLive beepLive = new Game.BeepLive()
+                    Game.BeepLiveSfml beepLiveSfml = new Game.BeepLiveSfml()
                             .AddMap(map => map
                                 .LoadConfig(o.ConfigPath)
                                 .GenerateMap())
                             .AddTeam(team => team)
                         ;
 
-                    File.WriteAllText(o.ConfigPath, XmlHelper.ToXml(beepLive.Map.Config));
+                    File.WriteAllText(o.ConfigPath, XmlHelper.ToXml(beepLiveSfml.BeepLive.Map.Config));
 
-                    beepLive.Run();
+                    beepLiveSfml.Run();
                 });
         }
     }
