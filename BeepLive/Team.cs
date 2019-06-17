@@ -8,5 +8,14 @@ namespace BeepLive
     {
         public Color TeamColor;
         public List<Player> Players;
+
+        #region Fluent API
+
+        public Team AddPlayer()
+        {
+
+        }
+
+        #endregion
     }
 }

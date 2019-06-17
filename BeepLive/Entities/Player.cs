@@ -10,6 +10,9 @@ namespace BeepLive.Entities
         private Vector2f _lastSafePosition;
 
         public float Health;
+        public string Name;
+
+        public Boundary Boundary => new Boundary {Min = Position, Max = Position + new Vector2f(Size, Size)};
 
         public Player(Map map, Vector2f position, int size)
         {

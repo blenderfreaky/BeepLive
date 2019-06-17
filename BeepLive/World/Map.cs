@@ -13,6 +13,8 @@ namespace BeepLive.World
         public Chunk[,] Chunks;
         public uint ChunkSize;
         public List<Entity> Entities;
+        public List<Player> Players;
+        public Boundary EntityBoundary;
         public int MapWidth, MapHeight;
         public PhysicalEnvironment PhysicalEnvironment;
         public Random Random;
@@ -28,8 +30,11 @@ namespace BeepLive.World
 
         public void Step()
         {
-            // Make array to avoid concurrent modification exception; Make temporary clone to be able to modify the original
-            Entities.ToArray().ForEach(e => e.Step());
+            lock (Entities)
+            {
+                // Make array to avoid concurrent modification exception; Make temporary clone to be able to modify the original
+                Entities.ToArray().ForEach(e => e.Step());
+            }
         }
 
         public Vector2i GetChunkIndex(Vector2f position)
@@ -39,8 +44,8 @@ namespace BeepLive.World
 
         public Chunk GetChunk(Vector2f position, out Vector2f chunkPosition)
         {
-            int i = (int) MathF.Floor(position.X / ChunkSize);
-            int j = (int) MathF.Floor(position.Y / ChunkSize);
+            var i = (int) MathF.Floor(position.X / ChunkSize);
+            var j = (int) MathF.Floor(position.Y / ChunkSize);
             chunkPosition = new Vector2f(i * ChunkSize, j * ChunkSize);
             return i < 0 || j < 0 || i >= MapWidth || j >= MapHeight ? null : Chunks[i, j];
         }
@@ -99,6 +104,24 @@ namespace BeepLive.World
             return this;
         }
 
+        public Map SetEntityBoundary(Vector2f min, Vector2f max)
+        {
+            EntityBoundary = new Boundary {Min = min, Max = max};
+
+            return this;
+        }
+
+        public Map SetEntityBoundaryAroundChunks(Vector2f min, Vector2f max)
+        {
+            EntityBoundary = new Boundary
+            {
+                Min = min,
+                Max = new Vector2f(MapWidth * ChunkSize, MapHeight * ChunkSize) + max
+            };
+
+            return this;
+        }
+
         public Map GenerateMap(VoxelType ground, int groundLevel, float scale, float heightScale)
         {
             PhysicalEnvironment.VoxelTypes.Add(ground);
@@ -111,13 +134,13 @@ namespace BeepLive.World
 
                 for (uint voxelI = 0; voxelI < ChunkSize; voxelI++)
                 {
-                    float height = Noise.CalcPixel1D(
-                                       (int) (chunkI * ChunkSize + voxelI),
-                                       scale) * heightScale / 128f;
+                    var height = Noise.CalcPixel1D(
+                                     (int) (chunkI * ChunkSize + voxelI),
+                                     scale) * heightScale / 128f;
 
                     for (uint voxelJ = 0; voxelJ < ChunkSize; voxelJ++)
                     {
-                        bool isAir = chunkJ * ChunkSize + voxelJ - groundLevel < height;
+                        var isAir = chunkJ * ChunkSize + voxelJ - groundLevel < height;
 
                         chunk[voxelI, voxelJ] =
                             isAir
@@ -137,19 +160,20 @@ namespace BeepLive.World
             return this;
         }
 
-        public Map AddProjectile(Vector2f position, Vector2f velocity, float radius, float lowestSpeed)
+        public Map AddProjectile(Vector2f position, Vector2f velocity, float radius, float lowestSpeed, int maxLifeTime)
         {
-            Entities.Add(new Projectile(this, position, velocity, radius, lowestSpeed));
+            Entities.Add(new Projectile(this, position, velocity, radius, lowestSpeed, maxLifeTime));
 
             return this;
         }
 
-        public Map AddClusterProjectile(Vector2f position, Vector2f velocity, float lowestSpeed, float radius,
+        public Map AddClusterProjectile(Vector2f position, Vector2f velocity, float radius, float lowestSpeed,
+            int maxLifeTime,
             int childCount,
-            int childRadius, float explosionPower, float childLowestSpeed)
+            int childRadius, float explosionPower, float childLowestSpeed, int childMaxLifeTime)
         {
-            Entities.Add(new ClusterProjectile<Projectile>(this, position, velocity, radius, lowestSpeed,
-                childCount, childRadius, explosionPower, childLowestSpeed));
+            Entities.Add(new ClusterProjectile<Projectile>(this, position, velocity, radius, lowestSpeed, maxLifeTime,
+                childCount, childRadius, explosionPower, childLowestSpeed, childMaxLifeTime));
 
             return this;
         }

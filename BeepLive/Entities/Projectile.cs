@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
@@ -7,17 +8,19 @@ namespace BeepLive.Entities
 {
     public class Projectile : Entity
     {
+        public int LifeTime, MaxLifeTime;
         public float LowestSpeed;
 
         public float Radius;
 
-        public Projectile(Map map, Vector2f position, Vector2f velocity, float radius, float lowestSpeed)
+        public Projectile(Map map, Vector2f position, Vector2f velocity, float radius, float lowestSpeed,
+            int maxLifeTime)
         {
             Shape = new CircleShape
             {
                 Position = position,
                 Radius = radius,
-                FillColor = Color.Yellow,
+                FillColor = Color.Yellow
             };
 
             Map = map;
@@ -25,6 +28,7 @@ namespace BeepLive.Entities
             Velocity = velocity;
             Radius = radius;
             LowestSpeed = lowestSpeed;
+            MaxLifeTime = maxLifeTime;
         }
 
         public CircleShape CircleShape
@@ -48,14 +52,19 @@ namespace BeepLive.Entities
                 ? Map.PhysicalEnvironment.AirResistance
                 : voxel.VoxelType.Resistance;
 
-            float dist = MathF.Sqrt(Velocity.X * Velocity.X + Velocity.Y * Velocity.Y);
+            var dist = MathF.Sqrt(Velocity.X * Velocity.X + Velocity.Y * Velocity.Y);
 
-            if (dist < LowestSpeed) Die();
+            if (dist < LowestSpeed ||
+                LifeTime++ > MaxLifeTime ||
+                !Map.EntityBoundary.Contains(Position) ||
+                Map.Players.Any(p => p.Boundary.Contains(Position)))
+                Die();
 
             var front = Velocity / dist;
             var left = new Vector2f(front.Y, -front.X);
-            for (float x = 0; x < dist; x++)
-            for (float y = -Radius; y <= Radius; y++)
+
+            for (float x = 0; x < dist; x += .5f)
+            for (var y = -Radius; y <= Radius; y++)
             {
                 var position = Position + front * x + left * y;
 

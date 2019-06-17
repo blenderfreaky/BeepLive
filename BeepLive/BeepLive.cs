@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using BeepLive.Entities;
 using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
@@ -23,22 +25,29 @@ namespace BeepLive
             Window.MouseButtonPressed += Window_MousePressed;
             Window.Closed += Window_Closed;
 
-            Map = new Map()
-                .SetAirResistance(0.99f)
-                .SetGravity(0, 1)
-                .SetSize(8, 4)
-                .SetChunkSize(128)
-                .SetCollisionResponseMode(CollisionResponseMode.Raise)
-                .SetBackgroundColor(new Color(0, 0, 0))
-                .GenerateMap(new VoxelType
-                {
-                    Color = new Color(127, 127, 127),
-                    Resistance = 0.002f
-                }, 100, 0.01f, 20f)
-                .AddPlayer(new Vector2f(50, 10), 10)
-                .AddProjectile(new Vector2f(100, 50), new Vector2f(0, 0), 2, 2)
-                .AddClusterProjectile(new Vector2f(100, 50), new Vector2f(10, 0), 10, 4, 20, 2, 10, 5);
+            Teams = new List<Team>();
+        }
 
+        #region Fluent API
+
+        public BeepLive AddMap(Func<Map, Map> mapMaker)
+        {
+            Map = mapMaker(new Map());
+
+            return this;
+        }
+
+        public BeepLive AddTeam(Func<Team, Team> teamMaker)
+        {
+            Teams.Add(teamMaker(new Team()));
+
+            return this;
+        }
+
+        #endregion
+
+        public BeepLive Run()
+        {
             using var physicsTimer = new Timer(_ => Map.Step(), null, 1000, 1000 / 60);
 
             while (Window.IsOpen)
@@ -50,19 +59,27 @@ namespace BeepLive
 
                 Window.Display();
             }
+
+            return this;
         }
 
         private void GameLoop()
         {
-            for (int chunkI = 0; chunkI < Map.MapWidth; chunkI++)
-            for (int chunkJ = 0; chunkJ < Map.MapHeight; chunkJ++)
+            for (var chunkI = 0; chunkI < Map.MapWidth; chunkI++)
+            for (var chunkJ = 0; chunkJ < Map.MapHeight; chunkJ++)
             {
                 var chunk = Map.Chunks[chunkI, chunkJ];
                 chunk.Update();
                 Window.Draw(chunk.Sprite);
             }
 
-            foreach (var entity in Map.Entities.ToArray()) Window.Draw(entity.Shape);
+            Entity[] entities;
+            lock (Map.Entities)
+            {
+                entities = Map.Entities.Where(e => !(e is null)).ToArray();
+            }
+
+            foreach (var entity in entities) Window.Draw(entity.Shape);
         }
 
         private static void Window_KeyPressed(object sender, KeyEventArgs e)
@@ -73,6 +90,8 @@ namespace BeepLive
 
         private void Window_MousePressed(object sender, MouseButtonEventArgs e)
         {
+            var position = new Vector2f(20, 20);
+            Map.AddClusterProjectile(position, new Vector2f(e.X - position.X, e.Y - position.Y) / 10, 4, 10, 300, 200, 2, 10, 5, 200);
         }
 
         private void Window_Closed(object sender, EventArgs e)

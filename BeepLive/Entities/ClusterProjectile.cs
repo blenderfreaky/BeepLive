@@ -8,29 +8,22 @@ namespace BeepLive.Entities
         where TProjectile : Projectile
     {
         public int ChildCount;
+        public float ChildLowestSpeed;
+        public int ChildMaxLifeTime;
         public float ChildRadius;
         public float ExplosionPower;
-        public float ExplosionProneness;
-        public float ChildLowestSpeed;
-        
+
         public ClusterProjectile(Map map, Vector2f position, Vector2f velocity, float radius, float lowestSpeed,
+            int maxLifeTime,
             int childCount,
-            float childRadius, float explosionPower, float childLowestSpeed) : base(map, position, velocity, radius, lowestSpeed)
+            float childRadius, float explosionPower, float childLowestSpeed, int childMaxLifeTime) : base(map, position,
+            velocity, radius, lowestSpeed, maxLifeTime)
         {
             ChildCount = childCount;
             ChildRadius = childRadius;
             ExplosionPower = explosionPower;
             ChildLowestSpeed = childLowestSpeed;
-            ExplosionProneness = lowestSpeed;
-        }
-
-        public override void Step()
-        {
-            base.Step();
-
-            float dist = MathF.Sqrt(Velocity.X * Velocity.X + Velocity.Y * Velocity.Y);
-
-            if (dist <= ExplosionProneness) Die();
+            ChildMaxLifeTime = childMaxLifeTime;
         }
 
         public override void Die()
@@ -42,12 +35,12 @@ namespace BeepLive.Entities
 
         public void Explode()
         {
-            for (int i = 0; i < ChildCount; i++)
+            for (var i = 0; i < ChildCount; i++)
             {
-                var direction = new Vector2f((float) Map.Random.NextDouble() * ExplosionPower,
-                    (float) Map.Random.NextDouble() * ExplosionPower);
+                var direction = new Vector2f((float) (Map.Random.NextDouble() * 2 - 1) * ExplosionPower,
+                    (float) (Map.Random.NextDouble() * 2 - 1) * ExplosionPower);
                 Map.Entities.Add(Activator.CreateInstance(typeof(TProjectile), Map, Position, Velocity + direction,
-                    ChildRadius, ChildLowestSpeed) as TProjectile);
+                    ChildRadius, ChildLowestSpeed, ChildMaxLifeTime) as TProjectile);
             }
         }
     }
