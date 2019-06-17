@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 namespace BeepLive.Config
 {
     // https://stackoverflow.com/questions/11447529/convert-an-object-to-an-xml-string/21685169
-    internal static class XML
+    internal static class XMLHelper
     {
         public static string ToXML<T>(T elem)
         {

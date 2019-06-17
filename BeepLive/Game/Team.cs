@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BeepLive.Entities;
+using BeepLive.World;
 using SFML.Graphics;
 
 namespace BeepLive.Game
@@ -9,7 +10,7 @@ namespace BeepLive.Game
     {
         public BeepLive BeepLive;
         public List<Player> Players;
-        public Color TeamColor;
+        public VoxelType VoxelType;
 
         public Team(BeepLive beepLive)
         {
@@ -19,9 +20,10 @@ namespace BeepLive.Game
 
         #region Fluent API
 
-        public Team SetTeamColor(Color teamColor)
+        public Team SetVoxelType(VoxelType voxelType)
         {
-            TeamColor = teamColor;
+            voxelType.OwnerTeam = this;
+            VoxelType = voxelType;
 
             return this;
         }

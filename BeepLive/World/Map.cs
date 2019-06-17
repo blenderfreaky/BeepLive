@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using BeepLive.Config;
 using BeepLive.Entities;
 using SFML.Graphics;
@@ -55,18 +56,25 @@ namespace BeepLive.World
 
         #region Fluent API
 
-        public Map SetConfig(Func<MapConfig,MapConfig> configMaker)
+        public Map Configure(Func<MapConfig,MapConfig> configMaker)
         {
             Config = configMaker(new MapConfig());
             
             return this;
         }
 
-        public Map GenerateMap(VoxelType ground, int groundLevel, float scale, float heightScale)
+        public Map LoadConfig(string path)
         {
-            Chunks = new Chunk[Config.MapWidth, Config.MapHeight];
+            Config = XMLHelper.LoadFromXMLString<MapConfig>(File.ReadAllText(path));
+            
+            return this;
+        }
 
-            Config.PhysicalEnvironment.VoxelTypes.Add(ground);
+        public Map GenerateMap(string groundMaterial, int groundLevel, float scale, float heightScale)
+        {
+            VoxelType ground = Config.PhysicalEnvironment.GetVoxelTypeByName(groundMaterial);
+
+            Chunks = new Chunk[Config.MapWidth, Config.MapHeight];
 
             for (uint chunkI = 0; chunkI < Config.MapWidth; chunkI++)
             for (uint chunkJ = 0; chunkJ < Config.MapHeight; chunkJ++)
