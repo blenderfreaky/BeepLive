@@ -33,10 +33,7 @@ namespace BeepLive.Entities
         }
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.disposed)
-            {
-                disposed = true;
-            }
+            if (!this.disposed) disposed = true;
         }
         ~Entity()
         {

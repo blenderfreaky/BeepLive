@@ -100,5 +100,14 @@ namespace BeepLive.Entities
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                ((RectangleShape)Shape).Dispose();
+            }
+            base.Dispose(disposing);
+        }
     }
 }
