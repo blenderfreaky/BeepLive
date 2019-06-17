@@ -80,6 +80,15 @@ namespace BeepLive.Entities
         public virtual void Die()
         {
             Map.Entities.Remove(this);
+            Dispose();
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                CircleShape.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

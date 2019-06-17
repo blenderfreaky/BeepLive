@@ -1,6 +1,7 @@
 ﻿using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
+using System;
 
 namespace BeepLive.Entities
 {
@@ -21,6 +22,25 @@ namespace BeepLive.Entities
         public Voxel GetVoxelUnscaled(float x, float y)
         {
             return Map.GetVoxel(Position + new Vector2f(x, y));
+        }
+
+        protected bool disposed = false;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                disposed = true;
+            }
+        }
+        ~Entity()
+        {
+            Dispose(false);
         }
     }
 }
