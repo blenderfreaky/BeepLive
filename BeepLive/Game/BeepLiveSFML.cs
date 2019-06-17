@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using BeepLive.Entities;
+using BeepLive.Network;
 using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
@@ -11,32 +12,19 @@ namespace BeepLive.Game
 {
     public class BeepLiveSfml
     {
+        public Action<PlayerActionPacket> SendAction;
         public RenderWindow Window;
 
-        #region Camera
-
-        private readonly View _view;
-        private Vector2f _center;
-        private float _zoom = 1;
-        private float _rotation;
-
-        #region Shake
-
-        private readonly Stopwatch _shakeTimer;
-        private long _shakeDuration; // In milliseconds
-        private float _shakeMagnitude;
-        private readonly Random _random;
-
-        #endregion
-
-        #endregion
-
-        public BeepLiveSfml()
+        public BeepLiveSfml(BeepLiveGame beepLive)
         {
-            VideoMode mode = new VideoMode(800, 600);
+            var mode = new VideoMode(800, 600);
             Window = new RenderWindow(mode, "Map");
 
-            _view = new View(new Vector2f(), new Vector2f(Window.Size.X, Window.Size.Y));
+            _center = new Vector2f();
+            _zoom = 1;
+            _rotation = 0;
+
+            _view = new View(_center, new Vector2f(Window.Size.X, Window.Size.Y));
             Window.SetView(_view);
 
             Window.KeyPressed += Window_KeyPressed;
@@ -45,20 +33,24 @@ namespace BeepLive.Game
 
             _random = new Random();
             _shakeTimer = new Stopwatch();
-            BeepLive = new BeepLive();
+            BeepLiveGame = beepLive;
         }
 
-        public BeepLive BeepLive { get; }
+        public BeepLiveGame BeepLiveGame { get; }
 
         public BeepLiveSfml Run()
         {
-            using (BeepLive.Run())
+            using (BeepLiveGame.Run())
             {
                 while (Window.IsOpen)
                 {
                     Window.DispatchEvents();
                     Window.Clear(Color.Black);
 
+                    const float interpolation = 0.5f;
+                    _center = _center * interpolation +
+                              (BeepLiveGame.LocalPlayer.Position + new Vector2f(BeepLiveGame.LocalPlayer.Size / 2f,
+                                   BeepLiveGame.LocalPlayer.Size / 2f)) * (1 - interpolation);
                     ApplyShake();
                     _view.Size = new Vector2f(Window.Size.X * _zoom, Window.Size.Y * _zoom);
                     _view.Rotation = _rotation;
@@ -76,12 +68,12 @@ namespace BeepLive.Game
         private void ApplyShake()
         {
             if (!_shakeTimer.IsRunning) return;
-            
+
             // ReSharper disable once PossibleLossOfFraction
-            float fulfillment = (float)(_shakeTimer.ElapsedMilliseconds / (double)_shakeDuration);
+            float fulfillment = (float) (_shakeTimer.ElapsedMilliseconds / (double) _shakeDuration);
             if (fulfillment < 1f)
             {
-                Vector2f direction = new Vector2f((float) (_random.NextDouble() * 2 - 1),
+                var direction = new Vector2f((float) (_random.NextDouble() * 2 - 1),
                     (float) (_random.NextDouble() * 2 - 1));
                 direction /= MathF.Sqrt(direction.X * direction.X + direction.Y * direction.Y);
                 _view.Center = _center + direction * _shakeMagnitude * (1f - fulfillment);
@@ -102,15 +94,16 @@ namespace BeepLive.Game
 
         private void Window_KeyPressed(object sender, KeyEventArgs e)
         {
-            Window window = (Window) sender;
+            var window = (Window) sender;
             if (e.Code == Keyboard.Key.Escape) window.Close();
             //TriggerShake(10f, 1000);
         }
 
         private void Window_MousePressed(object sender, MouseButtonEventArgs e)
         {
-            Vector2f position = new Vector2f(20, 20);
-            BeepLive.Map.AddClusterProjectile(position, new Vector2f(e.X - position.X, e.Y - position.Y) / 10, 4, 10, 300, 200,
+            var position = new Vector2f(20, 20);
+            BeepLiveGame.Map.AddClusterProjectile(position, new Vector2f(e.X - position.X, e.Y - position.Y) / 10, 4,
+                10, 300, 200,
                 2, 10, 5, 200);
         }
 
@@ -119,48 +112,66 @@ namespace BeepLive.Game
             Window.Close();
         }
 
+        private void GameLoop()
+        {
+            for (int chunkI = 0; chunkI < BeepLiveGame.Map.Config.MapWidth; chunkI++)
+            for (int chunkJ = 0; chunkJ < BeepLiveGame.Map.Config.MapHeight; chunkJ++)
+            {
+                var chunk = BeepLiveGame.Map.Chunks[chunkI, chunkJ];
+                chunk.Update();
+                Window.Draw(chunk.Sprite);
+            }
+
+            Entity[] entities;
+            lock (BeepLiveGame.Map.Entities)
+            {
+                entities = BeepLiveGame.Map.Entities.Where(e => !(e is null)).ToArray();
+            }
+
+            foreach (var entity in entities.Where(entity => !entity.Alive)) Window.Draw(entity.Shape);
+        }
+
+        #region Camera
+
+        private readonly View _view;
+        private Vector2f _center;
+        private readonly float _zoom = 1;
+        private readonly float _rotation;
+
+        #region Shake
+
+        private readonly Stopwatch _shakeTimer;
+        private long _shakeDuration; // In milliseconds
+        private float _shakeMagnitude;
+        private readonly Random _random;
+
+        #endregion
+
+        #endregion
+
         #region Fluent API
 
         public BeepLiveSfml AddMap(Func<Map, Map> mapMaker)
         {
-            BeepLive.Map = mapMaker(new Map());
+            BeepLiveGame.Map = mapMaker(new Map());
 
             return this;
         }
 
         public BeepLiveSfml AddTeam(Func<Team, Team> teamMaker)
         {
-            BeepLive.Teams.Add(teamMaker(new Team(this)));
+            BeepLiveGame.Teams.Add(teamMaker(new Team(BeepLiveGame)));
 
             return this;
         }
 
         public BeepLiveSfml SetLocalPlayer(Player localPlayer)
         {
-            BeepLive.LocalPlayer = localPlayer;
+            BeepLiveGame.LocalPlayer = localPlayer;
 
             return this;
         }
 
         #endregion
-
-        private void GameLoop()
-        {
-            for (var chunkI = 0; chunkI < World.Map.Config.MapWidth; chunkI++)
-            for (var chunkJ = 0; chunkJ < World.Map.Config.MapHeight; chunkJ++)
-            {
-                Chunk chunk = World.Map.Chunks[chunkI, chunkJ];
-                chunk.Update();
-                this.Window.Draw(chunk.Sprite);
-            }
-
-            Entity[] entities;
-            lock (World.Map.Entities)
-            {
-                entities = World.Map.Entities.Where(e => !(e is null)).ToArray();
-            }
-
-            foreach (var entity in entities.Where(entity => !entity.Alive)) this.Window.Draw(entity.Shape);
-        }
     }
 }

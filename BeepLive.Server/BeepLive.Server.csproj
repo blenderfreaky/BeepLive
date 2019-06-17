@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0-preview6.19304.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.0-preview6.19304.6" />
+    <PackageReference Include="Networker" Version="3.0.20-rc" />
+    <PackageReference Include="Networker.Extensions.ProtobufNet" Version="3.0.20-rc" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BeepLive.Client\BeepLive.Client.csproj" />
+    <ProjectReference Include="..\BeepLive\BeepLive.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

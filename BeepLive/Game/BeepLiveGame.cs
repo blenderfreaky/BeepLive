@@ -5,13 +5,13 @@ using BeepLive.World;
 
 namespace BeepLive.Game
 {
-    public class BeepLive
+    public class BeepLiveGame
     {
         public Player LocalPlayer;
         public Map Map;
         public List<Team> Teams;
 
-        public BeepLive()
+        public BeepLiveGame()
         {
             Teams = new List<Team>();
         }
