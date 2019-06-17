@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using BeepLive.Client;
 using BeepLive.Network;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +13,8 @@ namespace BeepLive.Server
 {
     public class BeepServer
     {
+        public Dictionary<Guid, Guid> PlayerSecrets;
+
         public BeepServer()
         {
             IConfiguration config = new ConfigurationBuilder()
@@ -18,6 +22,8 @@ namespace BeepLive.Server
                 .Build();
 
             var networkerSettings = config.GetSection("Networker");
+
+            PlayerSecrets = new Dictionary<Guid, Guid>();
 
             Server = new ServerBuilder()
                 .UseTcp(networkerSettings.GetValue<int>("TcpPort"))
@@ -37,8 +43,7 @@ namespace BeepLive.Server
         {
             Server.Start();
 
-            var beepClient = new BeepClient();
-            beepClient.Client.Connect();
+            new BeepClient().Start();
 
             while (Server.Information.IsRunning) Thread.Sleep(10000);
         }

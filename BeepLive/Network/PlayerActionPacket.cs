@@ -31,7 +31,7 @@ namespace BeepLive.Network
     }
 
     [ProtoContract]
-    public class PlayerFlow : PlayerActionPacket
+    public class PlayerFlowPacket : PlayerActionPacket
     {
         public enum PlayerFlowType
         {

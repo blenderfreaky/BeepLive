@@ -1,4 +1,6 @@
-﻿using BeepLive.Network;
+﻿using System;
+using BeepLive.Game;
+using BeepLive.Network;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Networker.Client;
@@ -9,6 +11,9 @@ namespace BeepLive.Client
 {
     public class BeepClient
     {
+        public BeepLiveSfml BeepLiveSfml;
+        public Guid MyPlayer, MySecret;
+
         public BeepClient()
         {
             var config = new ConfigurationBuilder()
@@ -16,6 +21,11 @@ namespace BeepLive.Client
                 .Build();
 
             var networkerSettings = config.GetSection("Networker");
+
+            MyPlayer = new Guid();
+            MySecret = new Guid();
+
+            BeepLiveSfml = new BeepLiveSfml(new BeepLiveGame());
 
             Client = new ClientBuilder()
                 .UseIp(networkerSettings.GetValue<string>("Address"))
@@ -31,5 +41,16 @@ namespace BeepLive.Client
         }
 
         public IClient Client { get; set; }
+
+        public void Start()
+        {
+            Client.Connect();
+
+            Client.Send(new PlayerFlowPacket
+            {
+                PlayerGuid = MyPlayer, Secret = MySecret, MessageGuid = new Guid(),
+                Type = PlayerFlowPacket.PlayerFlowType.Join
+            });
+        }
     }
 }
