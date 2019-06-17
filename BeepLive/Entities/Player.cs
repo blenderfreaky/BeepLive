@@ -7,6 +7,8 @@ namespace BeepLive.Entities
 {
     public class Player : Entity
     {
+        public Guid Guid;
+
         private Vector2f _lastSafePosition;
 
         public float Health;
