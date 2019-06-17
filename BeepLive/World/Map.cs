@@ -70,10 +70,8 @@ namespace BeepLive.World
             return this;
         }
 
-        public Map GenerateMap(string groundMaterial, int groundLevel, float scale, float heightScale)
+        public Map GenerateMap()
         {
-            VoxelType ground = Config.PhysicalEnvironment.GetVoxelTypeByName(groundMaterial);
-
             Chunks = new Chunk[Config.MapWidth, Config.MapHeight];
 
             for (uint chunkI = 0; chunkI < Config.MapWidth; chunkI++)
@@ -86,16 +84,22 @@ namespace BeepLive.World
                 {
                     float height = Noise.CalcPixel1D(
                                        (int) (chunkI * Config.ChunkSize + voxelI),
-                                       scale) * heightScale / 128f;
+                                       Config.HorizontalNoiseScale) * (Config.VerticalNoiseScale / 128f);
 
                     for (uint voxelJ = 0; voxelJ < Config.ChunkSize; voxelJ++)
                     {
-                        bool isAir = chunkJ * Config.ChunkSize + voxelJ - groundLevel < height;
+                        bool isGround = chunkJ * Config.ChunkSize + voxelJ - Config.GroundLevel < height;
+
+                        bool isFloating = Noise.CalcPixel2D(
+                                              (int)(chunkI * Config.ChunkSize + voxelI),
+                                              (int)(chunkJ * Config.ChunkSize + voxelI),
+                                              Config.FloatingNoiseScale) / 128f
+                            < Config.FloatingNoiseThreshold;
 
                         chunk[voxelI, voxelJ] =
-                            isAir
+                            isGround
                                 ? new Voxel(this)
-                                : new Voxel(this, ground);
+                                : new Voxel(this, Config.GroundVoxelType);
                     }
                 }
             }

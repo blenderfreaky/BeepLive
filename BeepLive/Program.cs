@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using BeepLive.Config;
-using BeepLive.Properties;
 using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
@@ -14,7 +13,7 @@ namespace BeepLive
             Game.BeepLive beepLive = new Game.BeepLive()
                     .AddMap(map => map
                         .LoadConfig("BeepConfig.xml")
-                        .GenerateMap("Ground", 100, 0.01f, 20f))
+                        .GenerateMap())
                     .AddTeam(team => team)
                 ;
 

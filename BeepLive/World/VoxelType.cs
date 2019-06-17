@@ -6,7 +6,6 @@ namespace BeepLive.World
 {
     public class VoxelType
     {
-        public string Name;
         public Color Color;
 
         [XmlIgnore] public Team OwnerTeam;

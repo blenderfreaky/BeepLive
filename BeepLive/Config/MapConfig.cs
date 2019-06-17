@@ -43,6 +43,10 @@ namespace BeepLive.Config
         public int MapHeight;
         public int MapWidth;
         public PhysicalEnvironment PhysicalEnvironment;
+        public VoxelType GroundVoxelType;
+        public int GroundLevel;
+        public float HorizontalNoiseScale, VerticalNoiseScale;
+        public float FloatingNoiseScale, FloatingNoiseThreshold, FloatingNoiseFalloff;
 
         public MapConfig()
         {
