@@ -87,7 +87,7 @@ namespace BeepLive
                 entities = Map.Entities.Where(e => !(e is null)).ToArray();
             }
 
-            foreach (Entity entity in entities) Window.Draw(entity.Shape);
+            foreach (Entity entity in entities) try { if(!entity.Disposed) Window.Draw(entity.Shape); } catch { };
         }
 
         private static void Window_KeyPressed(object sender, KeyEventArgs e)
