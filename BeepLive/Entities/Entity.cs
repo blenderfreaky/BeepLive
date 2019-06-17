@@ -5,7 +5,7 @@ using SFML.System;
 
 namespace BeepLive.Entities
 {
-    public abstract class Entity
+    public abstract class Entity : IDisposable
     {
         protected bool Disposed;
         public Map Map;
