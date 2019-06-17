@@ -18,7 +18,7 @@ namespace BeepLive
 
         public BeepLive()
         {
-            var mode = new VideoMode(800, 600);
+            VideoMode mode = new VideoMode(800, 600);
             Window = new RenderWindow(mode, "Map");
 
             Window.KeyPressed += Window_KeyPressed;
@@ -48,7 +48,7 @@ namespace BeepLive
 
         public BeepLive Run()
         {
-            using var physicsTimer = new Timer(_ => Map.Step(), null, 1000, 1000 / 60);
+            using Timer physicsTimer = new Timer(_ => Map.Step(), null, 1000, 1000 / 60);
 
             while (Window.IsOpen)
             {
@@ -65,10 +65,10 @@ namespace BeepLive
 
         private void GameLoop()
         {
-            for (var chunkI = 0; chunkI < Map.MapWidth; chunkI++)
-            for (var chunkJ = 0; chunkJ < Map.MapHeight; chunkJ++)
+            for (int chunkI = 0; chunkI < Map.MapWidth; chunkI++)
+            for (int chunkJ = 0; chunkJ < Map.MapHeight; chunkJ++)
             {
-                var chunk = Map.Chunks[chunkI, chunkJ];
+                Chunk chunk = Map.Chunks[chunkI, chunkJ];
                 chunk.Update();
                 Window.Draw(chunk.Sprite);
             }
@@ -79,18 +79,18 @@ namespace BeepLive
                 entities = Map.Entities.Where(e => !(e is null)).ToArray();
             }
 
-            foreach (var entity in entities) Window.Draw(entity.Shape);
+            foreach (Entity entity in entities) Window.Draw(entity.Shape);
         }
 
         private static void Window_KeyPressed(object sender, KeyEventArgs e)
         {
-            var window = (Window) sender;
+            Window window = (Window) sender;
             if (e.Code == Keyboard.Key.Escape) window.Close();
         }
 
         private void Window_MousePressed(object sender, MouseButtonEventArgs e)
         {
-            var position = new Vector2f(20, 20);
+            Vector2f position = new Vector2f(20, 20);
             Map.AddClusterProjectile(position, new Vector2f(e.X - position.X, e.Y - position.Y) / 10, 4, 10, 300, 200, 2, 10, 5, 200);
         }
 

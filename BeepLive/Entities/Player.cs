@@ -74,7 +74,7 @@ namespace BeepLive.Entities
                     break;
                 case CollisionResponseMode.LeastResistance:
                     // The center of mass of voxels intersecting the player
-                    var center = new Vector2f(0, 0);
+                    Vector2f center = new Vector2f(0, 0);
                     // The amount of voxels intersecting the Player
                     int collisionCount = 0;
 

@@ -44,15 +44,15 @@ namespace BeepLive.World
 
         public Chunk GetChunk(Vector2f position, out Vector2f chunkPosition)
         {
-            var i = (int) MathF.Floor(position.X / ChunkSize);
-            var j = (int) MathF.Floor(position.Y / ChunkSize);
+            int i = (int) MathF.Floor(position.X / ChunkSize);
+            int j = (int) MathF.Floor(position.Y / ChunkSize);
             chunkPosition = new Vector2f(i * ChunkSize, j * ChunkSize);
             return i < 0 || j < 0 || i >= MapWidth || j >= MapHeight ? null : Chunks[i, j];
         }
 
         public Voxel GetVoxel(Vector2f position)
         {
-            return GetChunk(position, out var chunkPosition)?.GetVoxel(position - chunkPosition) ?? new Voxel(this);
+            return GetChunk(position, out Vector2f chunkPosition)?.GetVoxel(position - chunkPosition) ?? new Voxel(this);
         }
 
         #region Fluent API
@@ -129,18 +129,18 @@ namespace BeepLive.World
             for (uint chunkI = 0; chunkI < MapWidth; chunkI++)
             for (uint chunkJ = 0; chunkJ < MapHeight; chunkJ++)
             {
-                var chunk = Chunks[chunkI, chunkJ] =
+                Chunk chunk = Chunks[chunkI, chunkJ] =
                     new Chunk(this, new Vector2f(chunkI * ChunkSize, chunkJ * ChunkSize));
 
                 for (uint voxelI = 0; voxelI < ChunkSize; voxelI++)
                 {
-                    var height = Noise.CalcPixel1D(
+                    float height = Noise.CalcPixel1D(
                                      (int) (chunkI * ChunkSize + voxelI),
                                      scale) * heightScale / 128f;
 
                     for (uint voxelJ = 0; voxelJ < ChunkSize; voxelJ++)
                     {
-                        var isAir = chunkJ * ChunkSize + voxelJ - groundLevel < height;
+                        bool isAir = chunkJ * ChunkSize + voxelJ - groundLevel < height;
 
                         chunk[voxelI, voxelJ] =
                             isAir

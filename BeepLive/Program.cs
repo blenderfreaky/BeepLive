@@ -8,7 +8,7 @@ namespace BeepLive
     {
         private static void Main(string[] args)
         {
-            var beepLive = new BeepLive()
+            BeepLive beepLive = new BeepLive()
                 .AddMap(map => map
                     .SetAirResistance(0.99f)
                     .SetGravity(0, 1)
