@@ -25,6 +25,7 @@ namespace BeepLive.Entities
         }
 
         protected bool disposed = false;
+        public bool Disposed { get => disposed; }
 
         public void Dispose()
         {
