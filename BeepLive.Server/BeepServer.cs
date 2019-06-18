@@ -52,9 +52,8 @@ namespace BeepLive.Server
         {
             Server.Start();
 
-            var client = new BeepClient(BeepConfig);
-            //client.BeepLiveSfml.BeepGameState.InputsAllowed = true;
-            client.Start();
+            BeepClient.BeepClientInstance = new BeepClient();
+            BeepClient.BeepClientInstance.Start();
 
             while (Server.Information.IsRunning) Thread.Sleep(10000);
         }

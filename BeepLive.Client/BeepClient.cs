@@ -14,8 +14,10 @@ namespace BeepLive.Client
     {
         public BeepLiveSfml BeepLiveSfml;
         public Guid MyPlayer, MySecret;
+        public static BeepClient BeepClientInstance;
+        public static BeepConfig BeepConfig;
 
-        public BeepClient(BeepConfig beepConfig)
+        public BeepClient()
         {
             IConfigurationRoot config = new ConfigurationBuilder()
                 .AddJsonFile("clientSettings.json", false, true)
@@ -26,8 +28,6 @@ namespace BeepLive.Client
             MyPlayer = Guid.NewGuid();
             MySecret = Guid.NewGuid();
 
-            BeepLiveSfml = new BeepLiveSfml(new BeepLiveGame(beepConfig));
-
             Client = new ClientBuilder()
                 .UseIp(networkerSettings.GetValue<string>("Address"))
                 .UseTcp(networkerSettings.GetValue<int>("TcpPort"))
@@ -37,7 +37,10 @@ namespace BeepLive.Client
                     loggingBuilder.AddConsole();
                 })
                 .UseProtobufNet()
-                .RegisterPacketHandler<PlayerActionPacket, ClientPlayerActionPacketHandler>()
+                .RegisterPacketHandler<PlayerShotPacket, ClientPlayerShotPacketHandler>()
+                .RegisterPacketHandler<PlayerJumpPacket, ClientPlayerJumpPacketHandler>()
+                .RegisterPacketHandler<ServerFlowPacket, ClientServerFlowPacketHandler>()
+                .RegisterPacketHandler<SyncPacket, ClientSyncPacketHandler>()
                 .Build();
         }
 
@@ -54,6 +57,9 @@ namespace BeepLive.Client
             };
             Client.Send(playerFlowPacket);
 
+            while (BeepConfig == null) {}
+
+            BeepLiveSfml = new BeepLiveSfml(new BeepLiveGame(BeepConfig)) {BeepGameState = {Drawing = true}};
             BeepLiveSfml.Run();
         }
     }
