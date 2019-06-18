@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using BeepLive.Entities;
 using BeepLive.Network;
@@ -20,7 +21,7 @@ namespace BeepLive.Game
             var mode = new VideoMode(800, 600);
             Window = new RenderWindow(mode, "Map");
 
-            _center = new Vector2f();
+            _center = new Vector2f(Window.Size.X / 2f, Window.Size.Y / 2f);
             _zoom = 1;
             _rotation = 0;
 
@@ -34,9 +35,19 @@ namespace BeepLive.Game
             _random = new Random();
             _shakeTimer = new Stopwatch();
             BeepLiveGame = beepLive;
+
+            BeepGameState = new GameState();
+
+            _font = new Font(Path.GetFullPath("BioRhymeExpanded-ExtraBold.ttf"));
+            _text = new Text("Connecting to Server", _font)
+            {
+                Position = _center,
+            };
         }
 
         public BeepLiveGame BeepLiveGame { get; }
+
+        public GameState BeepGameState { get; set; }
 
         public BeepLiveSfml Run()
         {
@@ -45,18 +56,35 @@ namespace BeepLive.Game
                 while (Window.IsOpen)
                 {
                     Window.DispatchEvents();
-                    Window.Clear(Color.Black);
 
-                    const float interpolation = 0.5f;
-                    _center = _center * interpolation +
-                              (BeepLiveGame.LocalPlayer.Position + new Vector2f(BeepLiveGame.LocalPlayer.Size / 2f,
-                                   BeepLiveGame.LocalPlayer.Size / 2f)) * (1 - interpolation);
-                    ApplyShake();
-                    _view.Size = new Vector2f(Window.Size.X * _zoom, Window.Size.Y * _zoom);
-                    _view.Rotation = _rotation;
-                    Window.SetView(_view);
+                    if (BeepGameState.Drawing)
+                    {
+                        Window.Clear(Color.Black);
 
-                    GameLoop();
+                        const float interpolation = 0.5f;
+                        _center = _center * interpolation +
+                                  (BeepLiveGame.LocalPlayer?.Position != null
+                                      ? BeepLiveGame.LocalPlayer.Position + new Vector2f(
+                                            BeepLiveGame.LocalPlayer.Size / 2f,
+                                            BeepLiveGame.LocalPlayer.Size / 2f)
+                                      : new Vector2f(Window.Size.X / 2f, Window.Size.Y / 2f)) * (1 - interpolation);
+                        ApplyShake();
+                        _view.Size = new Vector2f(Window.Size.X * _zoom, Window.Size.Y * _zoom);
+                        _view.Rotation = _rotation;
+                        Window.SetView(_view);
+
+                        GameLoop();
+                    }
+
+                    if (BeepGameState.SelectingTeams)
+                    {
+                        //Window.Draw();
+                    }
+
+                    if (BeepGameState.Connecting)
+                    {
+                        Window.Draw(_text);
+                    }
 
                     Window.Display();
                 }
@@ -70,7 +98,7 @@ namespace BeepLive.Game
             if (!_shakeTimer.IsRunning) return;
 
             // ReSharper disable once PossibleLossOfFraction
-            float fulfillment = (float) (_shakeTimer.ElapsedMilliseconds / (double) _shakeDuration);
+            var fulfillment = (float) (_shakeTimer.ElapsedMilliseconds / (double) _shakeDuration);
             if (fulfillment < 1f)
             {
                 var direction = new Vector2f((float) (_random.NextDouble() * 2 - 1),
@@ -101,10 +129,14 @@ namespace BeepLive.Game
 
         private void Window_MousePressed(object sender, MouseButtonEventArgs e)
         {
-            var position = new Vector2f(20, 20);
-            BeepLiveGame.Map.AddClusterProjectile(position, new Vector2f(e.X - position.X, e.Y - position.Y) / 10, 4,
-                10, 300, 200,
-                2, 10, 5, 200);
+            if (BeepGameState.InputsAllowed)
+            {
+                Vector2f localPlayerPosition = BeepLiveGame.LocalPlayer.Position;
+                BeepLiveGame.Map.AddClusterProjectile(localPlayerPosition, new Vector2f(e.X - localPlayerPosition.X, e.Y - localPlayerPosition.Y) / 10,
+                    4,
+                    10, 300, 200,
+                    2, 10, 5, 200);
+            }
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -114,10 +146,10 @@ namespace BeepLive.Game
 
         private void GameLoop()
         {
-            for (int chunkI = 0; chunkI < BeepLiveGame.Map.Config.MapWidth; chunkI++)
-            for (int chunkJ = 0; chunkJ < BeepLiveGame.Map.Config.MapHeight; chunkJ++)
+            for (var chunkI = 0; chunkI < BeepLiveGame.Map.Config.MapWidth; chunkI++)
+            for (var chunkJ = 0; chunkJ < BeepLiveGame.Map.Config.MapHeight; chunkJ++)
             {
-                var chunk = BeepLiveGame.Map.Chunks[chunkI, chunkJ];
+                Chunk chunk = BeepLiveGame.Map.Chunks[chunkI, chunkJ];
                 chunk.Update();
                 Window.Draw(chunk.Sprite);
             }
@@ -128,7 +160,7 @@ namespace BeepLive.Game
                 entities = BeepLiveGame.Map.Entities.Where(e => !(e is null)).ToArray();
             }
 
-            foreach (var entity in entities.Where(entity => !entity.Alive)) Window.Draw(entity.Shape);
+            foreach (Entity entity in entities.Where(entity => !entity.Alive)) Window.Draw(entity.Shape);
         }
 
         #region Camera
@@ -144,6 +176,8 @@ namespace BeepLive.Game
         private long _shakeDuration; // In milliseconds
         private float _shakeMagnitude;
         private readonly Random _random;
+        private readonly Font _font;
+        private readonly Text _text;
 
         #endregion
 
@@ -173,5 +207,14 @@ namespace BeepLive.Game
         }
 
         #endregion
+        
+        public class GameState
+        {
+            public bool Drawing;
+            public bool InputsAllowed;
+            public bool Simulating;
+            public bool SelectingTeams;
+            public bool Connecting;
+        }
     }
 }

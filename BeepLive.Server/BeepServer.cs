@@ -21,7 +21,7 @@ namespace BeepLive.Server
                 .AddJsonFile("appSettings.json", false, true)
                 .Build();
 
-            var networkerSettings = config.GetSection("Networker");
+            IConfigurationSection networkerSettings = config.GetSection("Networker");
 
             PlayerSecrets = new Dictionary<Guid, Guid>();
 
@@ -33,7 +33,9 @@ namespace BeepLive.Server
                     loggingBuilder.AddConsole();
                 })
                 .UseProtobufNet()
-                .RegisterPacketHandler<PlayerActionPacket, PlayerActionPacketHandler>()
+                .RegisterPacketHandler<PlayerShotPacket, PlayerShotPacketHandler>()
+                .RegisterPacketHandler<PlayerJumpPacket, PlayerJumpPacketHandler>()
+                .RegisterPacketHandler<PlayerFlowPacket, PlayerFlowPacketHandler>()
                 .Build();
         }
 
@@ -43,7 +45,9 @@ namespace BeepLive.Server
         {
             Server.Start();
 
-            new BeepClient().Start();
+            var client = new BeepClient();
+            //client.BeepLiveSfml.BeepGameState.InputsAllowed = true;
+            client.Start();
 
             while (Server.Information.IsRunning) Thread.Sleep(10000);
         }

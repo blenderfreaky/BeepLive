@@ -16,14 +16,14 @@ namespace BeepLive.Client
 
         public BeepClient()
         {
-            var config = new ConfigurationBuilder()
+            IConfigurationRoot config = new ConfigurationBuilder()
                 .AddJsonFile("clientSettings.json", false, true)
                 .Build();
 
-            var networkerSettings = config.GetSection("Networker");
+            IConfigurationSection networkerSettings = config.GetSection("Networker");
 
-            MyPlayer = new Guid();
-            MySecret = new Guid();
+            MyPlayer = Guid.NewGuid();
+            MySecret = Guid.NewGuid();
 
             BeepLiveSfml = new BeepLiveSfml(new BeepLiveGame());
 
@@ -46,11 +46,14 @@ namespace BeepLive.Client
         {
             Client.Connect();
 
-            Client.Send(new PlayerFlowPacket
+            var playerFlowPacket = new PlayerFlowPacket
             {
-                PlayerGuid = MyPlayer, Secret = MySecret, MessageGuid = new Guid(),
+                PlayerGuid = MyPlayer.ToString(), Secret = MySecret.ToString(), MessageGuid = Guid.NewGuid().ToString(),
                 Type = PlayerFlowPacket.PlayerFlowType.Join
-            });
+            };
+            Client.Send(playerFlowPacket);
+
+            BeepLiveSfml.Run();
         }
     }
 }

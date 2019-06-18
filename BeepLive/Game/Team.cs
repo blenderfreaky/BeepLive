@@ -38,7 +38,7 @@ namespace BeepLive.Game
 
         public Team AddPlayer(Func<Player, Player> playerMaker)
         {
-            var player = playerMaker(new Player(BeepLiveGame.Map));
+            Player player = playerMaker(new Player(BeepLiveGame.Map));
             player.GenerateShape();
             Players.Add(player);
 
