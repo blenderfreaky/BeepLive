@@ -1,4 +1,5 @@
 ﻿using System;
+using BeepLive.Config;
 using BeepLive.Game;
 using BeepLive.Network;
 using Microsoft.Extensions.Configuration;
@@ -14,7 +15,7 @@ namespace BeepLive.Client
         public BeepLiveSfml BeepLiveSfml;
         public Guid MyPlayer, MySecret;
 
-        public BeepClient()
+        public BeepClient(BeepConfig beepConfig)
         {
             IConfigurationRoot config = new ConfigurationBuilder()
                 .AddJsonFile("clientSettings.json", false, true)
@@ -25,7 +26,7 @@ namespace BeepLive.Client
             MyPlayer = Guid.NewGuid();
             MySecret = Guid.NewGuid();
 
-            BeepLiveSfml = new BeepLiveSfml(new BeepLiveGame());
+            BeepLiveSfml = new BeepLiveSfml(new BeepLiveGame(beepConfig));
 
             Client = new ClientBuilder()
                 .UseIp(networkerSettings.GetValue<string>("Address"))

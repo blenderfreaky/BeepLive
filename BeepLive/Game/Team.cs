@@ -8,6 +8,7 @@ namespace BeepLive.Game
 {
     public class Team
     {
+        public TeamConfig TeamConfig;
         public BeepLiveGame BeepLiveGame;
         public List<Player> Players;
         public VoxelType VoxelType;
@@ -15,6 +16,7 @@ namespace BeepLive.Game
         public Team(BeepLiveGame beepLiveGame, TeamConfig teamConfig)
         {
             BeepLiveGame = beepLiveGame;
+            TeamConfig = teamConfig;
             Players = new List<Player>(teamConfig.MaxPlayers);
             VoxelType = new VoxelType
                 {OwnerTeam = this, Color = teamConfig.Color, Resistance = teamConfig.TerritoryResistance};

@@ -25,6 +25,13 @@ namespace BeepLive.World
             Random = new Random();
         }
 
+        public Map(MapConfig config) : this()
+        {
+            Config = config;
+
+            GenerateMap();
+        }
+
         public void Step()
         {
             lock (Entities)

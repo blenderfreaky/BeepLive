@@ -4,7 +4,7 @@
     {
         private static void Main(string[] args)
         {
-            new BeepServer().Start();
+            BeepServer.Start();
         }
     }
 }

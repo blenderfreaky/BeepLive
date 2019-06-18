@@ -121,19 +121,17 @@ namespace BeepLive.Game
         {
             var window = (Window) sender;
             if (e.Code == Keyboard.Key.Escape) window.Close();
-            //TriggerShake(10f, 1000);
         }
 
         private void Window_MousePressed(object sender, MouseButtonEventArgs e)
         {
-            if (BeepGameState.InputsAllowed)
+            if (BeepGameState.Spawning)
+            {
+
+            }
+            else if (BeepGameState.InputsAllowed)
             {
                 Vector2f localPlayerPosition = BeepLiveGame.LocalPlayer.Position;
-                BeepLiveGame.Map.AddClusterProjectile(localPlayerPosition,
-                    new Vector2f(e.X - localPlayerPosition.X, e.Y - localPlayerPosition.Y) / 10,
-                    4,
-                    10, 300, 200,
-                    2, 10, 5, 200);
             }
         }
 
@@ -168,6 +166,7 @@ namespace BeepLive.Game
             public bool InputsAllowed;
             public bool SelectingTeams;
             public bool Simulating;
+            public bool Spawning;
         }
 
         #region Camera

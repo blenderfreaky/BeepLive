@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using BeepLive.Client;
+using BeepLive.Config;
 using BeepLive.Network;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -13,6 +15,7 @@ namespace BeepLive.Server
     public static class BeepServer
     {
         public static Dictionary<string, string> PlayerSecrets;
+        public static BeepConfig BeepConfig;
 
         static BeepServer()
         {
@@ -36,6 +39,11 @@ namespace BeepLive.Server
                 .RegisterPacketHandler<PlayerJumpPacket, PlayerJumpPacketHandler>()
                 .RegisterPacketHandler<PlayerFlowPacket, PlayerFlowPacketHandler>()
                 .Build();
+
+            const string beepConfigXml = "BeepConfig.xml";
+
+            if (!File.Exists(beepConfigXml)) File.WriteAllText(beepConfigXml, XmlHelper.ToXml(BeepConfig = new BeepConfig()));
+            else BeepConfig = XmlHelper.LoadFromXmlString<BeepConfig>(File.ReadAllText(beepConfigXml));
         }
 
         public static IServer Server { get; set; }
@@ -44,7 +52,7 @@ namespace BeepLive.Server
         {
             Server.Start();
 
-            var client = new BeepClient();
+            var client = new BeepClient(BeepConfig);
             //client.BeepLiveSfml.BeepGameState.InputsAllowed = true;
             client.Start();
 

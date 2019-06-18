@@ -22,8 +22,8 @@ namespace BeepLive.Server
             _logger.LogDebug("Received: " + packet);
 
             if (BeepServer.PlayerSecrets[packet.PlayerGuid] == packet.Secret)
-
-                packetContext.Sender.Send();
+            {
+            }
         }
     }
 
@@ -63,7 +63,7 @@ namespace BeepLive.Server
             {
                 BeepServer.PlayerSecrets[packet.PlayerGuid] = packet.Secret;
 
-                packetContext.Sender.Send();
+                packetContext.Sender.Send(new SyncPacket(BeepServer.BeepConfig));
             }
         }
     }

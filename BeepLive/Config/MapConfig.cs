@@ -24,6 +24,7 @@ namespace BeepLive.Config
         public MapConfig()
         {
             PhysicalEnvironment = new PhysicalEnvironment();
+            GroundVoxelType = new VoxelType();
         }
 
         [XmlIgnore]

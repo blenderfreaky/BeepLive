@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using BeepLive.Config;
 using BeepLive.Entities;
 using BeepLive.World;
+using SFML.System;
 
 namespace BeepLive.Game
 {
@@ -18,13 +20,28 @@ namespace BeepLive.Game
         {
             BeepConfig = beepConfig;
 
-            Teams = new List<Team>(beepConfig.TeamConfigs.Count);
-            Teams = beepConfig.TeamConfigs.Select(x => new Team(this, x));
+            Map = new Map(beepConfig.MapConfig);
+
+            Teams = beepConfig.TeamConfigs.Select(x => new Team(this, x)).ToList();
         }
 
         public Timer Run()
         {
             return new Timer(_ => Map?.Step(), null, 1000, 1000 / 60);
+        }
+
+        public void JoinTeam(Team team)
+        {
+            if (team.Players.Count < team.TeamConfig.MaxPlayers)
+            {
+                LocalPlayer = new Player(Map, new Vector2f(), team.TeamConfig.PlayerSize);
+
+                team.Players.Add(LocalPlayer);
+            }
+            else
+            {
+                throw new InvalidOperationException("Can't join full team");
+            }
         }
     }
 }

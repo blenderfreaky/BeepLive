@@ -20,6 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="BioRhymeExpanded-ExtraBold.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="clientSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
