@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace BeepLive.Config
 {
     public class BeepConfig
     {
-        public List<TeamConfig> TeamConfigs;
         public MapConfig MapConfig;
+        public List<TeamConfig> TeamConfigs;
 
         public BeepConfig()
         {

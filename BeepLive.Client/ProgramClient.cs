@@ -1,7 +1,4 @@
-﻿using System.IO;
-using BeepLive.Config;
-
-namespace BeepLive.Client
+﻿namespace BeepLive.Client
 {
     public class ProgramClient
     {

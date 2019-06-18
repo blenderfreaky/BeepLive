@@ -8,13 +8,13 @@ namespace BeepLive.Entities
     public class ClusterProjectile<TProjectile> : Projectile
         where TProjectile : Projectile
     {
+        public delegate void OnExplode();
+
         public int ChildCount;
         public float ChildLowestSpeed;
         public int ChildMaxLifeTime;
         public float ChildRadius;
         public float ExplosionPower;
-        public delegate void OnExplode();
-        public event OnExplode OnExplodeEvent;
 
         public ClusterProjectile(Map map, Vector2f position, Vector2f velocity, float radius, float lowestSpeed,
             int maxLifeTime, int childCount, float childRadius, float explosionPower, float childLowestSpeed,
@@ -34,6 +34,8 @@ namespace BeepLive.Entities
                 shotConfig.ChildMaxLifeTime)
         {
         }
+
+        public event OnExplode OnExplodeEvent;
 
         public override void Die()
         {

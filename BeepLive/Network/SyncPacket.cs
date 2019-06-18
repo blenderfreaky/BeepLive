@@ -6,10 +6,11 @@ namespace BeepLive.Network
     [ProtoContract]
     public class SyncPacket
     {
-        [ProtoMember(1)]
-        public string BeepConfigXml;
+        [ProtoMember(1)] public string BeepConfigXml;
 
-        public SyncPacket() : this(new BeepConfig()) { }
+        public SyncPacket() : this(new BeepConfig())
+        {
+        }
 
         public SyncPacket(BeepConfig beepConfig)
         {

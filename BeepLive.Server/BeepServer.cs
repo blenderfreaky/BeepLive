@@ -42,7 +42,8 @@ namespace BeepLive.Server
 
             const string beepConfigXml = "BeepConfig.xml";
 
-            if (!File.Exists(beepConfigXml)) File.WriteAllText(beepConfigXml, XmlHelper.ToXml(BeepConfig = new BeepConfig()));
+            if (!File.Exists(beepConfigXml))
+                File.WriteAllText(beepConfigXml, XmlHelper.ToXml(BeepConfig = new BeepConfig()));
             else BeepConfig = XmlHelper.LoadFromXmlString<BeepConfig>(File.ReadAllText(beepConfigXml));
         }
 

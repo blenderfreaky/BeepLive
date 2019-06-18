@@ -96,7 +96,7 @@ namespace BeepLive.World
 
                     for (uint voxelJ = 0; voxelJ < Config.ChunkSize; voxelJ++)
                     {
-                        bool isGround = chunkJ * Config.ChunkSize + voxelJ - Config.GroundLevel > height;
+                        bool isGround = chunkJ * Config.ChunkSize + voxelJ > height + Config.GroundLevel;
 
                         bool isFloating = Noise.CalcPixel2D(
                                               (int) (chunkI * Config.ChunkSize + voxelI),

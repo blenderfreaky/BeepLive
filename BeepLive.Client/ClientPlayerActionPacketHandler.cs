@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using BeepLive.Config;
 using BeepLive.Network;
 using Microsoft.Extensions.Logging;
 using Networker.Common;

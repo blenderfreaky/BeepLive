@@ -8,9 +8,9 @@ namespace BeepLive.Config
 
         public ShotConfig DestructiveShotConfig, GenerativeShotConfig;
         public int MaxPlayers;
+        public int PlayerSize;
 
         public float TerritoryResistance;
-        public int PlayerSize;
 
         public TeamConfig()
         {

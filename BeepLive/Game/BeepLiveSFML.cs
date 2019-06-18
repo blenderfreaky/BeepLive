@@ -31,6 +31,7 @@ namespace BeepLive.Game
             Window.KeyPressed += Window_KeyPressed;
             Window.MouseButtonPressed += Window_MousePressed;
             Window.Closed += Window_Closed;
+            Window.MouseWheelScrolled += Window_MouseWheelScrolled;
 
             _random = new Random();
             _shakeTimer = new Stopwatch();
@@ -48,6 +49,11 @@ namespace BeepLive.Game
         public BeepLiveGame BeepLiveGame { get; }
 
         public GameState BeepGameState { get; set; }
+
+        private void Window_MouseWheelScrolled(object sender, MouseWheelScrollEventArgs e)
+        {
+            _zoom *= Math.Pow(2, e.Delta);
+        }
 
         public BeepLiveSfml Run()
         {
@@ -121,13 +127,26 @@ namespace BeepLive.Game
         {
             var window = (Window) sender;
             if (e.Code == Keyboard.Key.Escape) window.Close();
+
+            switch (e.Code)
+            {
+                case Keyboard.Key.Q:
+                    Shoot();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void Shoot()
+        {
+            
         }
 
         private void Window_MousePressed(object sender, MouseButtonEventArgs e)
         {
             if (BeepGameState.Spawning)
             {
-
             }
             else if (BeepGameState.InputsAllowed)
             {
@@ -173,7 +192,7 @@ namespace BeepLive.Game
 
         private readonly View _view;
         private Vector2f _center;
-        private readonly float _zoom = 1;
+        private float _zoom = 1;
         private readonly float _rotation;
 
         #region Shake

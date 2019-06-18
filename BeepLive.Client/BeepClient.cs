@@ -12,10 +12,10 @@ namespace BeepLive.Client
 {
     public class BeepClient
     {
-        public BeepLiveSfml BeepLiveSfml;
-        public Guid MyPlayer, MySecret;
         public static BeepClient BeepClientInstance;
         public static BeepConfig BeepConfig;
+        public BeepLiveSfml BeepLiveSfml;
+        public Guid MyPlayer, MySecret;
 
         public BeepClient()
         {
@@ -57,7 +57,9 @@ namespace BeepLive.Client
             };
             Client.Send(playerFlowPacket);
 
-            while (BeepConfig == null) {}
+            while (BeepConfig == null)
+            {
+            }
 
             BeepLiveSfml = new BeepLiveSfml(new BeepLiveGame(BeepConfig)) {BeepGameState = {Drawing = true}};
             BeepLiveSfml.Run();

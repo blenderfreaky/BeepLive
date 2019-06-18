@@ -8,9 +8,9 @@ namespace BeepLive.Game
 {
     public class Team
     {
-        public TeamConfig TeamConfig;
         public BeepLiveGame BeepLiveGame;
         public List<Player> Players;
+        public TeamConfig TeamConfig;
         public VoxelType VoxelType;
 
         public Team(BeepLiveGame beepLiveGame, TeamConfig teamConfig)
