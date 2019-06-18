@@ -1,10 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <ApplicationIcon />
-    <StartupObject />
+    <StartupObject>BeepLive.Server.ProgramServer</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,23 +12,23 @@
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.2.1" />
     <PackageReference Include="Networker" Version="3.0.20-rc" />
     <PackageReference Include="Networker.Extensions.ProtobufNet" Version="3.0.20-rc" />
-    <PackageReference Include="SFML.Net" Version="2.5.0" />
-    <PackageReference Include="SimplexNoise" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
+    <ProjectReference Include="..\BeepLive.Client\BeepLive.Client.csproj" />
+    <ProjectReference Include="..\BeepLive\BeepLive.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <None Update="appSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="BioRhymeExpanded-ExtraBold.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Blocked-48.vlw">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

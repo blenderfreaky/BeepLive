@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using BeepLive.Config;
 using BeepLive.Entities;
-using SFML.Graphics;
 using SFML.System;
 using SimplexNoise;
 
@@ -12,6 +11,8 @@ namespace BeepLive.World
     public class Map
     {
         public Chunk[,] Chunks;
+
+        public MapConfig Config;
         public List<Entity> Entities;
         public List<Player> Players;
         public Random Random;
@@ -22,6 +23,13 @@ namespace BeepLive.World
             Players = new List<Player>();
 
             Random = new Random();
+        }
+
+        public Map(MapConfig config) : this()
+        {
+            Config = config;
+
+            GenerateMap();
         }
 
         public void Step()
@@ -52,26 +60,26 @@ namespace BeepLive.World
                    new Voxel(this);
         }
 
-        public MapConfig Config;
-
         #region Fluent API
 
-        public Map Configure(Func<MapConfig,MapConfig> configMaker)
+        public Map Configure(Func<MapConfig, MapConfig> configMaker)
         {
             Config = configMaker(new MapConfig());
-            
+
             return this;
         }
 
         public Map LoadConfig(string path)
         {
-            Config = XMLHelper.LoadFromXMLString<MapConfig>(File.ReadAllText(path));
-            
+            Config = XmlHelper.LoadFromXmlString<MapConfig>(File.ReadAllText(path));
+
             return this;
         }
 
         public Map GenerateMap()
         {
+            Config.PhysicalEnvironment.VoxelTypes.Add(Config.GroundVoxelType);
+
             Chunks = new Chunk[Config.MapWidth, Config.MapHeight];
 
             for (uint chunkI = 0; chunkI < Config.MapWidth; chunkI++)
@@ -88,18 +96,18 @@ namespace BeepLive.World
 
                     for (uint voxelJ = 0; voxelJ < Config.ChunkSize; voxelJ++)
                     {
-                        bool isGround = chunkJ * Config.ChunkSize + voxelJ - Config.GroundLevel < height;
+                        bool isGround = chunkJ * Config.ChunkSize + voxelJ > height + Config.GroundLevel;
 
                         bool isFloating = Noise.CalcPixel2D(
-                                              (int)(chunkI * Config.ChunkSize + voxelI),
-                                              (int)(chunkJ * Config.ChunkSize + voxelI),
+                                              (int) (chunkI * Config.ChunkSize + voxelI),
+                                              (int) (chunkJ * Config.ChunkSize + voxelJ),
                                               Config.FloatingNoiseScale) / 128f
-                            < Config.FloatingNoiseThreshold;
+                                          < Config.FloatingNoiseThreshold;
 
                         chunk[voxelI, voxelJ] =
-                            isGround
-                                ? new Voxel(this)
-                                : new Voxel(this, Config.GroundVoxelType);
+                            isGround || isFloating
+                                ? new Voxel(this, Config.GroundVoxelType)
+                                : new Voxel(this);
                     }
                 }
             }

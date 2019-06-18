@@ -8,6 +8,7 @@ namespace BeepLive.Entities
     public class Player : Entity
     {
         private Vector2f _lastSafePosition;
+        public Guid Guid;
 
         public float Health;
         public string Name;
@@ -89,7 +90,7 @@ namespace BeepLive.Entities
                     break;
                 case CollisionResponseMode.LeastResistance:
                     // The center of mass of voxels intersecting the player
-                    Vector2f center = new Vector2f(0, 0);
+                    var center = new Vector2f(0, 0);
                     // The amount of voxels intersecting the Player
                     var collisionCount = 0;
 

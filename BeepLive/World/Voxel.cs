@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using SFML.Graphics;
+﻿using SFML.Graphics;
 
 namespace BeepLive.World
 {

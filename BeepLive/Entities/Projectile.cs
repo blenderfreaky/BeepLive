@@ -61,7 +61,7 @@ namespace BeepLive.Entities
                 Die();
 
             Vector2f front = Velocity / dist;
-            Vector2f left = new Vector2f(front.Y, -front.X);
+            var left = new Vector2f(front.Y, -front.X);
 
             for (float x = 0; x < dist; x += .5f)
             for (float y = -Radius; y <= Radius; y++)

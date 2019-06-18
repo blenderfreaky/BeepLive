@@ -1,21 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using BeepLive.Config;
 using BeepLive.Entities;
 using BeepLive.World;
-using SFML.Graphics;
 
 namespace BeepLive.Game
 {
     public class Team
     {
-        public BeepLive BeepLive;
+        public BeepLiveGame BeepLiveGame;
         public List<Player> Players;
+        public TeamConfig TeamConfig;
         public VoxelType VoxelType;
 
-        public Team(BeepLive beepLive)
+        public Team(BeepLiveGame beepLiveGame, TeamConfig teamConfig)
         {
-            BeepLive = beepLive;
-            Players = new List<Player>();
+            BeepLiveGame = beepLiveGame;
+            TeamConfig = teamConfig;
+            Players = new List<Player>(teamConfig.MaxPlayers);
+            VoxelType = new VoxelType
+                {OwnerTeam = this, Color = teamConfig.Color, Resistance = teamConfig.TerritoryResistance};
         }
 
         #region Fluent API
@@ -30,7 +34,7 @@ namespace BeepLive.Game
 
         public Team AddPlayer(Func<Player, Player> playerMaker, out Player player)
         {
-            player = playerMaker(new Player(BeepLive.Map));
+            player = playerMaker(new Player(BeepLiveGame.Map));
             player.GenerateShape();
             Players.Add(player);
 
@@ -39,7 +43,7 @@ namespace BeepLive.Game
 
         public Team AddPlayer(Func<Player, Player> playerMaker)
         {
-            Player player = playerMaker(new Player(BeepLive.Map));
+            Player player = playerMaker(new Player(BeepLiveGame.Map));
             player.GenerateShape();
             Players.Add(player);
 

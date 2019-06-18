@@ -5,7 +5,7 @@ using SFML.System;
 
 namespace BeepLive.Entities
 {
-    public abstract class Entity
+    public abstract class Entity : IDisposable
     {
         protected bool Disposed;
         public Map Map;
@@ -13,6 +13,12 @@ namespace BeepLive.Entities
         public virtual Vector2f Position { get; set; }
         public Vector2f Velocity { get; set; }
         public bool Alive => Disposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         public abstract void Step();
 
@@ -24,12 +30,6 @@ namespace BeepLive.Entities
         public Voxel GetVoxelUnscaled(float x, float y)
         {
             return Map.GetVoxel(Position + new Vector2f(x, y));
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)

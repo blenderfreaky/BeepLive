@@ -8,9 +8,25 @@ namespace BeepLive.Config
 {
     public class MapConfig
     {
+        private Boundary _entityBoundary;
+
+        private Boundary _entityBoundaryChunkOffset;
         public Color BackgroundColor;
         public uint ChunkSize;
-        private Boundary _entityBoundary;
+        public float FloatingNoiseScale, FloatingNoiseThreshold, FloatingNoiseFalloff;
+        public int GroundLevel;
+        public VoxelType GroundVoxelType;
+        public float HorizontalNoiseScale, VerticalNoiseScale;
+        public int MapHeight;
+        public int MapWidth;
+        public PhysicalEnvironment PhysicalEnvironment;
+
+        public MapConfig()
+        {
+            PhysicalEnvironment = new PhysicalEnvironment();
+            GroundVoxelType = new VoxelType();
+        }
+
         [XmlIgnore]
         public Boundary EntityBoundary
         {
@@ -21,12 +37,11 @@ namespace BeepLive.Config
                 _entityBoundaryChunkOffset = new Boundary
                 {
                     Min = value.Min,
-                    Max = value.Max - new Vector2f(MapWidth * ChunkSize, MapHeight * ChunkSize),
+                    Max = value.Max - new Vector2f(MapWidth * ChunkSize, MapHeight * ChunkSize)
                 };
             }
         }
 
-        private Boundary _entityBoundaryChunkOffset;
         public Boundary EntityBoundaryChunkOffset
         {
             get => _entityBoundaryChunkOffset;
@@ -36,21 +51,9 @@ namespace BeepLive.Config
                 _entityBoundary = new Boundary
                 {
                     Min = value.Min,
-                    Max = value.Max + new Vector2f(MapWidth * ChunkSize, MapHeight * ChunkSize),
+                    Max = value.Max + new Vector2f(MapWidth * ChunkSize, MapHeight * ChunkSize)
                 };
             }
-        }
-        public int MapHeight;
-        public int MapWidth;
-        public PhysicalEnvironment PhysicalEnvironment;
-        public VoxelType GroundVoxelType;
-        public int GroundLevel;
-        public float HorizontalNoiseScale, VerticalNoiseScale;
-        public float FloatingNoiseScale, FloatingNoiseThreshold, FloatingNoiseFalloff;
-
-        public MapConfig()
-        {
-            PhysicalEnvironment = new PhysicalEnvironment();
         }
 
         #region Fluent API
