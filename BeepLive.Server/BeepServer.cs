@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using BeepLive.Client;
 using BeepLive.Network;
@@ -11,11 +10,11 @@ using Networker.Server.Abstractions;
 
 namespace BeepLive.Server
 {
-    public class BeepServer
+    public static class BeepServer
     {
-        public Dictionary<Guid, Guid> PlayerSecrets;
+        public static Dictionary<string, string> PlayerSecrets;
 
-        public BeepServer()
+        static BeepServer()
         {
             IConfiguration config = new ConfigurationBuilder()
                 .AddJsonFile("appSettings.json", false, true)
@@ -23,7 +22,7 @@ namespace BeepLive.Server
 
             IConfigurationSection networkerSettings = config.GetSection("Networker");
 
-            PlayerSecrets = new Dictionary<Guid, Guid>();
+            PlayerSecrets = new Dictionary<string, string>();
 
             Server = new ServerBuilder()
                 .UseTcp(networkerSettings.GetValue<int>("TcpPort"))
@@ -39,9 +38,9 @@ namespace BeepLive.Server
                 .Build();
         }
 
-        public IServer Server { get; set; }
+        public static IServer Server { get; set; }
 
-        public void Start()
+        public static void Start()
         {
             Server.Start();
 

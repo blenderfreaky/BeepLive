@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BeepLive.Config;
 using BeepLive.Entities;
 using BeepLive.World;
 
@@ -11,10 +12,12 @@ namespace BeepLive.Game
         public List<Player> Players;
         public VoxelType VoxelType;
 
-        public Team(BeepLiveGame beepLiveGame)
+        public Team(BeepLiveGame beepLiveGame, TeamConfig teamConfig)
         {
             BeepLiveGame = beepLiveGame;
-            Players = new List<Player>();
+            Players = new List<Player>(teamConfig.MaxPlayers);
+            VoxelType = new VoxelType
+                {OwnerTeam = this, Color = teamConfig.Color, Resistance = teamConfig.TerritoryResistance};
         }
 
         #region Fluent API

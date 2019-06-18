@@ -36,7 +36,7 @@ namespace BeepLive.Config
                 _entityBoundaryChunkOffset = new Boundary
                 {
                     Min = value.Min,
-                    Max = value.Max - new Vector2f(MapWidth * ChunkSize, MapHeight * ChunkSize),
+                    Max = value.Max - new Vector2f(MapWidth * ChunkSize, MapHeight * ChunkSize)
                 };
             }
         }
@@ -50,7 +50,7 @@ namespace BeepLive.Config
                 _entityBoundary = new Boundary
                 {
                     Min = value.Min,
-                    Max = value.Max + new Vector2f(MapWidth * ChunkSize, MapHeight * ChunkSize),
+                    Max = value.Max + new Vector2f(MapWidth * ChunkSize, MapHeight * ChunkSize)
                 };
             }
         }

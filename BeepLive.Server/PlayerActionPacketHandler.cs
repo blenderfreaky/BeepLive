@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using BeepLive.Config;
 using BeepLive.Network;
 using Microsoft.Extensions.Logging;
 using Networker.Common;
@@ -20,7 +19,11 @@ namespace BeepLive.Server
         public override async Task Process(PlayerShotPacket packet, IPacketContext packetContext)
 #pragma warning restore 1998
         {
-            _logger.LogDebug("I received the packet: " + XmlHelper.ToXml(packet));
+            _logger.LogDebug("Received: " + packet);
+
+            if (BeepServer.PlayerSecrets[packet.PlayerGuid] == packet.Secret)
+
+                packetContext.Sender.Send();
         }
     }
 
@@ -37,7 +40,7 @@ namespace BeepLive.Server
         public override async Task Process(PlayerJumpPacket packet, IPacketContext packetContext)
 #pragma warning restore 1998
         {
-            _logger.LogDebug("I received the packet: " + XmlHelper.ToXml(packet));
+            _logger.LogDebug("Received: " + packet);
         }
     }
 
@@ -54,7 +57,14 @@ namespace BeepLive.Server
         public override async Task Process(PlayerFlowPacket packet, IPacketContext packetContext)
 #pragma warning restore 1998
         {
-            _logger.LogDebug("I received the packet: " + XmlHelper.ToXml(packet));
+            _logger.LogDebug("Received: " + packet);
+
+            if (packet.Type == PlayerFlowPacket.PlayerFlowType.Join)
+            {
+                BeepServer.PlayerSecrets[packet.PlayerGuid] = packet.Secret;
+
+                packetContext.Sender.Send();
+            }
         }
     }
 }

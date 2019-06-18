@@ -1,4 +1,5 @@
 ﻿using System;
+using BeepLive.Config;
 using BeepLive.World;
 using SFML.System;
 
@@ -25,6 +26,13 @@ namespace BeepLive.Entities
             ChildMaxLifeTime = childMaxLifeTime;
         }
 
+        public ClusterProjectile(Map map, Vector2f position, Vector2f velocity, ShotConfig shotConfig)
+            : this(map, position, velocity, shotConfig.Radius, shotConfig.LowestSpeed, shotConfig.MaxLifeTime,
+                shotConfig.ChildCount, shotConfig.ChildRadius, shotConfig.ExplosionPower, shotConfig.ChildLowestSpeed,
+                shotConfig.ChildMaxLifeTime)
+        {
+        }
+
         public override void Die()
         {
             base.Die();
@@ -34,7 +42,7 @@ namespace BeepLive.Entities
 
         public void Explode()
         {
-            for (int i = 0; i < ChildCount; i++)
+            for (var i = 0; i < ChildCount; i++)
             {
                 var direction = new Vector2f((float) (Map.Random.NextDouble() * 2 - 1) * ExplosionPower,
                     (float) (Map.Random.NextDouble() * 2 - 1) * ExplosionPower);

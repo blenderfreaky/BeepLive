@@ -41,7 +41,7 @@ namespace BeepLive.Game
             _font = new Font(Path.GetFullPath("BioRhymeExpanded-ExtraBold.ttf"));
             _text = new Text("Connecting to Server", _font)
             {
-                Position = _center,
+                Position = _center
             };
         }
 
@@ -81,10 +81,7 @@ namespace BeepLive.Game
                         //Window.Draw();
                     }
 
-                    if (BeepGameState.Connecting)
-                    {
-                        Window.Draw(_text);
-                    }
+                    if (BeepGameState.Connecting) Window.Draw(_text);
 
                     Window.Display();
                 }
@@ -132,7 +129,8 @@ namespace BeepLive.Game
             if (BeepGameState.InputsAllowed)
             {
                 Vector2f localPlayerPosition = BeepLiveGame.LocalPlayer.Position;
-                BeepLiveGame.Map.AddClusterProjectile(localPlayerPosition, new Vector2f(e.X - localPlayerPosition.X, e.Y - localPlayerPosition.Y) / 10,
+                BeepLiveGame.Map.AddClusterProjectile(localPlayerPosition,
+                    new Vector2f(e.X - localPlayerPosition.X, e.Y - localPlayerPosition.Y) / 10,
                     4,
                     10, 300, 200,
                     2, 10, 5, 200);
@@ -163,6 +161,15 @@ namespace BeepLive.Game
             foreach (Entity entity in entities.Where(entity => !entity.Alive)) Window.Draw(entity.Shape);
         }
 
+        public class GameState
+        {
+            public bool Connecting;
+            public bool Drawing;
+            public bool InputsAllowed;
+            public bool SelectingTeams;
+            public bool Simulating;
+        }
+
         #region Camera
 
         private readonly View _view;
@@ -182,39 +189,5 @@ namespace BeepLive.Game
         #endregion
 
         #endregion
-
-        #region Fluent API
-
-        public BeepLiveSfml AddMap(Func<Map, Map> mapMaker)
-        {
-            BeepLiveGame.Map = mapMaker(new Map());
-
-            return this;
-        }
-
-        public BeepLiveSfml AddTeam(Func<Team, Team> teamMaker)
-        {
-            BeepLiveGame.Teams.Add(teamMaker(new Team(BeepLiveGame)));
-
-            return this;
-        }
-
-        public BeepLiveSfml SetLocalPlayer(Player localPlayer)
-        {
-            BeepLiveGame.LocalPlayer = localPlayer;
-
-            return this;
-        }
-
-        #endregion
-        
-        public class GameState
-        {
-            public bool Drawing;
-            public bool InputsAllowed;
-            public bool Simulating;
-            public bool SelectingTeams;
-            public bool Connecting;
-        }
     }
 }
