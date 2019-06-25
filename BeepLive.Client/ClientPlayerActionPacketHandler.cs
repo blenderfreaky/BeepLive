@@ -3,6 +3,7 @@ using BeepLive.Network;
 using Microsoft.Extensions.Logging;
 using Networker.Common;
 using Networker.Common.Abstractions;
+#pragma warning disable 1998
 
 namespace BeepLive.Client
 {
@@ -15,11 +16,10 @@ namespace BeepLive.Client
             _logger = logger;
         }
 
-#pragma warning disable 1998
         public override async Task Process(PlayerShotPacket packet, IPacketContext packetContext)
-#pragma warning restore 1998
         {
             _logger.LogDebug("Received: " + packet);
+            BeepClient.BeepClientInstance.BeepLiveSfml.HandlePlayerActionPacket(packet);
         }
     }
 
@@ -32,11 +32,10 @@ namespace BeepLive.Client
             _logger = logger;
         }
 
-#pragma warning disable 1998
         public override async Task Process(PlayerJumpPacket packet, IPacketContext packetContext)
-#pragma warning restore 1998
         {
             _logger.LogDebug("Received: " + packet);
+            BeepClient.BeepClientInstance.BeepLiveSfml.HandlePlayerActionPacket(packet);
         }
     }
 
@@ -49,11 +48,10 @@ namespace BeepLive.Client
             _logger = logger;
         }
 
-#pragma warning disable 1998
         public override async Task Process(ServerFlowPacket packet, IPacketContext packetContext)
-#pragma warning restore 1998
         {
             _logger.LogDebug("Received: " + packet);
+            BeepClient.BeepClientInstance.BeepLiveSfml.HandleServerFlowPacket(packet);
         }
     }
 
@@ -66,12 +64,11 @@ namespace BeepLive.Client
             _logger = logger;
         }
 
-#pragma warning disable 1998
         public override async Task Process(SyncPacket packet, IPacketContext packetContext)
-#pragma warning restore 1998
         {
             _logger.LogDebug("Received: " + packet);
             BeepClient.BeepConfig = packet.BeepConfig;
+            BeepClient.BeepClientInstance.BeepLiveSfml.HandleSyncPacket(packet);
         }
     }
 }

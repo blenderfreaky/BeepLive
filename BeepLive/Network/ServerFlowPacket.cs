@@ -12,8 +12,13 @@ namespace BeepLive.Network
 
     public enum ServerFlowType
     {
-        Spawn,
+        StartTeamSelection,
+        StopTeamSelection,
+        StartSpawning,
+        StopSpawning,
         StartSimulation,
-        StartPlanning
+        StopSimulation,
+        StartPlanning,
+        StopPlanning,
     }
 }

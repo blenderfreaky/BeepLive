@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -44,6 +45,8 @@ namespace BeepLive.Game
             {
                 Position = _center
             };
+
+            QueuedPlayerActionPackets = new List<PlayerActionPacket>();
         }
 
         public BeepLiveGame BeepLiveGame { get; }
@@ -176,6 +179,62 @@ namespace BeepLive.Game
             }
 
             foreach (Entity entity in entities.Where(entity => !entity.Alive)) Window.Draw(entity.Shape);
+        }
+
+
+
+        public void HandlePlayerActionPacket(PlayerActionPacket packet)
+        {
+            QueuedPlayerActionPackets.Add(packet);
+        }
+
+        public readonly List<PlayerActionPacket> QueuedPlayerActionPackets;
+        public void HandleServerFlowPacket(ServerFlowPacket packet)
+        {
+            BeepGameState.Connecting = false;
+
+            switch (packet.Type)
+            {
+                case ServerFlowType.StartTeamSelection:
+                    BeepGameState.SelectingTeams = true;
+                    BeepGameState.Drawing = false;
+                    break;
+                case ServerFlowType.StopTeamSelection:
+                    BeepGameState.SelectingTeams = false;
+                    BeepGameState.Drawing = false;
+                    break;
+                case ServerFlowType.StartSpawning:
+                    BeepGameState.Spawning = true;
+                    BeepGameState.Drawing = true;
+                    break;
+                case ServerFlowType.StopSpawning:
+                    BeepGameState.Spawning = false;
+                    BeepGameState.Drawing = true;
+                    break;
+                case ServerFlowType.StartSimulation:
+                    BeepGameState.Simulating = true;
+                    BeepGameState.Drawing = true;
+                    break;
+                case ServerFlowType.StopSimulation:
+                    BeepGameState.Simulating = false;
+                    BeepGameState.Drawing = true;
+                    break;
+                case ServerFlowType.StartPlanning:
+                    BeepGameState.InputsAllowed = true;
+                    BeepGameState.Drawing = true;
+                    break;
+                case ServerFlowType.StopPlanning:
+                    BeepGameState.InputsAllowed = false;
+                    BeepGameState.Drawing = true;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public void HandleSyncPacket(SyncPacket packet)
+        {
+
         }
 
         public class GameState
