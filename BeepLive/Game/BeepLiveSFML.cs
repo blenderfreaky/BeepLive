@@ -52,7 +52,7 @@ namespace BeepLive.Game
 
         private void Window_MouseWheelScrolled(object sender, MouseWheelScrollEventArgs e)
         {
-            _zoom *= Math.Pow(2, e.Delta);
+            _zoom *= (float)Math.Pow(2, e.Delta);
         }
 
         public BeepLiveSfml Run()
@@ -101,7 +101,7 @@ namespace BeepLive.Game
             if (!_shakeTimer.IsRunning) return;
 
             // ReSharper disable once PossibleLossOfFraction
-            var fulfillment = (float) (_shakeTimer.ElapsedMilliseconds / (double) _shakeDuration);
+            float fulfillment = (float) (_shakeTimer.ElapsedMilliseconds / (double) _shakeDuration);
             if (fulfillment < 1f)
             {
                 var direction = new Vector2f((float) (_random.NextDouble() * 2 - 1),
@@ -161,8 +161,8 @@ namespace BeepLive.Game
 
         private void GameLoop()
         {
-            for (var chunkI = 0; chunkI < BeepLiveGame.Map.Config.MapWidth; chunkI++)
-            for (var chunkJ = 0; chunkJ < BeepLiveGame.Map.Config.MapHeight; chunkJ++)
+            for (int chunkI = 0; chunkI < BeepLiveGame.Map.Config.MapWidth; chunkI++)
+            for (int chunkJ = 0; chunkJ < BeepLiveGame.Map.Config.MapHeight; chunkJ++)
             {
                 Chunk chunk = BeepLiveGame.Map.Chunks[chunkI, chunkJ];
                 chunk.Update();

@@ -70,10 +70,10 @@ namespace BeepLive.Entities
 
                     break;
                 case CollisionResponseMode.Raise:
-                    var collides = false;
+                    bool collides = false;
 
-                    for (var i = 0; i < Size; i++)
-                    for (var j = 0; j < Size; j++)
+                    for (int i = 0; i < Size; i++)
+                    for (int j = 0; j < Size; j++)
                         if (!GetVoxel(i, j).IsAir)
                             collides = true;
 
@@ -92,10 +92,10 @@ namespace BeepLive.Entities
                     // The center of mass of voxels intersecting the player
                     var center = new Vector2f(0, 0);
                     // The amount of voxels intersecting the Player
-                    var collisionCount = 0;
+                    int collisionCount = 0;
 
-                    for (var i = 0; i < Size; i++)
-                    for (var j = 0; j < Size; j++)
+                    for (int i = 0; i < Size; i++)
+                    for (int j = 0; j < Size; j++)
                     {
                         if (GetVoxel(i, j).IsAir) continue;
 

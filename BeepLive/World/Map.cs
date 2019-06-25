@@ -48,8 +48,8 @@ namespace BeepLive.World
 
         public Chunk GetChunk(Vector2f position, out Vector2f chunkPosition)
         {
-            var i = (int) MathF.Floor(position.X / Config.ChunkSize);
-            var j = (int) MathF.Floor(position.Y / Config.ChunkSize);
+            int i = (int) MathF.Floor(position.X / Config.ChunkSize);
+            int j = (int) MathF.Floor(position.Y / Config.ChunkSize);
             chunkPosition = new Vector2f(i * Config.ChunkSize, j * Config.ChunkSize);
             return i < 0 || j < 0 || i >= Config.MapWidth || j >= Config.MapHeight ? null : Chunks[i, j];
         }
