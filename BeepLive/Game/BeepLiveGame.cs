@@ -35,7 +35,7 @@ namespace BeepLive.Game
         {
             if (team.Players.Count < team.TeamConfig.MaxPlayers)
             {
-                LocalPlayer = new Player(Map, new Vector2f(), team.TeamConfig.PlayerSize);
+                LocalPlayer = new Player(Map, new Vector2f(), team.TeamConfig.PlayerSize, team);
 
                 team.Players.Add(LocalPlayer);
             }

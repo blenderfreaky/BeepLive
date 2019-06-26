@@ -59,16 +59,7 @@ namespace BeepLive.World
             return GetChunk(position, out Vector2f chunkPosition)?.GetVoxel(position - chunkPosition) ??
                    new Voxel(this);
         }
-
-        #region Fluent API
-
-        public Map Configure(Func<MapConfig, MapConfig> configMaker)
-        {
-            Config = configMaker(new MapConfig());
-
-            return this;
-        }
-
+        
         public Map LoadConfig(string path)
         {
             Config = XmlHelper.LoadFromXmlString<MapConfig>(File.ReadAllText(path));
@@ -114,32 +105,5 @@ namespace BeepLive.World
 
             return this;
         }
-
-        public Map AddPlayer(Vector2f position, int size)
-        {
-            Entities.Add(new Player(this, position, size));
-
-            return this;
-        }
-
-        public Map AddProjectile(Vector2f position, Vector2f velocity, float radius, float lowestSpeed, int maxLifeTime)
-        {
-            Entities.Add(new Projectile(this, position, velocity, radius, lowestSpeed, maxLifeTime));
-
-            return this;
-        }
-
-        public Map AddClusterProjectile(Vector2f position, Vector2f velocity, float radius, float lowestSpeed,
-            int maxLifeTime,
-            int childCount,
-            int childRadius, float explosionPower, float childLowestSpeed, int childMaxLifeTime)
-        {
-            Entities.Add(new ClusterProjectile<Projectile>(this, position, velocity, radius, lowestSpeed, maxLifeTime,
-                childCount, childRadius, explosionPower, childLowestSpeed, childMaxLifeTime));
-
-            return this;
-        }
-
-        #endregion
     }
 }

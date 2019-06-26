@@ -212,6 +212,8 @@ namespace BeepLive.Game
                     BeepGameState.Drawing = true;
                     break;
                 case ServerFlowType.StartSimulation:
+                    ExecutePlayerActionPackets();
+
                     BeepGameState.Simulating = true;
                     BeepGameState.Drawing = true;
                     break;
@@ -226,6 +228,26 @@ namespace BeepLive.Game
                 case ServerFlowType.StopPlanning:
                     BeepGameState.InputsAllowed = false;
                     BeepGameState.Drawing = true;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void ExecutePlayerActionPackets() =>
+            QueuedPlayerActionPackets.OrderBy(x => x.MessageGuid).ThenBy(x => x.PlayerGuid).ForEach(ExecutePlayerActionPacket);
+
+        private void ExecutePlayerActionPacket(PlayerActionPacket packet)
+        {
+            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid));
+
+            switch (packet)
+            {
+                case PlayerJumpPacket jumpPacket:
+                    player.Velocity += jumpPacket.Direction;
+                    break;
+                case PlayerShotPacket shotPacket:
+                    //player.Shoot(shotPacket.);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

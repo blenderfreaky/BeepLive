@@ -1,4 +1,6 @@
 ﻿using System;
+using BeepLive.Config;
+using BeepLive.Game;
 using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
@@ -8,12 +10,16 @@ namespace BeepLive.Entities
     public class Player : Entity
     {
         private Vector2f _lastSafePosition;
-        public Guid Guid;
+        public string Guid;
 
         public float Health;
         public string Name;
 
-        public Player(Map map, Vector2f position, int size)
+        public ClusterShotConfig<ShotConfig> ShotConfig;
+
+        public Team Team;
+
+        public Player(Map map, Vector2f position, int size, Team team)
         {
             Shape = new RectangleShape
             {
@@ -25,11 +31,7 @@ namespace BeepLive.Entities
             Map = map;
             Position = position;
             Size = size;
-        }
-
-        internal Player(Map map)
-        {
-            Map = map;
+            Team = team;
         }
 
         public Boundary Boundary => new Boundary {Min = Position, Max = Position + new Vector2f(Size, Size)};
@@ -50,6 +52,14 @@ namespace BeepLive.Entities
                 Size = new Vector2f(Size, Size),
                 FillColor = Color.Red
             };
+        }
+
+        public ClusterProjectile<Projectile<ShotConfig>, ShotConfig> Shoot(Vector2f velocity)
+        {
+            var projectile =
+                new ClusterProjectile<Projectile<ShotConfig>, ShotConfig>(Map, Position, velocity, ShotConfig);
+            Map.Entities.Add(projectile);
+            return projectile;
         }
 
         public override void Step()
