@@ -19,11 +19,11 @@ namespace BeepLive.Client
 
         public BeepClient()
         {
-            var config = new ConfigurationBuilder()
+            IConfigurationRoot config = new ConfigurationBuilder()
                 .AddJsonFile("clientSettings.json", false, true)
                 .Build();
 
-            var networkerSettings = config.GetSection("Networker");
+            IConfigurationSection networkerSettings = config.GetSection("Networker");
 
             MyPlayer = Guid.NewGuid();
             MySecret = Guid.NewGuid();
@@ -50,7 +50,7 @@ namespace BeepLive.Client
         {
             Client.Connect();
 
-            var playerFlowPacket = new PlayerFlowPacket
+            PlayerFlowPacket playerFlowPacket = new PlayerFlowPacket
             {
                 PlayerGuid = MyPlayer.ToString(),
                 Secret = MySecret.ToString(),

@@ -31,7 +31,7 @@ namespace BeepLive.Entities
         {
             for (int i = 0; i < ShotConfig.ChildCount; i++)
             {
-                var direction = new Vector2f((float) (Map.Random.NextDouble() * 2 - 1) * ShotConfig.ExplosionPower,
+                Vector2f direction = new Vector2f((float) (Map.Random.NextDouble() * 2 - 1) * ShotConfig.ExplosionPower,
                     (float) (Map.Random.NextDouble() * 2 - 1) * ShotConfig.ExplosionPower);
                 Map.Entities.Add(Activator.CreateInstance(typeof(TProjectile), Map, Position, Velocity + direction,
                     ShotConfig.ChildShotConfig) as TProjectile);

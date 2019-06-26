@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using BeepLive.Entities;
 using BeepLive.Network;
+using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -19,7 +20,7 @@ namespace BeepLive.Game
 
         public BeepLiveSfml(BeepLiveGame beepLive)
         {
-            var mode = new VideoMode(800, 600);
+            VideoMode mode = new VideoMode(800, 600);
             Window = new RenderWindow(mode, "Map");
 
             _center = new Vector2f(Window.Size.X / 2f, Window.Size.Y / 2f);
@@ -107,7 +108,7 @@ namespace BeepLive.Game
             float fulfillment = (float) (_shakeTimer.ElapsedMilliseconds / (double) _shakeDuration);
             if (fulfillment < 1f)
             {
-                var direction = new Vector2f((float) (_random.NextDouble() * 2 - 1),
+                Vector2f direction = new Vector2f((float) (_random.NextDouble() * 2 - 1),
                     (float) (_random.NextDouble() * 2 - 1));
                 direction /= MathF.Sqrt(direction.X * direction.X + direction.Y * direction.Y);
                 _view.Center = _center + direction * _shakeMagnitude * (1f - fulfillment);
@@ -128,7 +129,7 @@ namespace BeepLive.Game
 
         private void Window_KeyPressed(object sender, KeyEventArgs e)
         {
-            var window = (Window) sender;
+            Window window = (Window) sender;
             if (e.Code == Keyboard.Key.Escape) window.Close();
 
             switch (e.Code)
@@ -150,7 +151,7 @@ namespace BeepLive.Game
             }
             else if (BeepGameState.InputsAllowed)
             {
-                var localPlayerPosition = BeepLiveGame.LocalPlayer.Position;
+                Vector2f localPlayerPosition = BeepLiveGame.LocalPlayer.Position;
             }
         }
 
@@ -164,7 +165,7 @@ namespace BeepLive.Game
             for (int chunkI = 0; chunkI < BeepLiveGame.Map.Config.MapWidth; chunkI++)
             for (int chunkJ = 0; chunkJ < BeepLiveGame.Map.Config.MapHeight; chunkJ++)
             {
-                var chunk = BeepLiveGame.Map.Chunks[chunkI, chunkJ];
+                Chunk chunk = BeepLiveGame.Map.Chunks[chunkI, chunkJ];
                 chunk.Update();
                 Window.Draw(chunk.Sprite);
             }
@@ -175,7 +176,7 @@ namespace BeepLive.Game
                 entities = BeepLiveGame.Map.Entities.Where(e => !(e is null)).ToArray();
             }
 
-            foreach (var entity in entities.Where(entity => !entity.Alive)) Window.Draw(entity.Shape);
+            foreach (Entity entity in entities.Where(entity => !entity.Alive)) Window.Draw(entity.Shape);
         }
 
 
@@ -237,7 +238,7 @@ namespace BeepLive.Game
 
         private void ExecutePlayerActionPacket(PlayerActionPacket packet)
         {
-            var player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid));
+            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid));
 
             switch (packet)
             {

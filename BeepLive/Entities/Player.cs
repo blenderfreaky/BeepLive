@@ -56,7 +56,7 @@ namespace BeepLive.Entities
 
         public ClusterProjectile<Projectile<ShotConfig>, ShotConfig> Shoot(Vector2f velocity)
         {
-            var projectile =
+            ClusterProjectile<Projectile<ShotConfig>, ShotConfig> projectile =
                 new ClusterProjectile<Projectile<ShotConfig>, ShotConfig>(Map, Position, velocity, ShotConfig);
             Map.Entities.Add(projectile);
             return projectile;
@@ -100,7 +100,7 @@ namespace BeepLive.Entities
                     break;
                 case CollisionResponseMode.LeastResistance:
                     // The center of mass of voxels intersecting the player
-                    var center = new Vector2f(0, 0);
+                    Vector2f center = new Vector2f(0, 0);
                     // The amount of voxels intersecting the Player
                     int collisionCount = 0;
 
