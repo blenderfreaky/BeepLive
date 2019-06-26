@@ -23,7 +23,7 @@ namespace BeepLive.Server
                 .AddJsonFile("appSettings.json", false, true)
                 .Build();
 
-            IConfigurationSection networkerSettings = config.GetSection("Networker");
+            var networkerSettings = config.GetSection("Networker");
 
             PlayerSecrets = new Dictionary<string, string>();
 

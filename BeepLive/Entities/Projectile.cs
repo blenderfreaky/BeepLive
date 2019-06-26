@@ -10,9 +10,10 @@ namespace BeepLive.Entities
     public class Projectile<TShotConfig> : Entity
         where TShotConfig : ShotConfig
     {
-        public TShotConfig ShotConfig;
+        public int LifeTime;
 
         public Player Owner;
+        public TShotConfig ShotConfig;
         public VoxelType VoxelTypeToPlace;
 
         public Projectile(Map map, Vector2f position, Vector2f velocity, TShotConfig shotConfig, Player owner = null)
@@ -31,7 +32,7 @@ namespace BeepLive.Entities
 
             Owner = owner;
 
-            VoxelTypeToPlace = 
+            VoxelTypeToPlace =
                 ShotConfig.Destructive ? null :
                 ShotConfig.Neutral ? Map.Config.GroundVoxelType :
                 Owner == null ? null : Owner.Team?.VoxelType ?? Map.Config.GroundVoxelType;
@@ -51,7 +52,7 @@ namespace BeepLive.Entities
 
         public override void Step()
         {
-            Voxel voxelUnderCenter = Map.GetVoxel(Position);
+            var voxelUnderCenter = Map.GetVoxel(Position);
 
             Velocity += Map.Config.PhysicalEnvironment.Gravity;
             Velocity *= voxelUnderCenter.IsAir
@@ -71,29 +72,25 @@ namespace BeepLive.Entities
                 Map.Players.Any(p => p.Boundary.Contains(Position)))
                 Die();
 
-            Vector2f front = Velocity / dist;
+            var front = Velocity / dist;
             var left = new Vector2f(front.Y, -front.X);
 
             for (float x = 0; x < dist; x += .5f)
             for (float y = -ShotConfig.Radius; y <= ShotConfig.Radius; y++)
             {
-                Vector2f position = Position + front * x + left * y;
-                
-                Chunk chunk = Map.GetChunk(position, out Vector2f chunkPosition);
+                var position = Position + front * x + left * y;
+
+                var chunk = Map.GetChunk(position, out var chunkPosition);
                 if (chunk == null) continue;
                 uint xFloored = (uint) MathF.Floor(position.X - chunkPosition.X);
                 uint yFloored = (uint) MathF.Floor(position.Y - chunkPosition.Y);
 
                 if ((ShotConfig.Damages & chunk[xFloored, yFloored].GetTeamRelation(Owner.Team)) != TeamRelation.Air)
-                {
-                    chunk[xFloored,yFloored] = new Voxel(Map, VoxelTypeToPlace);
-                }
+                    chunk[xFloored, yFloored] = new Voxel(Map, VoxelTypeToPlace);
             }
 
             Position += Velocity;
         }
-
-        public int LifeTime;
 
         public virtual void Die()
         {

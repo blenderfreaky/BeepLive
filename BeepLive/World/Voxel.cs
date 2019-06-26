@@ -1,5 +1,4 @@
 ﻿using System;
-using BeepLive.Entities;
 using BeepLive.Game;
 using SFML.Graphics;
 
@@ -29,14 +28,16 @@ namespace BeepLive.World
 
         public Color Color => VoxelType?.Color ?? Map.Config.BackgroundColor;
 
-        public TeamRelation GetTeamRelation(Team team) =>
-            VoxelType.OwnerTeam == null
+        public TeamRelation GetTeamRelation(Team team)
+        {
+            return VoxelType.OwnerTeam == null
                 ? TeamRelation.Neutral
                 : VoxelType == null
                     ? TeamRelation.Air
                     : VoxelType.OwnerTeam == team
                         ? TeamRelation.Friendly
                         : TeamRelation.Hostile;
+        }
     }
 
     [Flags]
@@ -45,6 +46,6 @@ namespace BeepLive.World
         Air = 0,
         Friendly = 1 << 1,
         Neutral = 1 << 2,
-        Hostile = 1 << 3,
+        Hostile = 1 << 3
     }
 }

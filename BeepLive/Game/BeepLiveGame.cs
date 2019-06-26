@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using BeepLive.Config;
 using BeepLive.Entities;
-using BeepLive.Network;
 using BeepLive.World;
 using SFML.System;
 

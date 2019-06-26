@@ -12,9 +12,11 @@ namespace BeepLive.Entities
         public delegate void OnExplode();
 
 
-        public ClusterProjectile(Map map, Vector2f position, Vector2f velocity, ClusterShotConfig<TShotConfig> shotConfig,
+        public ClusterProjectile(Map map, Vector2f position, Vector2f velocity,
+            ClusterShotConfig<TShotConfig> shotConfig,
             Player owner = null) : base(map, position, velocity, shotConfig, owner)
-        { }
+        {
+        }
 
         public event OnExplode OnExplodeEvent;
 
@@ -31,7 +33,8 @@ namespace BeepLive.Entities
             {
                 var direction = new Vector2f((float) (Map.Random.NextDouble() * 2 - 1) * ShotConfig.ExplosionPower,
                     (float) (Map.Random.NextDouble() * 2 - 1) * ShotConfig.ExplosionPower);
-                Map.Entities.Add(Activator.CreateInstance(typeof(TProjectile), Map, Position, Velocity + direction, ShotConfig.ChildShotConfig) as TProjectile);
+                Map.Entities.Add(Activator.CreateInstance(typeof(TProjectile), Map, Position, Velocity + direction,
+                    ShotConfig.ChildShotConfig) as TProjectile);
             }
 
             OnExplodeEvent?.Invoke();

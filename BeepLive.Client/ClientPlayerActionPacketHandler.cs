@@ -3,6 +3,7 @@ using BeepLive.Network;
 using Microsoft.Extensions.Logging;
 using Networker.Common;
 using Networker.Common.Abstractions;
+
 #pragma warning disable 1998
 
 namespace BeepLive.Client

@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using BeepLive.Entities;
 using BeepLive.Network;
-using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -14,6 +13,7 @@ namespace BeepLive.Game
 {
     public class BeepLiveSfml
     {
+        public readonly List<PlayerActionPacket> QueuedPlayerActionPackets;
         public Action<PlayerActionPacket> SendAction;
         public RenderWindow Window;
 
@@ -55,7 +55,7 @@ namespace BeepLive.Game
 
         private void Window_MouseWheelScrolled(object sender, MouseWheelScrollEventArgs e)
         {
-            _zoom *= (float)Math.Pow(2, e.Delta);
+            _zoom *= (float) Math.Pow(2, e.Delta);
         }
 
         public BeepLiveSfml Run()
@@ -136,14 +136,11 @@ namespace BeepLive.Game
                 case Keyboard.Key.Q:
                     Shoot();
                     break;
-                default:
-                    break;
             }
         }
 
         private void Shoot()
         {
-            
         }
 
         private void Window_MousePressed(object sender, MouseButtonEventArgs e)
@@ -153,7 +150,7 @@ namespace BeepLive.Game
             }
             else if (BeepGameState.InputsAllowed)
             {
-                Vector2f localPlayerPosition = BeepLiveGame.LocalPlayer.Position;
+                var localPlayerPosition = BeepLiveGame.LocalPlayer.Position;
             }
         }
 
@@ -167,7 +164,7 @@ namespace BeepLive.Game
             for (int chunkI = 0; chunkI < BeepLiveGame.Map.Config.MapWidth; chunkI++)
             for (int chunkJ = 0; chunkJ < BeepLiveGame.Map.Config.MapHeight; chunkJ++)
             {
-                Chunk chunk = BeepLiveGame.Map.Chunks[chunkI, chunkJ];
+                var chunk = BeepLiveGame.Map.Chunks[chunkI, chunkJ];
                 chunk.Update();
                 Window.Draw(chunk.Sprite);
             }
@@ -178,9 +175,8 @@ namespace BeepLive.Game
                 entities = BeepLiveGame.Map.Entities.Where(e => !(e is null)).ToArray();
             }
 
-            foreach (Entity entity in entities.Where(entity => !entity.Alive)) Window.Draw(entity.Shape);
+            foreach (var entity in entities.Where(entity => !entity.Alive)) Window.Draw(entity.Shape);
         }
-
 
 
         public void HandlePlayerActionPacket(PlayerActionPacket packet)
@@ -188,7 +184,6 @@ namespace BeepLive.Game
             QueuedPlayerActionPackets.Add(packet);
         }
 
-        public readonly List<PlayerActionPacket> QueuedPlayerActionPackets;
         public void HandleServerFlowPacket(ServerFlowPacket packet)
         {
             BeepGameState.Connecting = false;
@@ -234,12 +229,15 @@ namespace BeepLive.Game
             }
         }
 
-        private void ExecutePlayerActionPackets() =>
-            QueuedPlayerActionPackets.OrderBy(x => x.MessageGuid).ThenBy(x => x.PlayerGuid).ForEach(ExecutePlayerActionPacket);
+        private void ExecutePlayerActionPackets()
+        {
+            QueuedPlayerActionPackets.OrderBy(x => x.MessageGuid).ThenBy(x => x.PlayerGuid)
+                .ForEach(ExecutePlayerActionPacket);
+        }
 
         private void ExecutePlayerActionPacket(PlayerActionPacket packet)
         {
-            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid));
+            var player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid));
 
             switch (packet)
             {
@@ -256,7 +254,6 @@ namespace BeepLive.Game
 
         public void HandleSyncPacket(SyncPacket packet)
         {
-
         }
 
         public class GameState

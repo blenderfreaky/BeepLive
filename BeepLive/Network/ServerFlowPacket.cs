@@ -19,6 +19,6 @@ namespace BeepLive.Network
         StartSimulation,
         StopSimulation,
         StartPlanning,
-        StopPlanning,
+        StopPlanning
     }
 }

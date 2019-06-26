@@ -1,6 +1,4 @@
-﻿using System;
-using System.Xml.Serialization;
-using BeepLive.Entities;
+﻿using System.Xml.Serialization;
 using BeepLive.Game;
 using SFML.Graphics;
 
