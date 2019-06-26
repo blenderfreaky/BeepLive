@@ -27,7 +27,7 @@ namespace BeepLive.Server.PacketHandlers
 
                 packetContext.Sender.Send(new SyncPacket(BeepServer.BeepConfig));
 
-                packetContext.Sender.Send(new ServerFlowPacket(ServerFlowType.StartTeamSelection));
+                packetContext.Sender.Send(new ServerFlowPacket {Type = ServerFlowType.StartTeamSelection});
             }
         }
     }

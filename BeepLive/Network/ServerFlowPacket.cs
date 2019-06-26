@@ -10,9 +10,8 @@ namespace BeepLive.Network
 
         [ProtoMember(1)] public long UnixTime;
 
-        public ServerFlowPacket(ServerFlowType type)
+        public ServerFlowPacket()
         {
-            Type = type;
             UnixTime = DateTime.UtcNow.Ticks;
         }
     }
