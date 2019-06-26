@@ -51,7 +51,10 @@ namespace BeepLive.Game
 
             Flow(PlayerFlowPacket.PlayerFlowType.Join);
 
-            BeepGameState = new GameState();
+            BeepGameState = new GameState
+            {
+                Connecting = true
+            };
 
             _font = new Font(Path.GetFullPath("BioRhymeExpanded-ExtraBold.ttf"));
             _connectingText = new Text("Connecting to Server", _font)
@@ -326,6 +329,8 @@ namespace BeepLive.Game
             {
                 Map = {OnSimulationStop = () => Flow(PlayerFlowPacket.PlayerFlowType.FinishedSimulation)}
             };
+
+            BeepGameState.Connecting = false;
 
             _physicsTimer = BeepLiveGame.Run();
         }

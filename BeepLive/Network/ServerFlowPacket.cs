@@ -1,4 +1,5 @@
-﻿using ProtoBuf;
+﻿using System;
+using ProtoBuf;
 
 namespace BeepLive.Network
 {
@@ -8,6 +9,12 @@ namespace BeepLive.Network
         [ProtoMember(2)] public ServerFlowType Type;
 
         [ProtoMember(1)] public long UnixTime;
+
+        public ServerFlowPacket(ServerFlowType type)
+        {
+            Type = type;
+            UnixTime = DateTime.UtcNow.Ticks;
+        }
     }
 
     public enum ServerFlowType

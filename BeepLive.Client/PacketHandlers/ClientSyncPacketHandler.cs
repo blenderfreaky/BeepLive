@@ -6,7 +6,7 @@ using Networker.Common.Abstractions;
 
 #pragma warning disable 1998
 
-namespace BeepLive.Client
+namespace BeepLive.Client.PacketHandlers
 {
     public class ClientSyncPacketHandler : PacketHandlerBase<SyncPacket>
     {
@@ -20,7 +20,7 @@ namespace BeepLive.Client
         public override async Task Process(SyncPacket packet, IPacketContext packetContext)
         {
             _logger.LogDebug("Received: " + packet);
-            BeepClient.BeepConfig = packet.BeepConfig;
+
             BeepClient.BeepClientInstance.BeepLiveSfml.HandleSyncPacket(packet);
         }
     }

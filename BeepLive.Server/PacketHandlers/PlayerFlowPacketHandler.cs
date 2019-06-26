@@ -3,9 +3,10 @@ using BeepLive.Network;
 using Microsoft.Extensions.Logging;
 using Networker.Common;
 using Networker.Common.Abstractions;
+
 #pragma warning disable 1998
 
-namespace BeepLive.Server
+namespace BeepLive.Server.PacketHandlers
 {
     public class PlayerFlowPacketHandler : PacketHandlerBase<PlayerFlowPacket>
     {
@@ -25,6 +26,8 @@ namespace BeepLive.Server
                 BeepServer.PlayerSecrets[packet.PlayerGuid] = packet.Secret;
 
                 packetContext.Sender.Send(new SyncPacket(BeepServer.BeepConfig));
+
+                packetContext.Sender.Send(new ServerFlowPacket(ServerFlowType.StartTeamSelection));
             }
         }
     }

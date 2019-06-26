@@ -11,8 +11,8 @@ namespace BeepLive.Config
         public BeepConfig()
         {
             MapConfig = new MapConfig();
-            TeamConfigs = new List<TeamConfig> { new TeamConfig() };
-            ShotConfigs = new List<ShotConfig> { new ShotConfig(), new ClusterShotConfig() };
+            TeamConfigs = new List<TeamConfig> { };
+            ShotConfigs = new List<ShotConfig> { };
         }
     }
 }

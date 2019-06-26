@@ -4,6 +4,7 @@ using System.Threading;
 using BeepLive.Client;
 using BeepLive.Config;
 using BeepLive.Network;
+using BeepLive.Server.PacketHandlers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Networker.Extensions.ProtobufNet;

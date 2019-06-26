@@ -3,20 +3,21 @@ using BeepLive.Network;
 using Microsoft.Extensions.Logging;
 using Networker.Common;
 using Networker.Common.Abstractions;
+
 #pragma warning disable 1998
 
-namespace BeepLive.Server
+namespace BeepLive.Server.PacketHandlers
 {
-    public class PlayerTeamJoinPacketHandler : PacketHandlerBase<PlayerTeamJoinPacket>
+    public class PlayerSpawnAtPacketHandler : PacketHandlerBase<PlayerSpawnAtPacket>
     {
-        private readonly ILogger<PlayerTeamJoinPacketHandler> _logger;
+        private readonly ILogger<PlayerSpawnAtPacketHandler> _logger;
 
-        public PlayerTeamJoinPacketHandler(ILogger<PlayerTeamJoinPacketHandler> logger)
+        public PlayerSpawnAtPacketHandler(ILogger<PlayerSpawnAtPacketHandler> logger)
         {
             _logger = logger;
         }
 
-        public override async Task Process(PlayerTeamJoinPacket packet, IPacketContext packetContext)
+        public override async Task Process(PlayerSpawnAtPacket packet, IPacketContext packetContext)
         {
             _logger.LogDebug("Received: " + packet);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using BeepLive.Client.PacketHandlers;
 using BeepLive.Config;
 using BeepLive.Game;
 using BeepLive.Network;
@@ -13,7 +14,6 @@ namespace BeepLive.Client
     public class BeepClient
     {
         public static BeepClient BeepClientInstance;
-        public static BeepConfig BeepConfig;
         public BeepLiveSfml BeepLiveSfml;
 
         public BeepClient()
