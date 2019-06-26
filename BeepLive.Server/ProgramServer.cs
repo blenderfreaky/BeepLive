@@ -2,7 +2,7 @@
 {
     public class ProgramServer
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
             BeepServer.Start();
         }

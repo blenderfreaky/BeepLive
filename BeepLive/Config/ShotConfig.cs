@@ -1,7 +1,9 @@
-﻿using BeepLive.World;
+﻿using System.Xml.Serialization;
+using BeepLive.World;
 
 namespace BeepLive.Config
 {
+    [XmlInclude(typeof(ClusterShotConfig))]
     public class ShotConfig
     {
         public TeamRelation Damages;
@@ -13,14 +15,8 @@ namespace BeepLive.Config
 
         public bool Neutral;
         public float Radius;
-    }
 
-    public class ClusterShotConfig<TShotConfig> : ShotConfig
-        where TShotConfig : ShotConfig
-    {
-        public int ChildCount;
-
-        public TShotConfig ChildShotConfig;
-        public float ExplosionPower;
+        public ShotConfig()
+        {}
     }
 }

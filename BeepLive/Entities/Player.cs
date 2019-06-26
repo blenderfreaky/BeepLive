@@ -15,23 +15,18 @@ namespace BeepLive.Entities
         public float Health;
         public string Name;
 
-        public ClusterShotConfig<ShotConfig> ShotConfig;
-
         public Team Team;
 
-        public Player(Map map, Vector2f position, int size, Team team)
+        public Player(Map map, Vector2f position, int size, Team team, string guid)
         {
-            Shape = new RectangleShape
-            {
-                Position = position,
-                Size = new Vector2f(size, size),
-                FillColor = Color.Red
-            };
+            GenerateShape();
 
             Map = map;
             Position = position;
             Size = size;
             Team = team;
+
+            Guid = guid ?? throw new ArgumentNullException(nameof(guid));
         }
 
         public Boundary Boundary => new Boundary {Min = Position, Max = Position + new Vector2f(Size, Size)};
@@ -50,14 +45,22 @@ namespace BeepLive.Entities
             {
                 Position = Position,
                 Size = new Vector2f(Size, Size),
-                FillColor = Color.Red
+                FillColor = Team.VoxelType.Color
             };
         }
 
-        public ClusterProjectile<Projectile<ShotConfig>, ShotConfig> Shoot(Vector2f velocity)
+        public Projectile<ShotConfig> Shoot(ShotConfig shotConfig, Vector2f velocity)
         {
-            ClusterProjectile<Projectile<ShotConfig>, ShotConfig> projectile =
-                new ClusterProjectile<Projectile<ShotConfig>, ShotConfig>(Map, Position, velocity, ShotConfig);
+            var projectile =
+                new Projectile<ShotConfig>(Map, Position, velocity, shotConfig);
+            Map.Entities.Add(projectile);
+            return projectile;
+        }
+
+        public ClusterProjectile Shoot(ClusterShotConfig shotConfig, Vector2f velocity)
+        {
+            var projectile =
+                new ClusterProjectile(Map, Position, velocity, shotConfig);
             Map.Entities.Add(projectile);
             return projectile;
         }
@@ -68,6 +71,8 @@ namespace BeepLive.Entities
 
             Velocity += Map.Config.PhysicalEnvironment.Gravity;
             Velocity *= Map.Config.PhysicalEnvironment.AirResistance;
+
+            Alive = Map.Config.EntityBoundary.Contains(Position);
 
             Position += Velocity;
         }

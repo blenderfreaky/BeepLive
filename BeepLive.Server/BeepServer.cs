@@ -38,6 +38,8 @@ namespace BeepLive.Server
                 .RegisterPacketHandler<PlayerShotPacket, PlayerShotPacketHandler>()
                 .RegisterPacketHandler<PlayerJumpPacket, PlayerJumpPacketHandler>()
                 .RegisterPacketHandler<PlayerFlowPacket, PlayerFlowPacketHandler>()
+                .RegisterPacketHandler<PlayerSpawnAtPacket, PlayerSpawnAtPacketHandler>()
+                .RegisterPacketHandler<PlayerTeamJoinPacket, PlayerTeamJoinPacketHandler>()
                 .Build();
 
             const string beepConfigXml = "BeepConfig.xml";

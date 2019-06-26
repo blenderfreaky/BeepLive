@@ -22,7 +22,7 @@ namespace BeepLive.Entities
             {
                 Position = position,
                 Radius = shotConfig.Radius,
-                FillColor = Color.Yellow
+                FillColor = new Color((byte) (VoxelTypeToPlace.Color.R * .8), (byte) (VoxelTypeToPlace.Color.G * .8), (byte) (VoxelTypeToPlace.Color.B * .8))
             };
 
             Map = map;
@@ -55,27 +55,45 @@ namespace BeepLive.Entities
             Voxel voxelUnderCenter = Map.GetVoxel(Position);
 
             Velocity += Map.Config.PhysicalEnvironment.Gravity;
-            Velocity *= voxelUnderCenter.IsAir
-                ? Map.Config.PhysicalEnvironment.AirResistance
-                : voxelUnderCenter.VoxelType.Resistance *
-                  (voxelUnderCenter.VoxelType.OwnerTeam == null
-                      ? ShotConfig.NeutralResistanceFactor
-                      : voxelUnderCenter.VoxelType.OwnerTeam == Owner.Team
-                          ? ShotConfig.FriendlyResistanceFactor
-                          : ShotConfig.HostileResistanceFactor);
+            if (voxelUnderCenter.IsAir)
+            {
+                Velocity *= Map.Config.PhysicalEnvironment.AirResistance;
+            }
+            else
+            {
+                Velocity *= voxelUnderCenter.VoxelType.Resistance
+                            * (voxelUnderCenter.GetTeamRelation(Owner.Team) switch
+                                {
+                                TeamRelation.Friendly => ShotConfig.FriendlyResistanceFactor,
+                                TeamRelation.Neutral => ShotConfig.NeutralResistanceFactor,
+                                TeamRelation.Hostile => ShotConfig.HostileResistanceFactor,
+                                _ => throw new ArgumentOutOfRangeException(),
+                                });
+            }
 
-            float dist = MathF.Sqrt(Velocity.X * Velocity.X + Velocity.Y * Velocity.Y);
+            bool hitsPlayer = false;
+            foreach (var player in Map.Players)
+            {
+                if (!player.Boundary.Contains(Position)) continue;
 
-            if (dist < ShotConfig.LowestSpeed ||
+                hitsPlayer = true;
+
+                if (player.Team == null) Velocity *= ShotConfig.NeutralResistanceFactor;
+                if (player.Team == Owner.Team) Velocity *= ShotConfig.FriendlyResistanceFactor;
+                else Velocity *= ShotConfig.HostileResistanceFactor;
+            }
+
+            float velocity = Velocity.X * Velocity.X + Velocity.Y * Velocity.Y;
+
+            if (velocity < ShotConfig.LowestSpeed ||
                 LifeTime++ > ShotConfig.MaxLifeTime ||
                 !Map.Config.EntityBoundary.Contains(Position) ||
-                Map.Players.Any(p => p.Boundary.Contains(Position)))
-                Die();
+                hitsPlayer) Die();
 
-            Vector2f front = Velocity / dist;
+            Vector2f front = Velocity / velocity;
             Vector2f left = new Vector2f(front.Y, -front.X);
 
-            for (float x = 0; x < dist; x += .5f)
+            for (float x = 0; x < velocity; x += .5f)
             for (float y = -ShotConfig.Radius; y <= ShotConfig.Radius; y++)
             {
                 Vector2f position = Position + front * x + left * y;
@@ -90,12 +108,6 @@ namespace BeepLive.Entities
             }
 
             Position += Velocity;
-        }
-
-        public virtual void Die()
-        {
-            Map.Entities.Remove(this);
-            Dispose(true);
         }
 
         protected override void Dispose(bool disposing)

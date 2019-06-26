@@ -12,12 +12,10 @@ namespace BeepLive.Entities
         public Drawable Shape;
         public virtual Vector2f Position { get; set; }
         public Vector2f Velocity { get; set; }
-        public bool Alive => Disposed;
-
-        public void Dispose()
+        public bool Alive
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            get => Disposed;
+            set { if (!value) Die(); }
         }
 
         public abstract void Step();
@@ -32,12 +30,21 @@ namespace BeepLive.Entities
             return Map.GetVoxel(Position + new Vector2f(x, y));
         }
 
+        public virtual void Die()
+        {
+            Map.Entities.Remove(this);
+            Dispose(true);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         protected virtual void Dispose(bool disposing)
         {
-            lock (this)
-            {
-                if (!Disposed) Disposed = true;
-            }
+            lock (this) if (!Disposed) Disposed = true;
         }
 
         ~Entity()

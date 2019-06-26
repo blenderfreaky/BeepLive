@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using BeepLive.Config;
 using BeepLive.Entities;
 using SFML.System;
@@ -32,12 +33,26 @@ namespace BeepLive.World
             GenerateMap();
         }
 
+        public bool Simulating;
+        public Action OnSimulationStop;
+
         public void Step()
         {
+            if (!Simulating) return;
+
             lock (Entities)
             {
                 // Make array to avoid concurrent modification exception; Make temporary clone to be able to modify the original
-                Entities.ToArray().ForEach(e => e.Step());
+                Entity[] entities = Entities.ToArray();
+
+                entities.ForEach(e => e.Step());
+
+                float maxVelocity = entities.Max(e => e.Velocity.X * e.Velocity.X + e.Velocity.Y * e.Velocity.Y);
+
+                if (maxVelocity > Config.PhysicalEnvironment.MovementThreshold) return;
+
+                Simulating = false;
+                OnSimulationStop?.Invoke();
             }
         }
 

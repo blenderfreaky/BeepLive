@@ -9,14 +9,12 @@ namespace BeepLive.Entities
         where TProjectile : Projectile<TShotConfig>
         where TShotConfig : ShotConfig
     {
-        public delegate void OnExplode();
-
-
+        public delegate void OnExplode(ClusterProjectile<TProjectile, TShotConfig> projectile);
+        
         public ClusterProjectile(Map map, Vector2f position, Vector2f velocity,
             ClusterShotConfig<TShotConfig> shotConfig,
             Player owner = null) : base(map, position, velocity, shotConfig, owner)
-        {
-        }
+        { }
 
         public event OnExplode OnExplodeEvent;
 
@@ -37,7 +35,12 @@ namespace BeepLive.Entities
                     ShotConfig.ChildShotConfig) as TProjectile);
             }
 
-            OnExplodeEvent?.Invoke();
+            OnExplodeEvent?.Invoke(this);
         }
+    }
+
+    public class ClusterProjectile : ClusterProjectile<Projectile<ShotConfig>, ShotConfig> {
+        public ClusterProjectile(Map map, Vector2f position, Vector2f velocity, ClusterShotConfig<ShotConfig> shotConfig, Player owner = null) : base(map, position, velocity, shotConfig, owner)
+        {}
     }
 }

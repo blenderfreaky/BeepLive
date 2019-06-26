@@ -44,8 +44,8 @@ namespace BeepLive.World
     public enum TeamRelation : sbyte
     {
         Air = 0,
-        Friendly = 1 << 1,
-        Neutral = 1 << 2,
-        Hostile = 1 << 3
+        Friendly = 1 << 0,
+        Neutral = 1 << 1,
+        Hostile = 1 << 2
     }
 }

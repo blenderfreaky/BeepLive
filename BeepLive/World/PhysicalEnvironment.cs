@@ -9,6 +9,7 @@ namespace BeepLive.World
         public float AirResistance;
         public CollisionResponseMode CollisionResponseMode;
         public Vector2f Gravity;
+        public float MovementThreshold;
 
         [XmlIgnore] public List<VoxelType> VoxelTypes;
 
