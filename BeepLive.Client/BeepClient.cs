@@ -1,6 +1,4 @@
-﻿using System;
-using BeepLive.Client.PacketHandlers;
-using BeepLive.Config;
+﻿using BeepLive.Client.PacketHandlers;
 using BeepLive.Game;
 using BeepLive.Network;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +25,7 @@ namespace BeepLive.Client
             Client = new ClientBuilder()
                 .UseIp(networkerSettings.GetValue<string>("Address"))
                 .UseTcp(networkerSettings.GetValue<int>("TcpPort"))
+                .UseUdp(networkerSettings.GetValue<int>("UdpPort"))
                 .ConfigureLogging(loggingBuilder =>
                 {
                     loggingBuilder.AddConfiguration(config.GetSection("Logging"));

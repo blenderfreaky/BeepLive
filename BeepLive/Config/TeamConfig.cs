@@ -10,8 +10,5 @@ namespace BeepLive.Config
         public int PlayerSize;
 
         public float TerritoryResistance;
-
-        public TeamConfig()
-        { }
     }
 }

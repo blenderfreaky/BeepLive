@@ -49,7 +49,7 @@ namespace BeepLive.Game
             PlayerGuid = Guid.NewGuid().ToString();
             Secret = Guid.NewGuid().ToString();
 
-            Flow(PlayerFlowPacket.PlayerFlowType.Join);
+            Flow(PlayerFlowPacket.FlowType.Join);
 
             BeepGameState = new GameState
             {
@@ -158,6 +158,7 @@ namespace BeepLive.Game
             {
                 case Keyboard.Key.Num1:
                     JoinTeam(0);
+                    Flow(PlayerFlowPacket.FlowType.LockInTeam);
                     break;
                 case Keyboard.Key.Q:
                     Shoot(0, direction);
@@ -166,14 +167,14 @@ namespace BeepLive.Game
                     Jump(direction);
                     break;
                 case Keyboard.Key.Enter:
-                    Flow(PlayerFlowPacket.PlayerFlowType.ReadyForSimulation);
+                    Flow(PlayerFlowPacket.FlowType.ReadyForSimulation);
                     break;
             }
         }
 
         private void Window_MousePressed(object sender, MouseButtonEventArgs e)
         {
-            if (BeepGameState.Spawning) Flow(PlayerFlowPacket.PlayerFlowType.FinishedSimulation);
+            if (BeepGameState.Spawning) Flow(PlayerFlowPacket.FlowType.FinishedSimulation);
         }
 
         private void Window_Closed(object sender, EventArgs e) => Window.Close();
@@ -201,18 +202,20 @@ namespace BeepLive.Game
                 Direction = direction
             });
 
-        private void Flow(PlayerFlowPacket.PlayerFlowType flowType) =>
+        private void Flow(PlayerFlowPacket.FlowType flowType) =>
             SendPlayerAction(new PlayerFlowPacket
             {
                 Type = flowType
             });
 
-        private void JoinTeam(int teamIndex) => SendPlayerAction(new PlayerTeamJoinPacket
+        private void JoinTeam(int teamIndex) =>
+            SendPlayerAction(new PlayerTeamJoinPacket
         {
             TeamIndex = teamIndex,
         });
 
-        private void SpawnAt(Vector2f position) => SendPlayerAction(new PlayerSpawnAtPacket
+        private void SpawnAt(Vector2f position) => 
+            SendPlayerAction(new PlayerSpawnAtPacket
         {
             Position = position
         });
@@ -244,40 +247,26 @@ namespace BeepLive.Game
                 case ServerFlowType.StartTeamSelection:
                     BeepGameState.SelectingTeams = true;
                     BeepGameState.Drawing = false;
-                    break;
-                case ServerFlowType.StopTeamSelection:
-                    BeepGameState.SelectingTeams = false;
-                    BeepGameState.Drawing = false;
-                    break;
+                    break;;
                 case ServerFlowType.StartSpawning:
+                    BeepGameState.SelectingTeams = false;
                     BeepGameState.Spawning = true;
-                    BeepGameState.Drawing = true;
-                    break;
-                case ServerFlowType.StopSpawning:
-                    BeepGameState.Spawning = false;
                     BeepGameState.Drawing = true;
                     break;
                 case ServerFlowType.StartSimulation:
                     ExecutePlayerActionPackets();
 
+                    BeepGameState.InputsAllowed = false;
+                    BeepGameState.Spawning = false;
                     BeepLiveGame.Map.Simulating = true;
                     BeepGameState.Simulating = true;
-                    BeepGameState.Drawing = true;
-                    break;
-                case ServerFlowType.StopSimulation:
-                    Debug.Assert(!BeepLiveGame.Map.Simulating);
-
-                    BeepGameState.Simulating = false;
                     BeepGameState.Drawing = true;
                     break;
                 case ServerFlowType.StartPlanning:
                     Debug.Assert(!BeepLiveGame.Map.Simulating);
 
+                    BeepGameState.Simulating = false;
                     BeepGameState.InputsAllowed = true;
-                    BeepGameState.Drawing = true;
-                    break;
-                case ServerFlowType.StopPlanning:
-                    BeepGameState.InputsAllowed = false;
                     BeepGameState.Drawing = true;
                     break;
                 default:
@@ -327,7 +316,7 @@ namespace BeepLive.Game
         {
             BeepLiveGame = new BeepLiveGame(packet.BeepConfig, PlayerGuid) 
             {
-                Map = {OnSimulationStop = () => Flow(PlayerFlowPacket.PlayerFlowType.FinishedSimulation)}
+                Map = {OnSimulationStop = () => Flow(PlayerFlowPacket.FlowType.FinishedSimulation)}
             };
 
             BeepGameState.Connecting = false;

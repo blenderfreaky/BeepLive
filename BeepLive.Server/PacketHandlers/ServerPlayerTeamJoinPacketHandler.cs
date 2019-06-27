@@ -8,11 +8,11 @@ using Networker.Common.Abstractions;
 
 namespace BeepLive.Server.PacketHandlers
 {
-    public class PlayerTeamJoinPacketHandler : PacketHandlerBase<PlayerTeamJoinPacket>
+    public class ServerPlayerTeamJoinPacketHandler : PacketHandlerBase<PlayerTeamJoinPacket>
     {
-        private readonly ILogger<PlayerTeamJoinPacketHandler> _logger;
+        private readonly ILogger<ServerPlayerTeamJoinPacketHandler> _logger;
 
-        public PlayerTeamJoinPacketHandler(ILogger<PlayerTeamJoinPacketHandler> logger)
+        public ServerPlayerTeamJoinPacketHandler(ILogger<ServerPlayerTeamJoinPacketHandler> logger)
         {
             _logger = logger;
         }
@@ -21,8 +21,9 @@ namespace BeepLive.Server.PacketHandlers
         {
             _logger.LogDebug("Received: " + packet);
 
-            if (BeepServer.PlayerSecrets[packet.PlayerGuid] == packet.Secret)
+            if (!BeepServer.IsValid(packet))
             {
+                _logger.LogWarning($"Received packet with invalid Secret: {packet}\nSent by: {packetContext.Sender.EndPoint}");
             }
         }
     }

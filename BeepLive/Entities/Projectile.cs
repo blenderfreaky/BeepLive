@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using BeepLive.Config;
 using BeepLive.World;
 using SFML.Graphics;

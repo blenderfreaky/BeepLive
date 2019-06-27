@@ -5,15 +5,17 @@ namespace BeepLive.Network
     [ProtoContract]
     public class PlayerFlowPacket : PlayerActionPacket
     {
-        public enum PlayerFlowType
+        public enum FlowType
         {
             Join,
+            Leave,
+            LockInTeam,
             Spawn,
             ReadyForSimulation,
-            FinishedSimulation,
+            FinishedSimulation
         }
 
-        [ProtoMember(1)] public PlayerFlowType Type;
+        [ProtoMember(1)] public FlowType Type;
 
         public override string ToString() => $"{base.ToString()}, {nameof(Type)}: {Type}";
     }

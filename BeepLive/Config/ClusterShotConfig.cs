@@ -1,5 +1,4 @@
 ﻿using System;
-using BeepLive.Entities;
 
 namespace BeepLive.Config
 {

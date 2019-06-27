@@ -15,8 +15,5 @@ namespace BeepLive.Config
 
         public bool Neutral;
         public float Radius;
-
-        public ShotConfig()
-        {}
     }
 }
