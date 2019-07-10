@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using BeepLive.Client;
+using BeepLive.Client.PacketHandlers;
 using BeepLive.Config;
 using BeepLive.Network;
 using BeepLive.Server.PacketHandlers;
@@ -42,6 +43,7 @@ namespace BeepLive.Server
                 .RegisterPacketHandler<PlayerFlowPacket, ServerPlayerFlowPacketHandler>()
                 .RegisterPacketHandler<PlayerSpawnAtPacket, ServerPlayerSpawnAtPacketHandler>()
                 .RegisterPacketHandler<PlayerTeamJoinPacket, ServerPlayerTeamJoinPacketHandler>()
+                .RegisterPacketHandler<ServerFlowPacket, ClientServerFlowPacketHandler>()
                 .Build();
 
             const string beepConfigXml = "BeepConfig.xml";
