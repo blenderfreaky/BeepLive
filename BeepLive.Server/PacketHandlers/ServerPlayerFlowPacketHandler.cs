@@ -1,10 +1,10 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
-using BeepLive.Network;
+﻿using BeepLive.Network;
 using Microsoft.Extensions.Logging;
 using Networker.Common;
 using Networker.Common.Abstractions;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using static BeepLive.Server.BeepServer;
 
 #pragma warning disable 1998
@@ -53,12 +53,13 @@ namespace BeepLive.Server.PacketHandlers
                     if (player == null)
                         Players.Add(new ServerPlayer
                         {
-                            PlayerGuid = packet.PlayerGuid, Secret = packet.Secret,
+                            PlayerGuid = packet.PlayerGuid,
+                            Secret = packet.Secret,
                             State = ServerPlayerState.InTeamSelection
                         });
 
                     packetContext.Sender.Send(new SyncPacket(BeepConfig));
-                    packetContext.Sender.Send(new ServerFlowPacket {Type = ServerFlowType.StartTeamSelection});
+                    packetContext.Sender.Send(new ServerFlowPacket { Type = ServerFlowType.StartTeamSelection });
 
                     break;
                 case PlayerFlowPacket.FlowType.Leave:
@@ -107,7 +108,7 @@ namespace BeepLive.Server.PacketHandlers
             if (!AllPlayersInState(originState, true)) return;
 
             Players.ForEach(p => p.MoveToState(targetState));
-            GameServer.Broadcast(new ServerFlowPacket {Type = serverFlow});
+            GameServer.Broadcast(new ServerFlowPacket { Type = serverFlow });
         }
     }
 }

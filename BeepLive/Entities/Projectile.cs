@@ -1,8 +1,8 @@
-﻿using System;
-using BeepLive.Config;
+﻿using BeepLive.Config;
 using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
+using System;
 
 namespace BeepLive.Entities
 {
@@ -21,7 +21,7 @@ namespace BeepLive.Entities
             {
                 Position = position,
                 Radius = shotConfig.Radius,
-                FillColor = new Color((byte) (VoxelTypeToPlace.Color.R * .8), (byte) (VoxelTypeToPlace.Color.G * .8), (byte) (VoxelTypeToPlace.Color.B * .8))
+                FillColor = new Color((byte)(VoxelTypeToPlace.Color.R * .8), (byte)(VoxelTypeToPlace.Color.G * .8), (byte)(VoxelTypeToPlace.Color.B * .8))
             };
 
             Map = map;
@@ -39,7 +39,7 @@ namespace BeepLive.Entities
 
         public CircleShape CircleShape
         {
-            get => (CircleShape) Shape;
+            get => (CircleShape)Shape;
             set => Shape = value;
         }
 
@@ -62,12 +62,12 @@ namespace BeepLive.Entities
             {
                 Velocity *= voxelUnderCenter.VoxelType.Resistance
                             * (voxelUnderCenter.GetTeamRelation(Owner.Team) switch
-                                {
+                            {
                                 TeamRelation.Friendly => ShotConfig.FriendlyResistanceFactor,
                                 TeamRelation.Neutral => ShotConfig.NeutralResistanceFactor,
                                 TeamRelation.Hostile => ShotConfig.HostileResistanceFactor,
                                 _ => throw new ArgumentOutOfRangeException(),
-                                });
+                            });
             }
 
             bool hitsPlayer = false;
@@ -93,18 +93,18 @@ namespace BeepLive.Entities
             Vector2f left = new Vector2f(front.Y, -front.X);
 
             for (float x = 0; x < velocity; x += .5f)
-            for (float y = -ShotConfig.Radius; y <= ShotConfig.Radius; y++)
-            {
-                Vector2f position = Position + front * x + left * y;
+                for (float y = -ShotConfig.Radius; y <= ShotConfig.Radius; y++)
+                {
+                    Vector2f position = Position + front * x + left * y;
 
-                Chunk chunk = Map.GetChunk(position, out Vector2f chunkPosition);
-                if (chunk == null) continue;
-                uint xFloored = (uint) MathF.Floor(position.X - chunkPosition.X);
-                uint yFloored = (uint) MathF.Floor(position.Y - chunkPosition.Y);
+                    Chunk chunk = Map.GetChunk(position, out Vector2f chunkPosition);
+                    if (chunk == null) continue;
+                    uint xFloored = (uint)MathF.Floor(position.X - chunkPosition.X);
+                    uint yFloored = (uint)MathF.Floor(position.Y - chunkPosition.Y);
 
-                if ((ShotConfig.Damages & chunk[xFloored, yFloored].GetTeamRelation(Owner.Team)) != TeamRelation.Air)
-                    chunk[xFloored, yFloored] = new Voxel(Map, VoxelTypeToPlace);
-            }
+                    if ((ShotConfig.Damages & chunk[xFloored, yFloored].GetTeamRelation(Owner.Team)) != TeamRelation.Air)
+                        chunk[xFloored, yFloored] = new Voxel(Map, VoxelTypeToPlace);
+                }
 
             Position += Velocity;
         }

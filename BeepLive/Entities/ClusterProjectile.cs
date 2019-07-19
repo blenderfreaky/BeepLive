@@ -1,7 +1,7 @@
-﻿using System;
-using BeepLive.Config;
+﻿using BeepLive.Config;
 using BeepLive.World;
 using SFML.System;
+using System;
 
 namespace BeepLive.Entities
 {
@@ -10,7 +10,7 @@ namespace BeepLive.Entities
         where TShotConfig : ShotConfig
     {
         public delegate void OnExplode(ClusterProjectile<TProjectile, TShotConfig> projectile);
-        
+
         public ClusterProjectile(Map map, Vector2f position, Vector2f velocity,
             ClusterShotConfig<TShotConfig> shotConfig,
             Player owner = null) : base(map, position, velocity, shotConfig, owner)
@@ -29,8 +29,8 @@ namespace BeepLive.Entities
         {
             for (int i = 0; i < ShotConfig.ChildCount; i++)
             {
-                Vector2f direction = new Vector2f((float) (Map.Random.NextDouble() * 2 - 1) * ShotConfig.ExplosionPower,
-                    (float) (Map.Random.NextDouble() * 2 - 1) * ShotConfig.ExplosionPower);
+                Vector2f direction = new Vector2f((float)(Map.Random.NextDouble() * 2 - 1) * ShotConfig.ExplosionPower,
+                    (float)(Map.Random.NextDouble() * 2 - 1) * ShotConfig.ExplosionPower);
                 Map.Entities.Add(Activator.CreateInstance(typeof(TProjectile), Map, Position, Velocity + direction,
                     ShotConfig.ChildShotConfig) as TProjectile);
             }
@@ -39,8 +39,9 @@ namespace BeepLive.Entities
         }
     }
 
-    public class ClusterProjectile : ClusterProjectile<Projectile<ShotConfig>, ShotConfig> {
+    public class ClusterProjectile : ClusterProjectile<Projectile<ShotConfig>, ShotConfig>
+    {
         public ClusterProjectile(Map map, Vector2f position, Vector2f velocity, ClusterShotConfig<ShotConfig> shotConfig, Player owner = null) : base(map, position, velocity, shotConfig, owner)
-        {}
+        { }
     }
 }

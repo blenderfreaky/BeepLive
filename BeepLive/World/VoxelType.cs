@@ -1,6 +1,6 @@
-﻿using System.Xml.Serialization;
-using BeepLive.Game;
+﻿using BeepLive.Game;
 using SFML.Graphics;
+using System.Xml.Serialization;
 
 namespace BeepLive.World
 {

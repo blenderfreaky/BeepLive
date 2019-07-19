@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using BeepLive.Config;
+﻿using BeepLive.Config;
 using BeepLive.Entities;
 using SFML.System;
 using SimplexNoise;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace BeepLive.World
 {
@@ -58,13 +58,13 @@ namespace BeepLive.World
 
         public Vector2i GetChunkIndex(Vector2f position)
         {
-            return new Vector2i((int) MathF.Floor(position.X), (int) MathF.Floor(position.Y));
+            return new Vector2i((int)MathF.Floor(position.X), (int)MathF.Floor(position.Y));
         }
 
         public Chunk GetChunk(Vector2f position, out Vector2f chunkPosition)
         {
-            int i = (int) MathF.Floor(position.X / Config.ChunkSize);
-            int j = (int) MathF.Floor(position.Y / Config.ChunkSize);
+            int i = (int)MathF.Floor(position.X / Config.ChunkSize);
+            int j = (int)MathF.Floor(position.Y / Config.ChunkSize);
             chunkPosition = new Vector2f(i * Config.ChunkSize, j * Config.ChunkSize);
             return i < 0 || j < 0 || i >= Config.MapWidth || j >= Config.MapHeight ? null : Chunks[i, j];
         }
@@ -89,34 +89,34 @@ namespace BeepLive.World
             Chunks = new Chunk[Config.MapWidth, Config.MapHeight];
 
             for (uint chunkI = 0; chunkI < Config.MapWidth; chunkI++)
-            for (uint chunkJ = 0; chunkJ < Config.MapHeight; chunkJ++)
-            {
-                Chunk chunk = Chunks[chunkI, chunkJ] =
-                    new Chunk(this, new Vector2f(chunkI * Config.ChunkSize, chunkJ * Config.ChunkSize));
-
-                for (uint voxelI = 0; voxelI < Config.ChunkSize; voxelI++)
+                for (uint chunkJ = 0; chunkJ < Config.MapHeight; chunkJ++)
                 {
-                    float height = Noise.CalcPixel1D(
-                                       (int) (chunkI * Config.ChunkSize + voxelI),
-                                       Config.HorizontalNoiseScale) * (Config.VerticalNoiseScale / 128f);
+                    Chunk chunk = Chunks[chunkI, chunkJ] =
+                        new Chunk(this, new Vector2f(chunkI * Config.ChunkSize, chunkJ * Config.ChunkSize));
 
-                    for (uint voxelJ = 0; voxelJ < Config.ChunkSize; voxelJ++)
+                    for (uint voxelI = 0; voxelI < Config.ChunkSize; voxelI++)
                     {
-                        bool isGround = chunkJ * Config.ChunkSize + voxelJ > height + Config.GroundLevel;
+                        float height = Noise.CalcPixel1D(
+                                           (int)(chunkI * Config.ChunkSize + voxelI),
+                                           Config.HorizontalNoiseScale) * (Config.VerticalNoiseScale / 128f);
 
-                        bool isFloating = Noise.CalcPixel2D(
-                                              (int) (chunkI * Config.ChunkSize + voxelI),
-                                              (int) (chunkJ * Config.ChunkSize + voxelJ),
-                                              Config.FloatingNoiseScale) / 128f
-                                          < Config.FloatingNoiseThreshold;
+                        for (uint voxelJ = 0; voxelJ < Config.ChunkSize; voxelJ++)
+                        {
+                            bool isGround = chunkJ * Config.ChunkSize + voxelJ > height + Config.GroundLevel;
 
-                        chunk[voxelI, voxelJ] =
-                            isGround || isFloating
-                                ? new Voxel(this, Config.GroundVoxelType)
-                                : new Voxel(this);
+                            bool isFloating = Noise.CalcPixel2D(
+                                                  (int)(chunkI * Config.ChunkSize + voxelI),
+                                                  (int)(chunkJ * Config.ChunkSize + voxelJ),
+                                                  Config.FloatingNoiseScale) / 128f
+                                              < Config.FloatingNoiseThreshold;
+
+                            chunk[voxelI, voxelJ] =
+                                isGround || isFloating
+                                    ? new Voxel(this, Config.GroundVoxelType)
+                                    : new Voxel(this);
+                        }
                     }
                 }
-            }
 
             return this;
         }

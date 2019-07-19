@@ -1,7 +1,7 @@
-﻿using System;
-using BeepLive.World;
+﻿using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
+using System;
 
 namespace BeepLive.Entities
 {

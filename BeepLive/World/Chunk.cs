@@ -1,6 +1,6 @@
-﻿using System;
-using SFML.Graphics;
+﻿using SFML.Graphics;
 using SFML.System;
+using System;
 
 namespace BeepLive.World
 {
@@ -18,7 +18,7 @@ namespace BeepLive.World
             Map = map;
 
             Voxels = new Image(map.Config.ChunkSize, map.Config.ChunkSize);
-            Sprite = new Sprite(new Texture(Voxels)) {Texture = {Smooth = true}, Position = offset};
+            Sprite = new Sprite(new Texture(Voxels)) { Texture = { Smooth = true }, Position = offset };
         }
 
         public Voxel this[uint x, uint y]
@@ -34,14 +34,14 @@ namespace BeepLive.World
 
         public Vector2u GetVoxelIndex(Vector2f position)
         {
-            return new Vector2u((uint) Math.Floor(position.X),
-                (uint) MathF.Floor(position.Y));
+            return new Vector2u((uint)Math.Floor(position.X),
+                (uint)MathF.Floor(position.Y));
         }
 
         public Voxel GetVoxel(Vector2f position)
         {
-            return this[(uint) Math.Floor(position.X),
-                (uint) MathF.Floor(position.Y)];
+            return this[(uint)Math.Floor(position.X),
+                (uint)MathF.Floor(position.Y)];
         }
     }
 }

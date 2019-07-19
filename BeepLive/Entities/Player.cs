@@ -1,9 +1,9 @@
-﻿using System;
-using BeepLive.Config;
+﻿using BeepLive.Config;
 using BeepLive.Game;
 using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
+using System;
 
 namespace BeepLive.Entities
 {
@@ -31,14 +31,14 @@ namespace BeepLive.Entities
             UserName = userName;
         }
 
-        public Boundary Boundary => new Boundary {Min = Position, Max = Position + new Vector2f(Size, Size)};
+        public Boundary Boundary => new Boundary { Min = Position, Max = Position + new Vector2f(Size, Size) };
 
         public int Size { get; set; }
 
         public sealed override Vector2f Position
         {
-            get => ((RectangleShape) Shape).Position;
-            set => ((RectangleShape) Shape).Position = value;
+            get => ((RectangleShape)Shape).Position;
+            set => ((RectangleShape)Shape).Position = value;
         }
 
         internal void GenerateShape()
@@ -90,9 +90,9 @@ namespace BeepLive.Entities
                     bool collides = false;
 
                     for (int i = 0; i < Size; i++)
-                    for (int j = 0; j < Size; j++)
-                        if (!GetVoxel(i, j).IsAir)
-                            collides = true;
+                        for (int j = 0; j < Size; j++)
+                            if (!GetVoxel(i, j).IsAir)
+                                collides = true;
 
                     if (collides)
                     {
@@ -112,15 +112,15 @@ namespace BeepLive.Entities
                     int collisionCount = 0;
 
                     for (int i = 0; i < Size; i++)
-                    for (int j = 0; j < Size; j++)
-                    {
-                        if (GetVoxel(i, j).IsAir) continue;
+                        for (int j = 0; j < Size; j++)
+                        {
+                            if (GetVoxel(i, j).IsAir) continue;
 
-                        center.X += i;
-                        center.Y += j;
+                            center.X += i;
+                            center.Y += j;
 
-                        collisionCount++;
-                    }
+                            collisionCount++;
+                        }
 
                     center /= collisionCount;
 
@@ -136,7 +136,7 @@ namespace BeepLive.Entities
 
         protected override void Dispose(bool disposing)
         {
-            if (!Disposed) ((RectangleShape) Shape).Dispose();
+            if (!Disposed) ((RectangleShape)Shape).Dispose();
             base.Dispose(disposing);
         }
 

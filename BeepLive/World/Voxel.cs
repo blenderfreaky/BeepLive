@@ -1,6 +1,6 @@
-﻿using System;
-using BeepLive.Game;
+﻿using BeepLive.Game;
 using SFML.Graphics;
+using System;
 
 namespace BeepLive.World
 {

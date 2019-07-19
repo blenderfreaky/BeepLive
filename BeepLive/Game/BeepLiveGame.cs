@@ -1,11 +1,9 @@
-﻿using System;
+﻿using BeepLive.Config;
+using BeepLive.Entities;
+using BeepLive.World;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using BeepLive.Config;
-using BeepLive.Entities;
-using BeepLive.World;
-using SFML.System;
 
 namespace BeepLive.Game
 {

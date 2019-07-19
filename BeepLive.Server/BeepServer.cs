@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using BeepLive.Client;
+﻿using BeepLive.Client;
 using BeepLive.Client.PacketHandlers;
 using BeepLive.Config;
 using BeepLive.Network;
@@ -12,6 +8,9 @@ using Microsoft.Extensions.Logging;
 using Networker.Extensions.ProtobufNet;
 using Networker.Server;
 using Networker.Server.Abstractions;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 
 namespace BeepLive.Server
 {
@@ -44,6 +43,7 @@ namespace BeepLive.Server
                 .RegisterPacketHandler<PlayerFlowPacket, ServerPlayerFlowPacketHandler>()
                 .RegisterPacketHandler<PlayerSpawnAtPacket, ServerPlayerSpawnAtPacketHandler>()
                 .RegisterPacketHandler<PlayerTeamJoinPacket, ServerPlayerTeamJoinPacketHandler>()
+                .RegisterPacketHandler<ServerFlowPacket, ClientServerFlowPacketHandler>()
                 .Build();
 
             const string beepConfigXml = "BeepConfig.xml";
@@ -66,7 +66,7 @@ namespace BeepLive.Server
         }
 
         public static bool IsValid(PlayerActionPacket packet) =>
-            string.Equals(Players.Find(p => string.Equals(p.PlayerGuid, packet.PlayerGuid, StringComparison.InvariantCulture)).Secret, packet.Secret, StringComparison.InvariantCulture);
+            string.Equals(Players.Find(p => string.Equals(p.PlayerGuid, packet.PlayerGuid)).Secret, packet.Secret);
 
         public static void BroadcastWithoutSecret(PlayerActionPacket packet)
         {

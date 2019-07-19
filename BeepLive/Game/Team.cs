@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using BeepLive.Config;
+﻿using BeepLive.Config;
 using BeepLive.Entities;
 using BeepLive.World;
+using System.Collections.Generic;
 
 namespace BeepLive.Game
 {
@@ -18,7 +18,7 @@ namespace BeepLive.Game
             TeamConfig = teamConfig;
             Players = new List<Player>(teamConfig.MaxPlayers);
             VoxelType = new VoxelType
-                {OwnerTeam = this, Color = teamConfig.Color, Resistance = teamConfig.TerritoryResistance};
+            { OwnerTeam = this, Color = teamConfig.Color, Resistance = teamConfig.TerritoryResistance };
         }
     }
 }

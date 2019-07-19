@@ -1,5 +1,5 @@
-﻿using System.Xml.Serialization;
-using BeepLive.World;
+﻿using BeepLive.World;
+using System.Xml.Serialization;
 
 namespace BeepLive.Config
 {

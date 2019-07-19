@@ -1,5 +1,4 @@
-﻿using System;
-using ProtoBuf;
+﻿using ProtoBuf;
 
 namespace BeepLive.Network
 {
@@ -15,6 +14,5 @@ namespace BeepLive.Network
         StartSpawning,
         StartSimulation,
         StartPlanning
-
     }
 }

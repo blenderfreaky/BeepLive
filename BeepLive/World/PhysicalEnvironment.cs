@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SFML.System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
-using SFML.System;
 
 namespace BeepLive.World
 {

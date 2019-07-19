@@ -1,7 +1,7 @@
-﻿using System.Xml.Serialization;
-using BeepLive.World;
+﻿using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
+using System.Xml.Serialization;
 
 namespace BeepLive.Config
 {

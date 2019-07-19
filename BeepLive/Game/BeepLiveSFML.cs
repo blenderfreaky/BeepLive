@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using BeepLive.Config;
+﻿using BeepLive.Config;
 using BeepLive.Entities;
 using BeepLive.Network;
 using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
+using System.Threading;
 
 namespace BeepLive.Game
 {
@@ -74,7 +74,7 @@ namespace BeepLive.Game
 
         public GameState BeepGameState;
 
-        private void Window_MouseWheelScrolled(object sender, MouseWheelScrollEventArgs e) => _zoom *= (float) Math.Pow(2, e.Delta);
+        private void Window_MouseWheelScrolled(object sender, MouseWheelScrollEventArgs e) => _zoom *= (float)Math.Pow(2, e.Delta);
 
         public void Run()
         {
@@ -128,11 +128,11 @@ namespace BeepLive.Game
             if (!_shakeTimer.IsRunning) return;
 
             // ReSharper disable once PossibleLossOfFraction
-            float fulfillment = (float) (_shakeTimer.ElapsedMilliseconds / (double) _shakeDuration);
+            float fulfillment = (float)(_shakeTimer.ElapsedMilliseconds / (double)_shakeDuration);
             if (fulfillment < 1f)
             {
-                Vector2f direction = new Vector2f((float) (_random.NextDouble() * 2 - 1),
-                    (float) (_random.NextDouble() * 2 - 1));
+                Vector2f direction = new Vector2f((float)(_random.NextDouble() * 2 - 1),
+                    (float)(_random.NextDouble() * 2 - 1));
                 direction /= MathF.Sqrt(direction.X * direction.X + direction.Y * direction.Y);
                 _view.Center = _center + direction * _shakeMagnitude * (1f - fulfillment);
             }
@@ -159,7 +159,7 @@ namespace BeepLive.Game
             if (BeepLiveGame == null) return;//throw new InvalidOperationException();
 
             Vector2f mouse = Window.MapPixelToCoords(Mouse.GetPosition(Window));
-            Vector2f direction = mouse - (BeepLiveGame.LocalPlayer?.Position ?? new Vector2f()) - new Vector2f(BeepLiveGame.LocalPlayer?.Size/2f ?? 0, BeepLiveGame.LocalPlayer?.Size/2f ?? 0);
+            Vector2f direction = mouse - (BeepLiveGame.LocalPlayer?.Position ?? new Vector2f()) - new Vector2f(BeepLiveGame.LocalPlayer?.Size / 2f ?? 0, BeepLiveGame.LocalPlayer?.Size / 2f ?? 0);
 
             switch (e.Code)
             {
@@ -231,12 +231,12 @@ namespace BeepLive.Game
         private void DrawMap()
         {
             for (int chunkI = 0; chunkI < BeepLiveGame.Map.Config.MapWidth; chunkI++)
-            for (int chunkJ = 0; chunkJ < BeepLiveGame.Map.Config.MapHeight; chunkJ++)
-            {
-                Chunk chunk = BeepLiveGame.Map.Chunks[chunkI, chunkJ];
-                chunk.Update();
-                Window.Draw(chunk.Sprite);
-            }
+                for (int chunkJ = 0; chunkJ < BeepLiveGame.Map.Config.MapHeight; chunkJ++)
+                {
+                    Chunk chunk = BeepLiveGame.Map.Chunks[chunkI, chunkJ];
+                    chunk.Update();
+                    Window.Draw(chunk.Sprite);
+                }
 
             Entity[] entities;
             lock (BeepLiveGame.Map.Entities) entities = BeepLiveGame.Map.Entities.Where(e => !(e is null)).ToArray();
@@ -280,7 +280,7 @@ namespace BeepLive.Game
                                 }).ToList());
                     BeepLiveGame.LocalPlayer = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, PlayerGuid));
                     BeepLiveGame.LocalTeam = BeepLiveGame.LocalPlayer.Team;
-                    
+
                     BeepGameState.SelectingTeams = false;
                     BeepGameState.Spawning = true;
                     BeepGameState.Drawing = true;
@@ -373,9 +373,9 @@ namespace BeepLive.Game
 
         public void HandleSyncPacket(SyncPacket packet)
         {
-            BeepLiveGame = new BeepLiveGame(packet.BeepConfig, PlayerGuid) 
+            BeepLiveGame = new BeepLiveGame(packet.BeepConfig, PlayerGuid)
             {
-                Map = {OnSimulationStop = () => Flow(PlayerFlowPacket.FlowType.FinishedSimulation)}
+                Map = { OnSimulationStop = () => Flow(PlayerFlowPacket.FlowType.FinishedSimulation) }
             };
 
             BeepGameState.Connecting = false;

@@ -21,7 +21,7 @@ namespace BeepLive.Client
                 .Build();
 
             IConfigurationSection networkerSettings = config.GetSection("Networker");
-            
+
             Client = new ClientBuilder()
                 .UseIp(networkerSettings.GetValue<string>("Address"))
                 .UseTcp(networkerSettings.GetValue<int>("TcpPort"))
@@ -35,7 +35,6 @@ namespace BeepLive.Client
                 .RegisterPacketHandler<PlayerShotPacket, ClientPlayerShotPacketHandler>()
                 .RegisterPacketHandler<PlayerJumpPacket, ClientPlayerJumpPacketHandler>()
                 .RegisterPacketHandler<PlayerSpawnAtPacket, ClientPlayerSpawnAtHandler>()
-                .RegisterPacketHandler<PlayerTeamJoinPacket, ClientTeamJoinPacketHandler>()
                 .RegisterPacketHandler<ServerFlowPacket, ClientServerFlowPacketHandler>()
                 .RegisterPacketHandler<SyncPacket, ClientSyncPacketHandler>()
                 .Build();
