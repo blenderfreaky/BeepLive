@@ -9,6 +9,7 @@ namespace BeepLive.Entities
 {
     public class Player : Entity
     {
+        public string UserName;
         private Vector2f _lastSafePosition;
         public string Guid;
 
@@ -17,7 +18,7 @@ namespace BeepLive.Entities
 
         public Team Team;
 
-        public Player(Map map, Vector2f position, int size, Team team, string guid)
+        public Player(Map map, Vector2f position, int size, Team team, string guid, string userName)
         {
             GenerateShape();
 
@@ -27,6 +28,7 @@ namespace BeepLive.Entities
             Team = team;
 
             Guid = guid ?? throw new ArgumentNullException(nameof(guid));
+            UserName = userName;
         }
 
         public Boundary Boundary => new Boundary {Min = Position, Max = Position + new Vector2f(Size, Size)};

@@ -35,6 +35,7 @@ namespace BeepLive.Client
                 .RegisterPacketHandler<PlayerShotPacket, ClientPlayerShotPacketHandler>()
                 .RegisterPacketHandler<PlayerJumpPacket, ClientPlayerJumpPacketHandler>()
                 .RegisterPacketHandler<PlayerSpawnAtPacket, ClientPlayerSpawnAtHandler>()
+                .RegisterPacketHandler<PlayerTeamJoinPacket, ClientTeamJoinPacketHandler>()
                 .RegisterPacketHandler<ServerFlowPacket, ClientServerFlowPacketHandler>()
                 .RegisterPacketHandler<SyncPacket, ClientSyncPacketHandler>()
                 .Build();

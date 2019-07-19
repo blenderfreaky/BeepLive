@@ -4,6 +4,8 @@ namespace BeepLive.Config
 {
     public class TeamConfig
     {
+        public string TeamGuid;
+
         public Color Color;
 
         public int MaxPlayers;

@@ -4,21 +4,9 @@ using ProtoBuf;
 namespace BeepLive.Network
 {
     [ProtoContract]
-    public class ServerFlowPacket
+    public class ServerFlowPacket : Packet
     {
-        [ProtoMember(2)] public ServerFlowType Type;
-
-        [ProtoMember(1)] public long UnixTime;
-
-        public ServerFlowPacket()
-        {
-            UnixTime = DateTime.UtcNow.Ticks;
-        }
-
-        public override string ToString()
-        {
-            return $"{nameof(Type)}: {Type}, {nameof(UnixTime)}: {UnixTime}";
-        }
+        [ProtoMember(1)] public ServerFlowType Type;
     }
 
     public enum ServerFlowType
