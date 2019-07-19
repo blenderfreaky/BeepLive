@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using BeepLive.Config;
 using BeepLive.Entities;
 using SFML.System;
@@ -32,12 +33,26 @@ namespace BeepLive.World
             GenerateMap();
         }
 
+        public bool Simulating;
+        public Action OnSimulationStop;
+
         public void Step()
         {
+            if (!Simulating) return;
+
             lock (Entities)
             {
                 // Make array to avoid concurrent modification exception; Make temporary clone to be able to modify the original
-                Entities.ToArray().ForEach(e => e.Step());
+                Entity[] entities = Entities.ToArray();
+
+                entities.ForEach(e => e.Step());
+
+                float maxVelocity = entities.Max(e => e.Velocity.X * e.Velocity.X + e.Velocity.Y * e.Velocity.Y);
+
+                if (maxVelocity > Config.PhysicalEnvironment.MovementThreshold) return;
+
+                Simulating = false;
+                OnSimulationStop?.Invoke();
             }
         }
 
@@ -48,8 +63,8 @@ namespace BeepLive.World
 
         public Chunk GetChunk(Vector2f position, out Vector2f chunkPosition)
         {
-            var i = (int) MathF.Floor(position.X / Config.ChunkSize);
-            var j = (int) MathF.Floor(position.Y / Config.ChunkSize);
+            int i = (int) MathF.Floor(position.X / Config.ChunkSize);
+            int j = (int) MathF.Floor(position.Y / Config.ChunkSize);
             chunkPosition = new Vector2f(i * Config.ChunkSize, j * Config.ChunkSize);
             return i < 0 || j < 0 || i >= Config.MapWidth || j >= Config.MapHeight ? null : Chunks[i, j];
         }
@@ -58,15 +73,6 @@ namespace BeepLive.World
         {
             return GetChunk(position, out Vector2f chunkPosition)?.GetVoxel(position - chunkPosition) ??
                    new Voxel(this);
-        }
-
-        #region Fluent API
-
-        public Map Configure(Func<MapConfig, MapConfig> configMaker)
-        {
-            Config = configMaker(new MapConfig());
-
-            return this;
         }
 
         public Map LoadConfig(string path)
@@ -114,32 +120,5 @@ namespace BeepLive.World
 
             return this;
         }
-
-        public Map AddPlayer(Vector2f position, int size)
-        {
-            Entities.Add(new Player(this, position, size));
-
-            return this;
-        }
-
-        public Map AddProjectile(Vector2f position, Vector2f velocity, float radius, float lowestSpeed, int maxLifeTime)
-        {
-            Entities.Add(new Projectile(this, position, velocity, radius, lowestSpeed, maxLifeTime));
-
-            return this;
-        }
-
-        public Map AddClusterProjectile(Vector2f position, Vector2f velocity, float radius, float lowestSpeed,
-            int maxLifeTime,
-            int childCount,
-            int childRadius, float explosionPower, float childLowestSpeed, int childMaxLifeTime)
-        {
-            Entities.Add(new ClusterProjectile<Projectile>(this, position, velocity, radius, lowestSpeed, maxLifeTime,
-                childCount, childRadius, explosionPower, childLowestSpeed, childMaxLifeTime));
-
-            return this;
-        }
-
-        #endregion
     }
 }

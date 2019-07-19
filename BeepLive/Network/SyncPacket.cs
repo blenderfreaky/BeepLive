@@ -22,5 +22,10 @@ namespace BeepLive.Network
             get => XmlHelper.LoadFromXmlString<BeepConfig>(BeepConfigXml);
             set => BeepConfigXml = XmlHelper.ToXml(value);
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(BeepConfigXml)}: {BeepConfigXml}, {nameof(BeepConfig)}: {BeepConfig}";
+        }
     }
 }

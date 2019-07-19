@@ -5,9 +5,9 @@ VisualStudioVersion = 16.0.29006.145
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeepLive", "BeepLive\BeepLive.csproj", "{7241939B-B0EB-48E5-B128-582A5D8A7E57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeepLive.Server", "BeepLive.Server\BeepLive.Server.csproj", "{7D467E65-BF5A-4307-A33A-9F0D0F045B78}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeepLive.Server", "BeepLive.Server\BeepLive.Server.csproj", "{7D467E65-BF5A-4307-A33A-9F0D0F045B78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeepLive.Client", "BeepLive.Client\BeepLive.Client.csproj", "{5527F9FB-88F9-4B86-BE7E-11F6FB100393}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeepLive.Client", "BeepLive.Client\BeepLive.Client.csproj", "{5527F9FB-88F9-4B86-BE7E-11F6FB100393}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

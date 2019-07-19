@@ -1,5 +1,4 @@
-﻿using System;
-using BeepLive.Config;
+﻿using BeepLive.Client.PacketHandlers;
 using BeepLive.Game;
 using BeepLive.Network;
 using Microsoft.Extensions.Configuration;
@@ -13,9 +12,7 @@ namespace BeepLive.Client
     public class BeepClient
     {
         public static BeepClient BeepClientInstance;
-        public static BeepConfig BeepConfig;
         public BeepLiveSfml BeepLiveSfml;
-        public Guid MyPlayer, MySecret;
 
         public BeepClient()
         {
@@ -24,13 +21,11 @@ namespace BeepLive.Client
                 .Build();
 
             IConfigurationSection networkerSettings = config.GetSection("Networker");
-
-            MyPlayer = Guid.NewGuid();
-            MySecret = Guid.NewGuid();
-
+            
             Client = new ClientBuilder()
                 .UseIp(networkerSettings.GetValue<string>("Address"))
                 .UseTcp(networkerSettings.GetValue<int>("TcpPort"))
+                .UseUdp(networkerSettings.GetValue<int>("UdpPort"))
                 .ConfigureLogging(loggingBuilder =>
                 {
                     loggingBuilder.AddConfiguration(config.GetSection("Logging"));
@@ -39,6 +34,7 @@ namespace BeepLive.Client
                 .UseProtobufNet()
                 .RegisterPacketHandler<PlayerShotPacket, ClientPlayerShotPacketHandler>()
                 .RegisterPacketHandler<PlayerJumpPacket, ClientPlayerJumpPacketHandler>()
+                .RegisterPacketHandler<PlayerSpawnAtPacket, ClientPlayerSpawnAtHandler>()
                 .RegisterPacketHandler<ServerFlowPacket, ClientServerFlowPacketHandler>()
                 .RegisterPacketHandler<SyncPacket, ClientSyncPacketHandler>()
                 .Build();
@@ -49,20 +45,20 @@ namespace BeepLive.Client
         public void Start()
         {
             Client.Connect();
+            BeepLiveSfml = new BeepLiveSfml(new MessageSender(Client));
+            BeepLiveSfml.Run();
+        }
 
-            var playerFlowPacket = new PlayerFlowPacket
-            {
-                PlayerGuid = MyPlayer.ToString(), Secret = MySecret.ToString(), MessageGuid = Guid.NewGuid().ToString(),
-                Type = PlayerFlowPacket.PlayerFlowType.Join
-            };
-            Client.Send(playerFlowPacket);
+        private class MessageSender : IMessageSender
+        {
+            private readonly IClient _client;
 
-            while (BeepConfig == null)
+            public MessageSender(IClient client)
             {
+                _client = client;
             }
 
-            BeepLiveSfml = new BeepLiveSfml(new BeepLiveGame(BeepConfig)) {BeepGameState = {Drawing = true}};
-            BeepLiveSfml.Run();
+            public void SendMessage<T>(T message) => _client.Send(message);
         }
     }
 }

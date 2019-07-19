@@ -1,4 +1,6 @@
 ﻿using System;
+using BeepLive.Config;
+using BeepLive.Game;
 using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
@@ -8,28 +10,23 @@ namespace BeepLive.Entities
     public class Player : Entity
     {
         private Vector2f _lastSafePosition;
-        public Guid Guid;
+        public string Guid;
 
         public float Health;
         public string Name;
 
-        public Player(Map map, Vector2f position, int size)
+        public Team Team;
+
+        public Player(Map map, Vector2f position, int size, Team team, string guid)
         {
-            Shape = new RectangleShape
-            {
-                Position = position,
-                Size = new Vector2f(size, size),
-                FillColor = Color.Red
-            };
+            GenerateShape();
 
             Map = map;
             Position = position;
             Size = size;
-        }
+            Team = team;
 
-        internal Player(Map map)
-        {
-            Map = map;
+            Guid = guid ?? throw new ArgumentNullException(nameof(guid));
         }
 
         public Boundary Boundary => new Boundary {Min = Position, Max = Position + new Vector2f(Size, Size)};
@@ -48,8 +45,24 @@ namespace BeepLive.Entities
             {
                 Position = Position,
                 Size = new Vector2f(Size, Size),
-                FillColor = Color.Red
+                FillColor = Team.VoxelType.Color
             };
+        }
+
+        public Projectile<ShotConfig> Shoot(ShotConfig shotConfig, Vector2f velocity)
+        {
+            var projectile =
+                new Projectile<ShotConfig>(Map, Position, velocity, shotConfig);
+            Map.Entities.Add(projectile);
+            return projectile;
+        }
+
+        public ClusterProjectile Shoot(ClusterShotConfig shotConfig, Vector2f velocity)
+        {
+            var projectile =
+                new ClusterProjectile(Map, Position, velocity, shotConfig);
+            Map.Entities.Add(projectile);
+            return projectile;
         }
 
         public override void Step()
@@ -58,6 +71,8 @@ namespace BeepLive.Entities
 
             Velocity += Map.Config.PhysicalEnvironment.Gravity;
             Velocity *= Map.Config.PhysicalEnvironment.AirResistance;
+
+            Alive = Map.Config.EntityBoundary.Contains(Position);
 
             Position += Velocity;
         }
@@ -70,10 +85,10 @@ namespace BeepLive.Entities
 
                     break;
                 case CollisionResponseMode.Raise:
-                    var collides = false;
+                    bool collides = false;
 
-                    for (var i = 0; i < Size; i++)
-                    for (var j = 0; j < Size; j++)
+                    for (int i = 0; i < Size; i++)
+                    for (int j = 0; j < Size; j++)
                         if (!GetVoxel(i, j).IsAir)
                             collides = true;
 
@@ -90,12 +105,12 @@ namespace BeepLive.Entities
                     break;
                 case CollisionResponseMode.LeastResistance:
                     // The center of mass of voxels intersecting the player
-                    var center = new Vector2f(0, 0);
+                    Vector2f center = new Vector2f(0, 0);
                     // The amount of voxels intersecting the Player
-                    var collisionCount = 0;
+                    int collisionCount = 0;
 
-                    for (var i = 0; i < Size; i++)
-                    for (var j = 0; j < Size; j++)
+                    for (int i = 0; i < Size; i++)
+                    for (int j = 0; j < Size; j++)
                     {
                         if (GetVoxel(i, j).IsAir) continue;
 

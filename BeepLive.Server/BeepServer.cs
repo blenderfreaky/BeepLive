@@ -2,8 +2,10 @@
 using System.IO;
 using System.Threading;
 using BeepLive.Client;
+using BeepLive.Client.PacketHandlers;
 using BeepLive.Config;
 using BeepLive.Network;
+using BeepLive.Server.PacketHandlers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Networker.Extensions.ProtobufNet;
@@ -14,7 +16,7 @@ namespace BeepLive.Server
 {
     public static class BeepServer
     {
-        public static Dictionary<string, string> PlayerSecrets;
+        public static List<ServerPlayer> Players;
         public static BeepConfig BeepConfig;
 
         static BeepServer()
@@ -25,19 +27,23 @@ namespace BeepLive.Server
 
             IConfigurationSection networkerSettings = config.GetSection("Networker");
 
-            PlayerSecrets = new Dictionary<string, string>();
+            Players = new List<ServerPlayer>();
 
-            Server = new ServerBuilder()
+            GameServer = new ServerBuilder()
                 .UseTcp(networkerSettings.GetValue<int>("TcpPort"))
+                .UseUdp(networkerSettings.GetValue<int>("UdpPort"))
                 .ConfigureLogging(loggingBuilder =>
                 {
                     loggingBuilder.AddConfiguration(config.GetSection("Logging"));
                     loggingBuilder.AddConsole();
                 })
                 .UseProtobufNet()
-                .RegisterPacketHandler<PlayerShotPacket, PlayerShotPacketHandler>()
-                .RegisterPacketHandler<PlayerJumpPacket, PlayerJumpPacketHandler>()
-                .RegisterPacketHandler<PlayerFlowPacket, PlayerFlowPacketHandler>()
+                .RegisterPacketHandler<PlayerShotPacket, ServerPlayerShotPacketHandler>()
+                .RegisterPacketHandler<PlayerJumpPacket, ServerPlayerJumpPacketHandler>()
+                .RegisterPacketHandler<PlayerFlowPacket, ServerPlayerFlowPacketHandler>()
+                .RegisterPacketHandler<PlayerSpawnAtPacket, ServerPlayerSpawnAtPacketHandler>()
+                .RegisterPacketHandler<PlayerTeamJoinPacket, ServerPlayerTeamJoinPacketHandler>()
+                .RegisterPacketHandler<ServerFlowPacket, ClientServerFlowPacketHandler>()
                 .Build();
 
             const string beepConfigXml = "BeepConfig.xml";
@@ -47,16 +53,54 @@ namespace BeepLive.Server
             else BeepConfig = XmlHelper.LoadFromXmlString<BeepConfig>(File.ReadAllText(beepConfigXml));
         }
 
-        public static IServer Server { get; set; }
+        public static IServer GameServer { get; set; }
 
         public static void Start()
         {
-            Server.Start();
+            GameServer.Start();
 
             BeepClient.BeepClientInstance = new BeepClient();
             BeepClient.BeepClientInstance.Start();
 
-            while (Server.Information.IsRunning) Thread.Sleep(10000);
+            while (GameServer.Information.IsRunning) Thread.Sleep(10000);
         }
+
+        public static bool IsValid(PlayerActionPacket packet) =>
+            string.Equals(Players.Find(p => string.Equals(p.PlayerGuid, packet.PlayerGuid)).Secret, packet.Secret);
+
+        public static void BroadcastWithoutSecret(PlayerActionPacket packet)
+        {
+            packet.Secret = null;
+            GameServer.Broadcast(packet);
+        }
+
+        public static bool AllPlayersInState(ServerPlayerState state, bool finished) => Players.TrueForAll(p => p.State == state && p.Finished || !finished);
+    }
+
+    public class ServerPlayer
+    {
+        public string PlayerGuid, Secret;
+
+        public ServerPlayerState State;
+        public bool Finished;
+
+        public void MoveToState(ServerPlayerState state)
+        {
+            State = state;
+            Finished = false;
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(PlayerGuid)}: {PlayerGuid}, {nameof(Secret)}: {Secret}, {nameof(State)}: {State}, {nameof(Finished)}: {Finished}";
+        }
+    }
+
+    public enum ServerPlayerState
+    {
+        InTeamSelection,
+        InSpawning,
+        InPlanning,
+        InSimulation
     }
 }

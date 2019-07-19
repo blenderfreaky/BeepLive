@@ -1,4 +1,6 @@
-﻿using SFML.Graphics;
+﻿using System;
+using BeepLive.Game;
+using SFML.Graphics;
 
 namespace BeepLive.World
 {
@@ -25,5 +27,25 @@ namespace BeepLive.World
         }
 
         public Color Color => VoxelType?.Color ?? Map.Config.BackgroundColor;
+
+        public TeamRelation GetTeamRelation(Team team)
+        {
+            return VoxelType.OwnerTeam == null
+                ? TeamRelation.Neutral
+                : VoxelType == null
+                    ? TeamRelation.Air
+                    : VoxelType.OwnerTeam == team
+                        ? TeamRelation.Friendly
+                        : TeamRelation.Hostile;
+        }
+    }
+
+    [Flags]
+    public enum TeamRelation : sbyte
+    {
+        Air = 0,
+        Friendly = 1 << 0,
+        Neutral = 1 << 1,
+        Hostile = 1 << 2
     }
 }

@@ -1,6 +1,7 @@
 ﻿{
   "Networker": {
     "TcpPort": 25565,
+    "UdpPort": 25566,
     "Address": "localhost"
   },
   "Logging": {

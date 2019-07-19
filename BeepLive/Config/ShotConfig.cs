@@ -1,15 +1,19 @@
-﻿namespace BeepLive.Config
+﻿using System.Xml.Serialization;
+using BeepLive.World;
+
+namespace BeepLive.Config
 {
+    [XmlInclude(typeof(ClusterShotConfig))]
     public class ShotConfig
     {
-        public int ChildCount;
-        public float ChildLowestSpeed;
-        public int ChildMaxLifeTime;
+        public TeamRelation Damages;
+        public bool Destructive;
 
-        public float ChildRadius;
-        public float ExplosionPower;
+        public float FriendlyResistanceFactor, NeutralResistanceFactor, HostileResistanceFactor;
         public float LowestSpeed;
         public int MaxLifeTime;
+
+        public bool Neutral;
         public float Radius;
     }
 }

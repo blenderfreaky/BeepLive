@@ -1,34 +1,40 @@
 ﻿using System;
-using System.Linq;
+using BeepLive.Config;
 using BeepLive.World;
 using SFML.Graphics;
 using SFML.System;
 
 namespace BeepLive.Entities
 {
-    public class Projectile : Entity
+    public class Projectile<TShotConfig> : Entity
+        where TShotConfig : ShotConfig
     {
-        public int LifeTime, MaxLifeTime;
-        public float LowestSpeed;
+        public int LifeTime;
 
-        public float Radius;
+        public Player Owner;
+        public TShotConfig ShotConfig;
+        public VoxelType VoxelTypeToPlace;
 
-        public Projectile(Map map, Vector2f position, Vector2f velocity, float radius, float lowestSpeed,
-            int maxLifeTime)
+        public Projectile(Map map, Vector2f position, Vector2f velocity, TShotConfig shotConfig, Player owner = null)
         {
             Shape = new CircleShape
             {
                 Position = position,
-                Radius = radius,
-                FillColor = Color.Yellow
+                Radius = shotConfig.Radius,
+                FillColor = new Color((byte) (VoxelTypeToPlace.Color.R * .8), (byte) (VoxelTypeToPlace.Color.G * .8), (byte) (VoxelTypeToPlace.Color.B * .8))
             };
 
             Map = map;
             Position = position;
             Velocity = velocity;
-            Radius = radius;
-            LowestSpeed = lowestSpeed;
-            MaxLifeTime = maxLifeTime;
+            ShotConfig = shotConfig;
+
+            Owner = owner;
+
+            VoxelTypeToPlace =
+                ShotConfig.Destructive ? null :
+                ShotConfig.Neutral ? Map.Config.GroundVoxelType :
+                Owner == null ? null : Owner.Team?.VoxelType ?? Map.Config.GroundVoxelType;
         }
 
         public CircleShape CircleShape
@@ -45,42 +51,62 @@ namespace BeepLive.Entities
 
         public override void Step()
         {
-            Voxel voxel = Map.GetVoxel(Position);
+            Voxel voxelUnderCenter = Map.GetVoxel(Position);
 
             Velocity += Map.Config.PhysicalEnvironment.Gravity;
-            Velocity *= voxel.IsAir
-                ? Map.Config.PhysicalEnvironment.AirResistance
-                : voxel.VoxelType.Resistance;
+            if (voxelUnderCenter.IsAir)
+            {
+                Velocity *= Map.Config.PhysicalEnvironment.AirResistance;
+            }
+            else
+            {
+                Velocity *= voxelUnderCenter.VoxelType.Resistance
+                            * (voxelUnderCenter.GetTeamRelation(Owner.Team) switch
+                                {
+                                TeamRelation.Friendly => ShotConfig.FriendlyResistanceFactor,
+                                TeamRelation.Neutral => ShotConfig.NeutralResistanceFactor,
+                                TeamRelation.Hostile => ShotConfig.HostileResistanceFactor,
+                                _ => throw new ArgumentOutOfRangeException(),
+                                });
+            }
 
-            float dist = MathF.Sqrt(Velocity.X * Velocity.X + Velocity.Y * Velocity.Y);
+            bool hitsPlayer = false;
+            foreach (var player in Map.Players)
+            {
+                if (!player.Boundary.Contains(Position)) continue;
 
-            if (dist < LowestSpeed ||
-                LifeTime++ > MaxLifeTime ||
+                hitsPlayer = true;
+
+                if (player.Team == null) Velocity *= ShotConfig.NeutralResistanceFactor;
+                if (player.Team == Owner.Team) Velocity *= ShotConfig.FriendlyResistanceFactor;
+                else Velocity *= ShotConfig.HostileResistanceFactor;
+            }
+
+            float velocity = Velocity.X * Velocity.X + Velocity.Y * Velocity.Y;
+
+            if (velocity < ShotConfig.LowestSpeed ||
+                LifeTime++ > ShotConfig.MaxLifeTime ||
                 !Map.Config.EntityBoundary.Contains(Position) ||
-                Map.Players.Any(p => p.Boundary.Contains(Position)))
-                Die();
+                hitsPlayer) Die();
 
-            Vector2f front = Velocity / dist;
-            var left = new Vector2f(front.Y, -front.X);
+            Vector2f front = Velocity / velocity;
+            Vector2f left = new Vector2f(front.Y, -front.X);
 
-            for (float x = 0; x < dist; x += .5f)
-            for (float y = -Radius; y <= Radius; y++)
+            for (float x = 0; x < velocity; x += .5f)
+            for (float y = -ShotConfig.Radius; y <= ShotConfig.Radius; y++)
             {
                 Vector2f position = Position + front * x + left * y;
 
                 Chunk chunk = Map.GetChunk(position, out Vector2f chunkPosition);
                 if (chunk == null) continue;
-                chunk[(uint) MathF.Floor(position.X - chunkPosition.X),
-                    (uint) MathF.Floor(position.Y - chunkPosition.Y)] = new Voxel(Map);
+                uint xFloored = (uint) MathF.Floor(position.X - chunkPosition.X);
+                uint yFloored = (uint) MathF.Floor(position.Y - chunkPosition.Y);
+
+                if ((ShotConfig.Damages & chunk[xFloored, yFloored].GetTeamRelation(Owner.Team)) != TeamRelation.Air)
+                    chunk[xFloored, yFloored] = new Voxel(Map, VoxelTypeToPlace);
             }
 
             Position += Velocity;
-        }
-
-        public virtual void Die()
-        {
-            Map.Entities.Remove(this);
-            Dispose(true);
         }
 
         protected override void Dispose(bool disposing)

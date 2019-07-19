@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using BeepLive.Config;
 using BeepLive.Entities;
 using BeepLive.World;
@@ -21,35 +20,5 @@ namespace BeepLive.Game
             VoxelType = new VoxelType
                 {OwnerTeam = this, Color = teamConfig.Color, Resistance = teamConfig.TerritoryResistance};
         }
-
-        #region Fluent API
-
-        public Team SetVoxelType(VoxelType voxelType)
-        {
-            voxelType.OwnerTeam = this;
-            VoxelType = voxelType;
-
-            return this;
-        }
-
-        public Team AddPlayer(Func<Player, Player> playerMaker, out Player player)
-        {
-            player = playerMaker(new Player(BeepLiveGame.Map));
-            player.GenerateShape();
-            Players.Add(player);
-
-            return this;
-        }
-
-        public Team AddPlayer(Func<Player, Player> playerMaker)
-        {
-            Player player = playerMaker(new Player(BeepLiveGame.Map));
-            player.GenerateShape();
-            Players.Add(player);
-
-            return this;
-        }
-
-        #endregion
     }
 }

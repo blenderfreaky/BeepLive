@@ -13,35 +13,30 @@ namespace BeepLive.Game
     {
         public BeepConfig BeepConfig;
         public Player LocalPlayer;
+        public Team LocalTeam;
         public Map Map;
         public List<Team> Teams;
+        public readonly string PlayerGuid;
 
-        public BeepLiveGame(BeepConfig beepConfig)
+        public BeepLiveGame(BeepConfig beepConfig, string playerGuid)
         {
             BeepConfig = beepConfig;
+            PlayerGuid = playerGuid;
 
             Map = new Map(beepConfig.MapConfig);
 
             Teams = beepConfig.TeamConfigs.Select(x => new Team(this, x)).ToList();
         }
 
-        public Timer Run()
-        {
-            return new Timer(_ => Map?.Step(), null, 1000, 1000 / 60);
-        }
+        public Timer Run() => new Timer(_ => Map?.Step(), null, 1000, 1000 / 60);
 
         public void JoinTeam(Team team)
         {
-            if (team.Players.Count < team.TeamConfig.MaxPlayers)
-            {
-                LocalPlayer = new Player(Map, new Vector2f(), team.TeamConfig.PlayerSize);
+            if (team.Players.Count >= team.TeamConfig.MaxPlayers) throw new InvalidOperationException("Can't join full team");
 
-                team.Players.Add(LocalPlayer);
-            }
-            else
-            {
-                throw new InvalidOperationException("Can't join full team");
-            }
+            LocalPlayer = new Player(Map, new Vector2f(), team.TeamConfig.PlayerSize, team, PlayerGuid);
+
+            team.Players.Add(LocalPlayer);
         }
     }
 }
