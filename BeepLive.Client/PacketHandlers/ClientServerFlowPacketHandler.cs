@@ -20,7 +20,7 @@ namespace BeepLive.Client.PacketHandlers
         public override async Task Process(ServerFlowPacket packet, IPacketContext packetContext)
         {
             _logger.LogDebug("Received: " + packet);
-            BeepClient.BeepClientInstance.BeepLiveSfml.HandleServerFlowPacket(packet);
+            BeepClient.BeepClientInstance.BeepLiveSfml.HandlePacket(packet);
         }
     }
 }

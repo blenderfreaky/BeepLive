@@ -1,4 +1,5 @@
-﻿using ProtoBuf;
+﻿using System;
+using ProtoBuf;
 
 namespace BeepLive.Network
 {
@@ -8,14 +9,33 @@ namespace BeepLive.Network
     [ProtoInclude(300, typeof(PlayerFlowPacket))]
     [ProtoInclude(400, typeof(PlayerTeamJoinPacket))]
     [ProtoInclude(500, typeof(PlayerSpawnAtPacket))]
-    public abstract class PlayerActionPacket
+    public abstract class PlayerActionPacket : Packet
     {
-        [ProtoMember(3)] public string MessageGuid;
 
         [ProtoMember(1)] public string PlayerGuid;
 
         [ProtoMember(2)] public string Secret;
+    }
 
-        public override string ToString() => $"{nameof(MessageGuid)}: {MessageGuid}, {nameof(PlayerGuid)}: {PlayerGuid}, {nameof(Secret)}: {Secret}";
+    [ProtoContract]
+    [ProtoInclude(100, typeof(PlayerActionPacket))]
+    [ProtoInclude(200, typeof(ServerFlowPacket))]
+    [ProtoInclude(300, typeof(SyncPacket))]
+    public class Packet
+    {
+        [ProtoMember(1)] public string MessageGuid;
+        [ProtoMember(2)] public DateTime TimeSent;
+
+        public Packet()
+        {
+            MessageGuid = Guid.NewGuid().ToString();
+            TimeSent = DateTime.Now;
+        }
+
+        public Packet(string messageGuid, DateTime timeSent)
+        {
+            MessageGuid = messageGuid;
+            TimeSent = timeSent;
+        }
     }
 }

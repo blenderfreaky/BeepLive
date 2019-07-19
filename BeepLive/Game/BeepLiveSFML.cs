@@ -18,11 +18,15 @@ namespace BeepLive.Game
     public class BeepLiveSfml
     {
         public readonly List<PlayerActionPacket> QueuedPlayerActionPackets;
+        public readonly List<Packet> QueuedPackets;
         public RenderWindow Window;
 
         public IMessageSender MessageSender;
 
         public readonly string PlayerGuid, Secret;
+
+        public List<TeamMock> TeamMocks;
+        public List<PlayerMock> PlayerMocks;
 
         public BeepLiveSfml(IMessageSender messageSender)
         {
@@ -63,6 +67,7 @@ namespace BeepLive.Game
             };
 
             QueuedPlayerActionPackets = new List<PlayerActionPacket>();
+            QueuedPackets = new List<Packet>();
         }
 
         public BeepLiveGame BeepLiveGame;
@@ -78,6 +83,8 @@ namespace BeepLive.Game
                 Window.DispatchEvents();
 
                 Window.Clear(Color.Black);
+
+                ExecutePackets();
 
                 if (BeepGameState.Drawing)
                 {
@@ -157,7 +164,7 @@ namespace BeepLive.Game
             switch (e.Code)
             {
                 case Keyboard.Key.Num1:
-                    JoinTeam(0);
+                    JoinTeam("Team 0", "Player 0");
                     Flow(PlayerFlowPacket.FlowType.LockInTeam);
                     break;
                 case Keyboard.Key.Q:
@@ -208,17 +215,18 @@ namespace BeepLive.Game
                 Type = flowType
             });
 
-        private void JoinTeam(int teamIndex) =>
+        private void JoinTeam(string teamGuid, string userName) =>
             SendPlayerAction(new PlayerTeamJoinPacket
-        {
-            TeamIndex = teamIndex,
-        });
+            {
+                TeamGuid = teamGuid,
+                UserName = userName
+            });
 
-        private void SpawnAt(Vector2f position) => 
+        private void SpawnAt(Vector2f position) =>
             SendPlayerAction(new PlayerSpawnAtPacket
-        {
-            Position = position
-        });
+            {
+                Position = position
+            });
 
         private void DrawMap()
         {
@@ -247,8 +255,32 @@ namespace BeepLive.Game
                 case ServerFlowType.StartTeamSelection:
                     BeepGameState.SelectingTeams = true;
                     BeepGameState.Drawing = false;
-                    break;;
+                    break;
                 case ServerFlowType.StartSpawning:
+                    while (!BeepLiveGame.Teams.TrueForAll(t => t.Players.Count == t.TeamConfig.MaxPlayers))
+                        BeepLiveGame.Teams
+                            .ForEach(t => t.Players = TeamMocks
+                                .Find(tm =>
+                                    string.Equals(
+                                        t.TeamConfig.TeamGuid,
+                                        tm.TeamGuid, StringComparison.InvariantCulture))
+                                .Players
+                                .Select(p =>
+                                {
+                                    Player player = new Player(
+                                        BeepLiveGame.Map,
+                                        new Vector2f(0, 0),
+                                        t.TeamConfig.PlayerSize,
+                                        t,
+                                        p.PlayerGuid,
+                                        p.UserName);
+                                    BeepLiveGame.Map.Entities.Add(player);
+                                    BeepLiveGame.Map.Players.Add(player);
+                                    return player;
+                                }).ToList());
+                    BeepLiveGame.LocalPlayer = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, PlayerGuid));
+                    BeepLiveGame.LocalTeam = BeepLiveGame.LocalPlayer.Team;
+                    
                     BeepGameState.SelectingTeams = false;
                     BeepGameState.Spawning = true;
                     BeepGameState.Drawing = true;
@@ -274,13 +306,40 @@ namespace BeepLive.Game
             }
         }
 
+        private void ExecutePackets()
+        {
+            foreach (var packet in QueuedPackets.OrderBy(p => p.TimeSent))
+            {
+                switch (packet)
+                {
+                    case SyncPacket sync:
+                        HandleSyncPacket(sync);
+                        break;
+                    case ServerFlowPacket flow:
+                        HandleServerFlowPacket(flow);
+                        break;
+                    case PlayerTeamJoinPacket teamJoin:
+                        HandleClientTeamJoinPacket(teamJoin);
+                        break;
+                    case PlayerSpawnAtPacket spawnAt:
+                        HandlePlayerSpawnAtPacket(spawnAt);
+                        break;
+                    case PlayerActionPacket action:
+                        HandlePlayerActionPacket(action);
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Invalid packet: {packet}");
+                }
+            }
+        }
+
         private void ExecutePlayerActionPackets() =>
             QueuedPlayerActionPackets.OrderBy(x => x.MessageGuid).ThenBy(x => x.PlayerGuid)
                 .ForEach(ExecutePlayerActionPacket);
 
         private void ExecutePlayerActionPacket(PlayerActionPacket packet)
         {
-            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid));
+            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid, StringComparison.InvariantCulture));
 
             switch (packet)
             {
@@ -307,7 +366,7 @@ namespace BeepLive.Game
 
         public void HandlePlayerSpawnAtPacket(PlayerSpawnAtPacket packet)
         {
-            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid));
+            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid, StringComparison.InvariantCulture));
 
             player.Position = packet.Position;
         }
@@ -321,7 +380,38 @@ namespace BeepLive.Game
 
             BeepGameState.Connecting = false;
 
-            _physicsTimer = BeepLiveGame.Run();
+            _physicsTimer = BeepLiveGame.Run(); // Simulating is false, so this doesn't run immediately
+
+            TeamMocks = BeepLiveGame.Teams.Select(t => new TeamMock
+            {
+                TeamColor = t.TeamConfig.Color,
+                MaxPlayers = t.TeamConfig.MaxPlayers,
+                TeamGuid = t.TeamConfig.TeamGuid
+            }).ToList();
+            PlayerMocks = new List<PlayerMock>();
+        }
+
+        public void HandleClientTeamJoinPacket(PlayerTeamJoinPacket packet)
+        {
+            PlayerMock playerMock =
+                PlayerMocks.Find(x =>
+                    string.Equals(x.PlayerGuid,
+                        packet.PlayerGuid, StringComparison.InvariantCulture))
+                ?? new PlayerMock
+                {
+                    PlayerGuid = packet.PlayerGuid,
+                    UserName = packet.UserName
+                };
+
+            playerMock.Team?.Players.Remove(playerMock);
+
+            TeamMock teamMock =
+                TeamMocks.Find(x =>
+                    string.Equals(x.TeamGuid,
+                        packet.TeamGuid, StringComparison.InvariantCulture));
+
+            playerMock.Team = teamMock;
+            teamMock.Players.Add(playerMock);
         }
 
         public class GameState
@@ -354,5 +444,27 @@ namespace BeepLive.Game
         #endregion
 
         #endregion
+
+        public void HandlePacket(Packet packet) => QueuedPackets.Add(packet);
+    }
+
+    public class TeamMock
+    {
+        public string TeamGuid;
+        public List<PlayerMock> Players;
+        public Color TeamColor;
+        public int MaxPlayers;
+
+        public TeamMock()
+        {
+            Players = new List<PlayerMock>();
+        }
+    }
+
+    public class PlayerMock
+    {
+        public string PlayerGuid;
+        public string UserName;
+        public TeamMock Team;
     }
 }

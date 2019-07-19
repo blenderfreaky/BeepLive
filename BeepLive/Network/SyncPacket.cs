@@ -4,7 +4,7 @@ using ProtoBuf;
 namespace BeepLive.Network
 {
     [ProtoContract]
-    public class SyncPacket
+    public class SyncPacket : Packet
     {
         [ProtoMember(1)] public string BeepConfigXml;
 

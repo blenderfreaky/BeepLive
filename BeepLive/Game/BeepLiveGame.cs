@@ -29,14 +29,5 @@ namespace BeepLive.Game
         }
 
         public Timer Run() => new Timer(_ => Map?.Step(), null, 1000, 1000 / 60);
-
-        public void JoinTeam(Team team)
-        {
-            if (team.Players.Count >= team.TeamConfig.MaxPlayers) throw new InvalidOperationException("Can't join full team");
-
-            LocalPlayer = new Player(Map, new Vector2f(), team.TeamConfig.PlayerSize, team, PlayerGuid);
-
-            team.Players.Add(LocalPlayer);
-        }
     }
 }

@@ -21,7 +21,7 @@ namespace BeepLive.Client.PacketHandlers
         {
             _logger.LogDebug("Received: " + packet);
 
-            BeepClient.BeepClientInstance.BeepLiveSfml.HandleSyncPacket(packet);
+            BeepClient.BeepClientInstance.BeepLiveSfml.HandlePacket(packet);
         }
     }
 }

@@ -24,6 +24,7 @@ namespace BeepLive.Server.PacketHandlers
             if (!BeepServer.IsValid(packet))
             {
                 _logger.LogWarning($"Received packet with invalid Secret: {packet}\nSent by: {packetContext.Sender.EndPoint}");
+                BeepServer.BroadcastWithoutSecret(packet);
             }
         }
     }

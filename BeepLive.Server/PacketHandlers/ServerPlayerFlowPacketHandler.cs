@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using BeepLive.Network;
 using Microsoft.Extensions.Logging;
@@ -31,7 +32,7 @@ namespace BeepLive.Server.PacketHandlers
                 return;
             }
 
-            ServerPlayer player = Players.Find(p => string.Equals(p.PlayerGuid, packet.PlayerGuid));
+            ServerPlayer player = Players.Find(p => string.Equals(p.PlayerGuid, packet.PlayerGuid, StringComparison.InvariantCulture));
 
             if (player == null && packet.Type != PlayerFlowPacket.FlowType.Join)
             {

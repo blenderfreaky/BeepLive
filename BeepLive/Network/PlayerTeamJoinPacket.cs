@@ -5,8 +5,12 @@ namespace BeepLive.Network
     [ProtoContract]
     public class PlayerTeamJoinPacket : PlayerActionPacket
     {
-        [ProtoMember(1)] public int TeamIndex;
+        [ProtoMember(1)] public string TeamGuid;
+        [ProtoMember(2)] public string UserName;
 
-        public override string ToString() => $"{base.ToString()}, {nameof(TeamIndex)}: {TeamIndex}";
+        public override string ToString()
+        {
+            return $"{base.ToString()}, {nameof(TeamGuid)}: {TeamGuid}, {nameof(UserName)}: {UserName}";
+        }
     }
 }
