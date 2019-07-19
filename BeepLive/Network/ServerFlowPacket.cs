@@ -14,6 +14,11 @@ namespace BeepLive.Network
         {
             UnixTime = DateTime.UtcNow.Ticks;
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Type)}: {Type}, {nameof(UnixTime)}: {UnixTime}";
+        }
     }
 
     public enum ServerFlowType
