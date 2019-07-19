@@ -210,15 +210,15 @@ namespace BeepLive.Game
 
         private void JoinTeam(int teamIndex) =>
             SendPlayerAction(new PlayerTeamJoinPacket
-        {
-            TeamIndex = teamIndex,
-        });
+            {
+                TeamIndex = teamIndex,
+            });
 
-        private void SpawnAt(Vector2f position) => 
+        private void SpawnAt(Vector2f position) =>
             SendPlayerAction(new PlayerSpawnAtPacket
-        {
-            Position = position
-        });
+            {
+                Position = position
+            });
 
         private void DrawMap()
         {
@@ -263,7 +263,7 @@ namespace BeepLive.Game
                     BeepGameState.Drawing = true;
                     break;
                 case ServerFlowType.StartPlanning:
-                    Debug.Assert(!BeepLiveGame.Map.Simulating);
+                    Debug.Assert(BeepLiveGame.Map.Simulating);
 
                     BeepGameState.Simulating = false;
                     BeepGameState.InputsAllowed = true;
