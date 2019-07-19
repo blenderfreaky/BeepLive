@@ -13,8 +13,10 @@ namespace BeepLive.Entities
 
         public float Radius;
 
+        public VoxelType Created;
+
         public Projectile(Map map, Vector2f position, Vector2f velocity, float radius, float lowestSpeed,
-            int maxLifeTime)
+            int maxLifeTime, VoxelType created)
         {
             Shape = new CircleShape
             {
@@ -29,6 +31,7 @@ namespace BeepLive.Entities
             Radius = radius;
             LowestSpeed = lowestSpeed;
             MaxLifeTime = maxLifeTime;
+            Created = created;
         }
 
         public CircleShape CircleShape
