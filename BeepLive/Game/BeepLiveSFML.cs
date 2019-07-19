@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using BeepLive.Config;
 using BeepLive.Entities;
 using BeepLive.Network;
 using BeepLive.World;
@@ -139,13 +138,9 @@ namespace BeepLive.Game
             }
         }
 
-        private void Shoot(ShotConfig config, VoxelType result, Vector2f velocity)
+        private void Shoot()
         {
-            BeepLiveGame.Map.Entities.Add(new ClusterProjectile<Projectile>(BeepLiveGame.Map,
-                BeepLiveGame.LocalPlayer.Position,
-                velocity,
-                config,
-                result));
+            
         }
 
         private void Window_MousePressed(object sender, MouseButtonEventArgs e)

@@ -18,8 +18,8 @@ namespace BeepLive.Entities
 
         public ClusterProjectile(Map map, Vector2f position, Vector2f velocity, float radius, float lowestSpeed,
             int maxLifeTime, int childCount, float childRadius, float explosionPower, float childLowestSpeed,
-            int childMaxLifeTime, VoxelType created) : base(map, position,
-            velocity, radius, lowestSpeed, maxLifeTime, created)
+            int childMaxLifeTime) : base(map, position,
+            velocity, radius, lowestSpeed, maxLifeTime)
         {
             ChildCount = childCount;
             ChildRadius = childRadius;
@@ -28,10 +28,10 @@ namespace BeepLive.Entities
             ChildMaxLifeTime = childMaxLifeTime;
         }
 
-        public ClusterProjectile(Map map, Vector2f position, Vector2f velocity, ShotConfig shotConfig, VoxelType created)
+        public ClusterProjectile(Map map, Vector2f position, Vector2f velocity, ShotConfig shotConfig)
             : this(map, position, velocity, shotConfig.Radius, shotConfig.LowestSpeed, shotConfig.MaxLifeTime,
                 shotConfig.ChildCount, shotConfig.ChildRadius, shotConfig.ExplosionPower, shotConfig.ChildLowestSpeed,
-                shotConfig.ChildMaxLifeTime, created)
+                shotConfig.ChildMaxLifeTime)
         {
         }
 
@@ -51,7 +51,7 @@ namespace BeepLive.Entities
                 var direction = new Vector2f((float) (Map.Random.NextDouble() * 2 - 1) * ExplosionPower,
                     (float) (Map.Random.NextDouble() * 2 - 1) * ExplosionPower);
                 Map.Entities.Add(Activator.CreateInstance(typeof(TProjectile), Map, Position, Velocity + direction,
-                    ChildRadius, ChildLowestSpeed, ChildMaxLifeTime, Created) as TProjectile);
+                    ChildRadius, ChildLowestSpeed, ChildMaxLifeTime) as TProjectile);
             }
 
             OnExplodeEvent?.Invoke();
