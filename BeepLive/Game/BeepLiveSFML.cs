@@ -55,7 +55,7 @@
 
             Flow(PlayerFlowPacket.FlowType.Join);
 
-            BeepGameState = new GameState
+            BeepGameState = new BeepLiveGameState
             {
                 Connecting = true
             };
@@ -72,7 +72,7 @@
 
         public BeepLiveGame BeepLiveGame;
 
-        public GameState BeepGameState;
+        public BeepLiveGameState BeepGameState;
 
         private void Window_MouseWheelScrolled(object sender, MouseWheelScrollEventArgs e) => _zoom *= (float)Math.Pow(2, e.Delta);
 
@@ -262,6 +262,7 @@
 
                 case ServerFlowType.StartSpawning:
                     while (!BeepLiveGame.Teams.TrueForAll(t => t.Players.Count == t.TeamConfig.MaxPlayers))
+                    {
                         BeepLiveGame.Teams
                             .ForEach(t => t.Players = TeamMocks
                                 .Find(tm =>
@@ -282,6 +283,8 @@
                                     BeepLiveGame.Map.Players.Add(player);
                                     return player;
                                 }).ToList());
+                    }
+
                     BeepLiveGame.LocalPlayer = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, PlayerGuid));
                     BeepLiveGame.LocalTeam = BeepLiveGame.LocalPlayer.Team;
 
@@ -365,7 +368,7 @@
                     {
                         case ClusterShotConfig clusterShotConfig:
                             player.Shoot(clusterShotConfig, shotPacket.Direction).OnExplodeEvent +=
-                                p => TriggerShake(clusterShotConfig.ExplosionPower, 1000);
+                                _ => TriggerShake(clusterShotConfig.ExplosionPower, 1000);
                             break;
 
                         default:
@@ -429,16 +432,6 @@
             teamMock.Players.Add(playerMock);
         }
 
-        public class GameState
-        {
-            public bool Connecting;
-            public bool Drawing;
-            public bool InputsAllowed;
-            public bool SelectingTeams;
-            public bool Simulating;
-            public bool Spawning;
-        }
-
         #region Camera
 
         private readonly View _view;
@@ -461,25 +454,5 @@
         #endregion Camera
 
         public void HandlePacket(Packet packet) => QueuedPackets.Add(packet);
-    }
-
-    public class TeamMock
-    {
-        public string TeamGuid;
-        public List<PlayerMock> Players;
-        public Color TeamColor;
-        public int MaxPlayers;
-
-        public TeamMock()
-        {
-            Players = new List<PlayerMock>();
-        }
-    }
-
-    public class PlayerMock
-    {
-        public string PlayerGuid;
-        public string UserName;
-        public TeamMock Team;
     }
 }

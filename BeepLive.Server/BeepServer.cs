@@ -1,15 +1,10 @@
 ﻿namespace BeepLive.Server
 {
     using BeepLive.Client;
-    using BeepLive.Client.PacketHandlers;
     using BeepLive.Config;
     using BeepLive.Net;
     using BeepLive.Network;
-    using BeepLive.Server.PacketHandlers;
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
-    using Networker.Extensions.ProtobufNet;
-    using Networker.Server;
     using Networker.Server.Abstractions;
     using ProtoBuf;
     using System.Collections.Generic;

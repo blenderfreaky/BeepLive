@@ -32,7 +32,7 @@
             Sprite.Texture.Update(Voxels);
         }
 
-        public Vector2u GetVoxelIndex(Vector2f position)
+        public static Vector2u GetVoxelIndex(Vector2f position)
         {
             return new Vector2u((uint)Math.Floor(position.X),
                 (uint)MathF.Floor(position.Y));
