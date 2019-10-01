@@ -82,7 +82,7 @@ namespace BeepLive.Entities
                 else Velocity *= ShotConfig.HostileResistanceFactor;
             }
 
-            float velocity = Velocity.X * Velocity.X + Velocity.Y * Velocity.Y;
+            float velocity = (Velocity.X * Velocity.X) + (Velocity.Y * Velocity.Y);
 
             if (velocity < ShotConfig.LowestSpeed ||
                 LifeTime++ > ShotConfig.MaxLifeTime ||
@@ -95,7 +95,7 @@ namespace BeepLive.Entities
             for (float x = 0; x < velocity; x += .5f)
                 for (float y = -ShotConfig.Radius; y <= ShotConfig.Radius; y++)
                 {
-                    Vector2f position = Position + front * x + left * y;
+                    Vector2f position = Position + (front * x) + (left * y);
 
                     Chunk chunk = Map.GetChunk(position, out Vector2f chunkPosition);
                     if (chunk == null) continue;

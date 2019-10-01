@@ -74,7 +74,7 @@ namespace BeepLive.Server
             GameServer.Broadcast(packet);
         }
 
-        public static bool AllPlayersInState(ServerPlayerState state, bool finished) => Players.TrueForAll(p => p.State == state && p.Finished || !finished);
+        public static bool AllPlayersInState(ServerPlayerState state, bool finished) => Players.TrueForAll(p => (p.State == state && p.Finished) || !finished);
     }
 
     public class ServerPlayer

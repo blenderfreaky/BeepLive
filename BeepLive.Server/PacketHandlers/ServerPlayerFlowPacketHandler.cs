@@ -62,31 +62,37 @@ namespace BeepLive.Server.PacketHandlers
                     packetContext.Sender.Send(new ServerFlowPacket { Type = ServerFlowType.StartTeamSelection });
 
                     break;
+
                 case PlayerFlowPacket.FlowType.Leave:
                     Players.Remove(player);
                     BroadcastWithoutSecret(packet);
 
                     break;
+
                 case PlayerFlowPacket.FlowType.LockInTeam:
                     TryFlow(packet, player, ServerPlayerState.InTeamSelection, ServerPlayerState.InSpawning,
                         ServerFlowType.StartSpawning);
 
                     break;
+
                 case PlayerFlowPacket.FlowType.Spawn:
                     TryFlow(packet, player, ServerPlayerState.InSpawning, ServerPlayerState.InSimulation,
                         ServerFlowType.StartSimulation);
 
                     break;
+
                 case PlayerFlowPacket.FlowType.ReadyForSimulation:
                     TryFlow(packet, player, ServerPlayerState.InSimulation, ServerPlayerState.InPlanning,
                         ServerFlowType.StartPlanning);
 
                     break;
+
                 case PlayerFlowPacket.FlowType.FinishedSimulation:
                     TryFlow(packet, player, ServerPlayerState.InPlanning, ServerPlayerState.InSimulation,
                         ServerFlowType.StartSimulation);
 
                     break;
+
                 default:
                     _logger.LogError("Received invalid player-flow packet: " + packet);
                     break;

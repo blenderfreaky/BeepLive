@@ -5,7 +5,6 @@ namespace BeepLive.Network
     [ProtoContract]
     public class PlayerShotPacket : PlayerActionPacket
     {
-
         [ProtoMember(3)] public Vector2FSerializable Direction;
 
         [ProtoMember(1)] public int ShotConfigId;

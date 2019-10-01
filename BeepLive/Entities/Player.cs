@@ -86,6 +86,7 @@ namespace BeepLive.Entities
                 case CollisionResponseMode.NoClip:
 
                     break;
+
                 case CollisionResponseMode.Raise:
                     bool collides = false;
 
@@ -105,6 +106,7 @@ namespace BeepLive.Entities
                     }
 
                     break;
+
                 case CollisionResponseMode.LeastResistance:
                     // The center of mass of voxels intersecting the player
                     Vector2f center = new Vector2f(0, 0);
@@ -129,6 +131,7 @@ namespace BeepLive.Entities
 
                     Velocity -= center;
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -170,6 +173,6 @@ namespace BeepLive.Entities
             return this;
         }
 
-        #endregion
+        #endregion Fluent API
     }
 }

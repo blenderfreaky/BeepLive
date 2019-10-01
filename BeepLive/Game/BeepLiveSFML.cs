@@ -89,12 +89,12 @@ namespace BeepLive.Game
                 if (BeepGameState.Drawing)
                 {
                     const float interpolation = 0.5f;
-                    _center = _center * interpolation +
-                              (BeepLiveGame.LocalPlayer?.Position != null
+                    _center = (_center * interpolation) +
+                              ((BeepLiveGame.LocalPlayer?.Position != null
                                   ? BeepLiveGame.LocalPlayer.Position + new Vector2f(
                                         BeepLiveGame.LocalPlayer.Size / 2f,
                                         BeepLiveGame.LocalPlayer.Size / 2f)
-                                  : new Vector2f(Window.Size.X / 2f, Window.Size.Y / 2f)) * (1 - interpolation);
+                                  : new Vector2f(Window.Size.X / 2f, Window.Size.Y / 2f)) * (1 - interpolation));
                     ApplyShake();
                     _view.Size = new Vector2f(Window.Size.X * _zoom, Window.Size.Y * _zoom);
                     _view.Rotation = _rotation;
@@ -131,10 +131,10 @@ namespace BeepLive.Game
             float fulfillment = (float)(_shakeTimer.ElapsedMilliseconds / (double)_shakeDuration);
             if (fulfillment < 1f)
             {
-                Vector2f direction = new Vector2f((float)(_random.NextDouble() * 2 - 1),
-                    (float)(_random.NextDouble() * 2 - 1));
-                direction /= MathF.Sqrt(direction.X * direction.X + direction.Y * direction.Y);
-                _view.Center = _center + direction * _shakeMagnitude * (1f - fulfillment);
+                Vector2f direction = new Vector2f((float)((_random.NextDouble() * 2) - 1),
+                    (float)((_random.NextDouble() * 2) - 1));
+                direction /= MathF.Sqrt((direction.X * direction.X) + (direction.Y * direction.Y));
+                _view.Center = _center + (direction * _shakeMagnitude * (1f - fulfillment));
             }
             else
             {
@@ -167,12 +167,15 @@ namespace BeepLive.Game
                     JoinTeam("Team 0", "Player 0");
                     Flow(PlayerFlowPacket.FlowType.LockInTeam);
                     break;
+
                 case Keyboard.Key.Q:
                     Shoot(0, direction);
                     break;
+
                 case Keyboard.Key.W:
                     Jump(direction);
                     break;
+
                 case Keyboard.Key.Enter:
                     Flow(PlayerFlowPacket.FlowType.ReadyForSimulation);
                     break;
@@ -256,6 +259,7 @@ namespace BeepLive.Game
                     BeepGameState.SelectingTeams = true;
                     BeepGameState.Drawing = false;
                     break;
+
                 case ServerFlowType.StartSpawning:
                     while (!BeepLiveGame.Teams.TrueForAll(t => t.Players.Count == t.TeamConfig.MaxPlayers))
                         BeepLiveGame.Teams
@@ -285,6 +289,7 @@ namespace BeepLive.Game
                     BeepGameState.Spawning = true;
                     BeepGameState.Drawing = true;
                     break;
+
                 case ServerFlowType.StartSimulation:
                     ExecutePlayerActionPackets();
 
@@ -294,6 +299,7 @@ namespace BeepLive.Game
                     BeepGameState.Simulating = true;
                     BeepGameState.Drawing = true;
                     break;
+
                 case ServerFlowType.StartPlanning:
                     Debug.Assert(BeepLiveGame.Map.Simulating);
 
@@ -301,6 +307,7 @@ namespace BeepLive.Game
                     BeepGameState.InputsAllowed = true;
                     BeepGameState.Drawing = true;
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -315,18 +322,23 @@ namespace BeepLive.Game
                     case SyncPacket sync:
                         HandleSyncPacket(sync);
                         break;
+
                     case ServerFlowPacket flow:
                         HandleServerFlowPacket(flow);
                         break;
+
                     case PlayerTeamJoinPacket teamJoin:
                         HandleClientTeamJoinPacket(teamJoin);
                         break;
+
                     case PlayerSpawnAtPacket spawnAt:
                         HandlePlayerSpawnAtPacket(spawnAt);
                         break;
+
                     case PlayerActionPacket action:
                         HandlePlayerActionPacket(action);
                         break;
+
                     default:
                         throw new InvalidOperationException($"Invalid packet: {packet}");
                 }
@@ -346,6 +358,7 @@ namespace BeepLive.Game
                 case PlayerJumpPacket jumpPacket:
                     player.Velocity += jumpPacket.Direction;
                     break;
+
                 case PlayerShotPacket shotPacket:
                     var shotConfig = BeepLiveGame.BeepConfig.ShotConfigs[shotPacket.ShotConfigId];
                     switch (shotConfig)
@@ -354,11 +367,13 @@ namespace BeepLive.Game
                             player.Shoot(clusterShotConfig, shotPacket.Direction).OnExplodeEvent +=
                                 p => TriggerShake(clusterShotConfig.ExplosionPower, 1000);
                             break;
+
                         default:
                             player.Shoot(shotConfig, shotPacket.Direction);
                             break;
                     }
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -441,9 +456,9 @@ namespace BeepLive.Game
         private readonly Text _connectingText;
         private Timer _physicsTimer;
 
-        #endregion
+        #endregion Shake
 
-        #endregion
+        #endregion Camera
 
         public void HandlePacket(Packet packet) => QueuedPackets.Add(packet);
     }

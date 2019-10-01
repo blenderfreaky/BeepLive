@@ -47,7 +47,7 @@ namespace BeepLive.World
 
                 entities.ForEach(e => e.Step());
 
-                float maxVelocity = entities.Max(e => e.Velocity.X * e.Velocity.X + e.Velocity.Y * e.Velocity.Y);
+                float maxVelocity = entities.Max(e => (e.Velocity.X * e.Velocity.X) + (e.Velocity.Y * e.Velocity.Y));
 
                 if (maxVelocity > Config.PhysicalEnvironment.MovementThreshold) return;
 
@@ -97,16 +97,16 @@ namespace BeepLive.World
                     for (uint voxelI = 0; voxelI < Config.ChunkSize; voxelI++)
                     {
                         float height = Noise.CalcPixel1D(
-                                           (int)(chunkI * Config.ChunkSize + voxelI),
+                                           (int)((chunkI * Config.ChunkSize) + voxelI),
                                            Config.HorizontalNoiseScale) * (Config.VerticalNoiseScale / 128f);
 
                         for (uint voxelJ = 0; voxelJ < Config.ChunkSize; voxelJ++)
                         {
-                            bool isGround = chunkJ * Config.ChunkSize + voxelJ > height + Config.GroundLevel;
+                            bool isGround = (chunkJ * Config.ChunkSize) + voxelJ > height + Config.GroundLevel;
 
                             bool isFloating = Noise.CalcPixel2D(
-                                                  (int)(chunkI * Config.ChunkSize + voxelI),
-                                                  (int)(chunkJ * Config.ChunkSize + voxelJ),
+                                                  (int)((chunkI * Config.ChunkSize) + voxelI),
+                                                  (int)((chunkJ * Config.ChunkSize) + voxelJ),
                                                   Config.FloatingNoiseScale) / 128f
                                               < Config.FloatingNoiseThreshold;
 

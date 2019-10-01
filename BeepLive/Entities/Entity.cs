@@ -12,6 +12,7 @@ namespace BeepLive.Entities
         public Drawable Shape;
         public virtual Vector2f Position { get; set; }
         public Vector2f Velocity { get; set; }
+
         public bool Alive
         {
             get => Disposed;

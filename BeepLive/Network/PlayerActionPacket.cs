@@ -11,7 +11,6 @@ namespace BeepLive.Network
     [ProtoInclude(500, typeof(PlayerSpawnAtPacket))]
     public abstract class PlayerActionPacket : Packet
     {
-
         [ProtoMember(1)] public string PlayerGuid;
 
         [ProtoMember(2)] public string Secret;
