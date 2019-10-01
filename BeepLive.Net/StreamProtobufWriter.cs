@@ -6,7 +6,7 @@
     using System.IO;
     using System.Linq;
 
-    public class StreamProtobufWriter
+    public class StreamProtobuf
     {
         public readonly IReadOnlyCollection<Type> Types;
 
@@ -17,7 +17,7 @@
 
         public readonly PrefixStyle PrefixStyle;
 
-        public StreamProtobufWriter(Stream stream, PrefixStyle prefixStyle, params Type[] types)
+        public StreamProtobuf(Stream stream, PrefixStyle prefixStyle, params Type[] types)
         {
             Types = types;
             Stream = stream;

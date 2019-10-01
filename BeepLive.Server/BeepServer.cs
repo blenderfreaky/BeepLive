@@ -26,15 +26,24 @@
             IConfigurationSection networkerSettings = config.GetSection("Networker");
 
             Players = new List<ServerPlayer>();
+
             using TcpClient client = new TcpClient("localhost", networkerSettings.GetValue<int>("TcpPort"));
-            var writer = new StreamProtobufWriter(client.GetStream(), PrefixStyle.Base128,
+            var protobuf = new StreamProtobuf(client.GetStream(), PrefixStyle.Base128,
                 typeof(SyncPacket));
+
+            protobuf.ReadNext()
 
             const string beepConfigXml = "BeepConfig.xml";
 
             if (!File.Exists(beepConfigXml))
-                File.WriteAllText(beepConfigXml, XmlHelper.ToXml(BeepConfig = new BeepConfig()));
-            else BeepConfig = XmlHelper.LoadFromXmlString<BeepConfig>(File.ReadAllText(beepConfigXml));
+            {
+                BeepConfig = new BeepConfig();
+                File.WriteAllText(beepConfigXml, XmlHelper.ToXml(BeepConfig));
+            }
+            else
+            {
+                BeepConfig = XmlHelper.LoadFromXmlString<BeepConfig>(File.ReadAllText(beepConfigXml));
+            }
         }
 
         public static IServer GameServer { get; set; }
