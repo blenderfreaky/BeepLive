@@ -38,19 +38,11 @@
                 field);
         }
 
-        public bool ReadNext()
-        {
-            if (!Serializer.NonGeneric.TryDeserializeWithLengthPrefix(
+        public bool ReadNext(out object value) => 
+            Serializer.NonGeneric.TryDeserializeWithLengthPrefix(
                 Stream,
                 PrefixStyle,
                 field => TypeByIndex[field],
-                out object obj))
-            {
-                return false;
-            }
-
-            Console.WriteLine(obj);
-            return true;
-        }
+                out value);
     }
 }
