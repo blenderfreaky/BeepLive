@@ -1,10 +1,10 @@
-﻿using BeepLive.Config;
-using BeepLive.Entities;
-using BeepLive.World;
-using System.Collections.Generic;
-
-namespace BeepLive.Game
+﻿namespace BeepLive.Game
 {
+    using BeepLive.Config;
+    using BeepLive.Entities;
+    using BeepLive.World;
+    using System.Collections.Generic;
+
     public class Team
     {
         public BeepLiveGame BeepLiveGame;

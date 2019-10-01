@@ -1,7 +1,7 @@
-﻿using ProtoBuf;
-
-namespace BeepLive.Network
+﻿namespace BeepLive.Network
 {
+    using ProtoBuf;
+
     [ProtoContract]
     public class PlayerTeamJoinPacket : PlayerActionPacket
     {

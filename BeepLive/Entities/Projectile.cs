@@ -1,11 +1,11 @@
-﻿using BeepLive.Config;
-using BeepLive.World;
-using SFML.Graphics;
-using SFML.System;
-using System;
-
-namespace BeepLive.Entities
+﻿namespace BeepLive.Entities
 {
+    using BeepLive.Config;
+    using BeepLive.World;
+    using SFML.Graphics;
+    using SFML.System;
+    using System;
+
     public class Projectile<TShotConfig> : Entity
         where TShotConfig : ShotConfig
     {

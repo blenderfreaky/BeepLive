@@ -1,14 +1,14 @@
-﻿using BeepLive.Config;
-using BeepLive.Entities;
-using SFML.System;
-using SimplexNoise;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-namespace BeepLive.World
+﻿namespace BeepLive.World
 {
+    using BeepLive.Config;
+    using BeepLive.Entities;
+    using SFML.System;
+    using SimplexNoise;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+
     public class Map
     {
         public Chunk[,] Chunks;

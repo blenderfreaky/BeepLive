@@ -1,7 +1,7 @@
-﻿using SFML.Graphics;
-
-namespace BeepLive.Config
+﻿namespace BeepLive.Config
 {
+    using SFML.Graphics;
+
     public class TeamConfig
     {
         public string TeamGuid;

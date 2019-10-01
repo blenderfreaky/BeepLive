@@ -1,9 +1,9 @@
-﻿using System.Data;
-using System.IO;
-using System.Xml.Serialization;
-
-namespace BeepLive.Config
+﻿namespace BeepLive.Config
 {
+    using System.Data;
+    using System.IO;
+    using System.Xml.Serialization;
+
     // https://stackoverflow.com/questions/11447529/convert-an-object-to-an-xml-string/21685169
     public static class XmlHelper
     {

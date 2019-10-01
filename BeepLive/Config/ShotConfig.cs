@@ -1,8 +1,8 @@
-﻿using BeepLive.World;
-using System.Xml.Serialization;
-
-namespace BeepLive.Config
+﻿namespace BeepLive.Config
 {
+    using BeepLive.World;
+    using System.Xml.Serialization;
+
     [XmlInclude(typeof(ClusterShotConfig))]
     public class ShotConfig
     {

@@ -1,8 +1,8 @@
-﻿using BeepLive.Config;
-using ProtoBuf;
-
-namespace BeepLive.Network
+﻿namespace BeepLive.Network
 {
+    using BeepLive.Config;
+    using ProtoBuf;
+
     [ProtoContract]
     public class SyncPacket : Packet
     {

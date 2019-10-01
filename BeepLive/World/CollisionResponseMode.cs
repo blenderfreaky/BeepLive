@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
-
-namespace BeepLive.World
+﻿namespace BeepLive.World
 {
+    using System.ComponentModel;
+
     public enum CollisionResponseMode
     {
         [Description("Don't handle collisions at all")]

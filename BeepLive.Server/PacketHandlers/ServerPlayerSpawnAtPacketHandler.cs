@@ -1,13 +1,13 @@
-﻿using BeepLive.Network;
-using Microsoft.Extensions.Logging;
-using Networker.Common;
-using Networker.Common.Abstractions;
-using System.Threading.Tasks;
-
-#pragma warning disable 1998
+﻿#pragma warning disable 1998
 
 namespace BeepLive.Server.PacketHandlers
 {
+    using BeepLive.Network;
+    using Microsoft.Extensions.Logging;
+    using Networker.Common;
+    using Networker.Common.Abstractions;
+    using System.Threading.Tasks;
+
     public class ServerPlayerSpawnAtPacketHandler : PacketHandlerBase<PlayerSpawnAtPacket>
     {
         private readonly ILogger<ServerPlayerSpawnAtPacketHandler> _logger;

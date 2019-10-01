@@ -1,10 +1,10 @@
-﻿using BeepLive.World;
-using SFML.Graphics;
-using SFML.System;
-using System;
-
-namespace BeepLive.Entities
+﻿namespace BeepLive.Entities
 {
+    using BeepLive.World;
+    using SFML.Graphics;
+    using SFML.System;
+    using System;
+
     public abstract class Entity : IDisposable
     {
         protected bool Disposed;

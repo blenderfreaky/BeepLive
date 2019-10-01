@@ -1,19 +1,19 @@
-﻿using BeepLive.Client;
-using BeepLive.Client.PacketHandlers;
-using BeepLive.Config;
-using BeepLive.Network;
-using BeepLive.Server.PacketHandlers;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Networker.Extensions.ProtobufNet;
-using Networker.Server;
-using Networker.Server.Abstractions;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-
-namespace BeepLive.Server
+﻿namespace BeepLive.Server
 {
+    using BeepLive.Client;
+    using BeepLive.Client.PacketHandlers;
+    using BeepLive.Config;
+    using BeepLive.Network;
+    using BeepLive.Server.PacketHandlers;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+    using Networker.Extensions.ProtobufNet;
+    using Networker.Server;
+    using Networker.Server.Abstractions;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Threading;
+
     public static class BeepServer
     {
         public static List<ServerPlayer> Players;

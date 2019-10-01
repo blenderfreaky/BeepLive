@@ -1,10 +1,10 @@
-﻿using BeepLive.Config;
-using BeepLive.World;
-using SFML.System;
-using System;
-
-namespace BeepLive.Entities
+﻿namespace BeepLive.Entities
 {
+    using BeepLive.Config;
+    using BeepLive.World;
+    using SFML.System;
+    using System;
+
     public class ClusterProjectile<TProjectile, TShotConfig> : Projectile<ClusterShotConfig<TShotConfig>>
         where TProjectile : Projectile<TShotConfig>
         where TShotConfig : ShotConfig

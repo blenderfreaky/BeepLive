@@ -1,9 +1,9 @@
-﻿using BeepLive.Game;
-using SFML.Graphics;
-using System;
-
-namespace BeepLive.World
+﻿namespace BeepLive.World
 {
+    using BeepLive.Game;
+    using SFML.Graphics;
+    using System;
+
     public struct Voxel
     {
         public Map Map;

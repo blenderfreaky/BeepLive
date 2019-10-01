@@ -1,7 +1,7 @@
-﻿using SFML.System;
-
-namespace BeepLive.World
+﻿namespace BeepLive.World
 {
+    using SFML.System;
+
     public struct Boundary
     {
         public Vector2f Min, Max;

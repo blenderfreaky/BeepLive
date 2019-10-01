@@ -1,9 +1,9 @@
-﻿using SFML.System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-
-namespace BeepLive.World
+﻿namespace BeepLive.World
 {
+    using SFML.System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
+
     public class PhysicalEnvironment
     {
         public float AirResistance;

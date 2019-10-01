@@ -1,12 +1,12 @@
-﻿using BeepLive.Config;
-using BeepLive.Entities;
-using BeepLive.World;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-
-namespace BeepLive.Game
+﻿namespace BeepLive.Game
 {
+    using BeepLive.Config;
+    using BeepLive.Entities;
+    using BeepLive.World;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+
     public class BeepLiveGame
     {
         public BeepConfig BeepConfig;

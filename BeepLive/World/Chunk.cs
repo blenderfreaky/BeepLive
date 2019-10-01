@@ -1,9 +1,9 @@
-﻿using SFML.Graphics;
-using SFML.System;
-using System;
-
-namespace BeepLive.World
+﻿namespace BeepLive.World
 {
+    using SFML.Graphics;
+    using SFML.System;
+    using System;
+
     public class Chunk
     {
         public Map Map;

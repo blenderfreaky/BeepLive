@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace BeepLive.Config
+﻿namespace BeepLive.Config
 {
+    using System.Collections.Generic;
+
     public class BeepConfig
     {
         public MapConfig MapConfig;

@@ -1,12 +1,12 @@
-﻿using BeepLive.Config;
-using BeepLive.Game;
-using BeepLive.World;
-using SFML.Graphics;
-using SFML.System;
-using System;
-
-namespace BeepLive.Entities
+﻿namespace BeepLive.Entities
 {
+    using BeepLive.Config;
+    using BeepLive.Game;
+    using BeepLive.World;
+    using SFML.Graphics;
+    using SFML.System;
+    using System;
+
     public class Player : Entity
     {
         public string UserName;

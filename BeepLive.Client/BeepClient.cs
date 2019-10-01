@@ -1,14 +1,14 @@
-﻿using BeepLive.Client.PacketHandlers;
-using BeepLive.Game;
-using BeepLive.Network;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Networker.Client;
-using Networker.Client.Abstractions;
-using Networker.Extensions.ProtobufNet;
-
-namespace BeepLive.Client
+﻿namespace BeepLive.Client
 {
+    using BeepLive.Client.PacketHandlers;
+    using BeepLive.Game;
+    using BeepLive.Network;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+    using Networker.Client;
+    using Networker.Client.Abstractions;
+    using Networker.Extensions.ProtobufNet;
+
     public class BeepClient
     {
         public static BeepClient BeepClientInstance;

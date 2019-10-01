@@ -1,20 +1,20 @@
-﻿using BeepLive.Config;
-using BeepLive.Entities;
-using BeepLive.Network;
-using BeepLive.World;
-using SFML.Graphics;
-using SFML.System;
-using SFML.Window;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
-using System.Threading;
-
-namespace BeepLive.Game
+﻿namespace BeepLive.Game
 {
+    using BeepLive.Config;
+    using BeepLive.Entities;
+    using BeepLive.Network;
+    using BeepLive.World;
+    using SFML.Graphics;
+    using SFML.System;
+    using SFML.Window;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+    using System.Linq;
+    using System.Threading;
+
     public class BeepLiveSfml
     {
         public readonly List<PlayerActionPacket> QueuedPlayerActionPackets;

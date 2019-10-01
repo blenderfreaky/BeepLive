@@ -1,9 +1,9 @@
-﻿using BeepLive.Game;
-using SFML.Graphics;
-using System.Xml.Serialization;
-
-namespace BeepLive.World
+﻿namespace BeepLive.World
 {
+    using BeepLive.Game;
+    using SFML.Graphics;
+    using System.Xml.Serialization;
+
     public class VoxelType
     {
         public Color Color;

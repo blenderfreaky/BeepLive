@@ -1,8 +1,8 @@
-﻿using ProtoBuf;
-using SFML.System;
-
-namespace BeepLive.Network
+﻿namespace BeepLive.Network
 {
+    using ProtoBuf;
+    using SFML.System;
+
     [ProtoContract]
     public class Vector2FSerializable
     {

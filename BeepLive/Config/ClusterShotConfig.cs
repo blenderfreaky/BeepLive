@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace BeepLive.Config
+﻿namespace BeepLive.Config
 {
+    using System;
+
     public class ClusterShotConfig<TShotConfig> : ShotConfig
         where TShotConfig : ShotConfig
     {

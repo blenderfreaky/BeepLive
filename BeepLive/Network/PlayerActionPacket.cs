@@ -1,8 +1,8 @@
-﻿using ProtoBuf;
-using System;
-
-namespace BeepLive.Network
+﻿namespace BeepLive.Network
 {
+    using ProtoBuf;
+    using System;
+
     [ProtoContract]
     [ProtoInclude(100, typeof(PlayerShotPacket))]
     [ProtoInclude(200, typeof(PlayerJumpPacket))]

@@ -1,10 +1,10 @@
-﻿using BeepLive.World;
-using SFML.Graphics;
-using SFML.System;
-using System.Xml.Serialization;
-
-namespace BeepLive.Config
+﻿namespace BeepLive.Config
 {
+    using BeepLive.World;
+    using SFML.Graphics;
+    using SFML.System;
+    using System.Xml.Serialization;
+
     public class MapConfig
     {
         private Boundary _entityBoundary;
