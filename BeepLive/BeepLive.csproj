@@ -9,8 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="3.0.0" />
-    <PackageReference Include="Networker" Version="3.0.20-rc" />
-    <PackageReference Include="Networker.Extensions.ProtobufNet" Version="3.0.20-rc" />
+    <PackageReference Include="protobuf-net" Version="3.0.0-alpha.146.g00620fbe1a" />
     <PackageReference Include="SFML.Net" Version="2.5.0" />
     <PackageReference Include="SimplexNoise" Version="2.0.0" />
   </ItemGroup>

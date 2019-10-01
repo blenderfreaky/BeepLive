@@ -3,6 +3,7 @@
     using BeepLive.Client;
     using BeepLive.Client.PacketHandlers;
     using BeepLive.Config;
+    using BeepLive.Net;
     using BeepLive.Network;
     using BeepLive.Server.PacketHandlers;
     using Microsoft.Extensions.Configuration;
@@ -10,8 +11,10 @@
     using Networker.Extensions.ProtobufNet;
     using Networker.Server;
     using Networker.Server.Abstractions;
+    using ProtoBuf;
     using System.Collections.Generic;
     using System.IO;
+    using System.Net.Sockets;
     using System.Threading;
 
     public static class BeepServer
@@ -28,23 +31,9 @@
             IConfigurationSection networkerSettings = config.GetSection("Networker");
 
             Players = new List<ServerPlayer>();
-
-            GameServer = new ServerBuilder()
-                .UseTcp(networkerSettings.GetValue<int>("TcpPort"))
-                .UseUdp(networkerSettings.GetValue<int>("UdpPort"))
-                .ConfigureLogging(loggingBuilder =>
-                {
-                    loggingBuilder.AddConfiguration(config.GetSection("Logging"));
-                    loggingBuilder.AddConsole();
-                })
-                .UseProtobufNet()
-                .RegisterPacketHandler<PlayerShotPacket, ServerPlayerShotPacketHandler>()
-                .RegisterPacketHandler<PlayerJumpPacket, ServerPlayerJumpPacketHandler>()
-                .RegisterPacketHandler<PlayerFlowPacket, ServerPlayerFlowPacketHandler>()
-                .RegisterPacketHandler<PlayerSpawnAtPacket, ServerPlayerSpawnAtPacketHandler>()
-                .RegisterPacketHandler<PlayerTeamJoinPacket, ServerPlayerTeamJoinPacketHandler>()
-                .RegisterPacketHandler<ServerFlowPacket, ClientServerFlowPacketHandler>()
-                .Build();
+            using TcpClient client = new TcpClient("localhost", networkerSettings.GetValue<int>("TcpPort"));
+            var writer = new StreamProtobufWriter(client.GetStream(), PrefixStyle.Base128,
+                typeof(SyncPacket));
 
             const string beepConfigXml = "BeepConfig.xml";
 

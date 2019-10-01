@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BeepLive.Client\BeepLive.Client.csproj" />
+    <ProjectReference Include="..\BeepLive.Net\BeepLive.Net.csproj" />
     <ProjectReference Include="..\BeepLive\BeepLive.csproj" />
   </ItemGroup>
 

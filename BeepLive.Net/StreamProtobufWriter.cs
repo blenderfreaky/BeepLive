@@ -8,16 +8,19 @@
 
     public class StreamProtobufWriter
     {
-        public List<Type> Types = new List<Type>();
+        public readonly IReadOnlyCollection<Type> Types;
 
-        public Dictionary<int, Type> TypeByIndex;
-        public Dictionary<Type, int> IndexByType;
+        public readonly Stream Stream;
 
-        public PrefixStyle PrefixStyle;
+        private readonly IReadOnlyDictionary<int, Type> TypeByIndex;
+        private readonly IReadOnlyDictionary<Type, int> IndexByType;
 
-        public StreamProtobufWriter(List<Type> types, PrefixStyle prefixStyle)
+        public readonly PrefixStyle PrefixStyle;
+
+        public StreamProtobufWriter(Stream stream, PrefixStyle prefixStyle, params Type[] types)
         {
             Types = types;
+            Stream = stream;
             PrefixStyle = prefixStyle;
 
             var typesAndIndicies = Types.Select((x, i) => (x, i)).ToArray();
@@ -25,20 +28,20 @@
             IndexByType = typesAndIndicies.ToDictionary(x => x.x, x => x.i);
         }
 
-        public void WriteNext(Stream stream, object obj)
+        public void WriteNext(object obj)
         {
             int field = IndexByType[obj.GetType()];
             Serializer.NonGeneric.SerializeWithLengthPrefix(
-                stream,
+                Stream,
                 obj,
                 PrefixStyle,
                 field);
         }
 
-        public bool ReadNext(Stream stream)
+        public bool ReadNext()
         {
             if (!Serializer.NonGeneric.TryDeserializeWithLengthPrefix(
-                stream,
+                Stream,
                 PrefixStyle,
                 field => TypeByIndex[field],
                 out object obj))
