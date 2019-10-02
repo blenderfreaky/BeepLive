@@ -13,6 +13,7 @@
         }
 
         public override bool Equals(object obj) => obj is Boundary boundary && Min.Equals(boundary.Min) && Max.Equals(boundary.Max);
+
         public override int GetHashCode() => HashCode.Combine(Min, Max);
 
         public static bool operator ==(Boundary left, Boundary right) => left.Equals(right);

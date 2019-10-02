@@ -3,6 +3,7 @@
     using BeepLive.Config;
     using BeepLive.Entities;
     using BeepLive.World;
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
@@ -14,9 +15,9 @@
         public Team LocalTeam;
         public Map Map;
         public List<Team> Teams;
-        public readonly string PlayerGuid;
+        public readonly Guid PlayerGuid;
 
-        public BeepLiveGame(BeepConfig beepConfig, string playerGuid)
+        public BeepLiveGame(BeepConfig beepConfig, Guid playerGuid)
         {
             BeepConfig = beepConfig;
             PlayerGuid = playerGuid;

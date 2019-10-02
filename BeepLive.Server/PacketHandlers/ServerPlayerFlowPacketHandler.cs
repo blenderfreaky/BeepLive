@@ -3,8 +3,6 @@
     using BeepLive.Network;
     using Microsoft.Extensions.Logging;
     using System;
-    using System.Net.Sockets;
-    using System.Threading.Tasks;
 
     internal static partial class PacketHandlers
     {
@@ -19,9 +17,8 @@
             }
 
             ServerPlayer player = packetContext.Server.Players
-                .Find(p => string.Equals(p.PlayerGuid,
-                    packetContext.Packet.PlayerGuid,
-                    StringComparison.Ordinal));
+                .Find(p => p.PlayerGuid
+                    == packetContext.Packet.PlayerGuid);
 
             if (player == null && packetContext.Packet.Type != PlayerFlowPacket.FlowType.Join)
             {

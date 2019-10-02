@@ -11,14 +11,14 @@
     {
         public string UserName;
         private Vector2f _lastSafePosition;
-        public string Guid;
+        public Guid Guid;
 
         public float Health;
         public string Name;
 
         public Team Team;
 
-        public Player(Map map, Vector2f position, int size, Team team, string guid, string userName)
+        public Player(Map map, Vector2f position, int size, Team team, Guid guid, string userName)
         {
             GenerateShape();
 
@@ -27,7 +27,7 @@
             Size = size;
             Team = team;
 
-            Guid = guid ?? throw new ArgumentNullException(nameof(guid));
+            Guid = guid;
             UserName = userName;
         }
 
@@ -91,9 +91,15 @@
                     bool collides = false;
 
                     for (int i = 0; i < Size; i++)
+                    {
                         for (int j = 0; j < Size; j++)
+                        {
                             if (!GetVoxel(i, j).IsAir)
+                            {
                                 collides = true;
+                            }
+                        }
+                    }
 
                     if (collides)
                     {
@@ -114,6 +120,7 @@
                     int collisionCount = 0;
 
                     for (int i = 0; i < Size; i++)
+                    {
                         for (int j = 0; j < Size; j++)
                         {
                             if (GetVoxel(i, j).IsAir) continue;
@@ -123,6 +130,7 @@
 
                             collisionCount++;
                         }
+                    }
 
                     center /= collisionCount;
 

@@ -1,8 +1,10 @@
 ﻿namespace BeepLive.Game
 {
+    using System;
+
     public class PlayerMock
     {
-        public string PlayerGuid;
+        public Guid PlayerGuid;
         public string UserName;
         public TeamMock Team;
     }

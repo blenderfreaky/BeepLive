@@ -2,8 +2,6 @@
 {
     using BeepLive.Network;
     using Microsoft.Extensions.Logging;
-    using System;
-    using System.Threading.Tasks;
 
     internal static partial class PacketHandlers
     {

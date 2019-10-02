@@ -89,6 +89,7 @@
             Chunks = new Chunk[Config.MapWidth, Config.MapHeight];
 
             for (uint chunkI = 0; chunkI < Config.MapWidth; chunkI++)
+            {
                 for (uint chunkJ = 0; chunkJ < Config.MapHeight; chunkJ++)
                 {
                     Chunk chunk = Chunks[chunkI, chunkJ] =
@@ -117,6 +118,7 @@
                         }
                     }
                 }
+            }
 
             return this;
         }

@@ -1,6 +1,7 @@
 ﻿namespace BeepLive.Network
 {
     using ProtoBuf;
+    using System;
 
     [ProtoContract]
     [ProtoInclude(100, typeof(PlayerShotPacket))]
@@ -10,8 +11,8 @@
     [ProtoInclude(500, typeof(PlayerSpawnAtPacket))]
     public abstract class PlayerActionPacket : Packet
     {
-        [ProtoMember(1)] public string PlayerGuid;
+        [ProtoMember(1)] public Guid PlayerGuid;
 
-        [ProtoMember(2)] public string Secret;
+        [ProtoMember(2)] public Guid Secret;
     }
 }

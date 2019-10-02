@@ -23,7 +23,7 @@
 
         public IMessageSender MessageSender;
 
-        public readonly string PlayerGuid, Secret;
+        public readonly Guid PlayerGuid, Secret;
 
         public List<TeamMock> TeamMocks;
         public List<PlayerMock> PlayerMocks;
@@ -50,8 +50,8 @@
 
             MessageSender = messageSender;
 
-            PlayerGuid = Guid.NewGuid().ToString();
-            Secret = Guid.NewGuid().ToString();
+            PlayerGuid = Guid.NewGuid();
+            Secret = Guid.NewGuid();
 
             Flow(PlayerFlowPacket.FlowType.Join);
 
@@ -194,7 +194,7 @@
         {
             action.PlayerGuid = PlayerGuid;
             action.Secret = Secret;
-            action.MessageGuid = Guid.NewGuid().ToString();
+            action.MessageGuid = Guid.NewGuid();
 
             MessageSender.SendMessage(action);
         }
@@ -234,12 +234,14 @@
         private void DrawMap()
         {
             for (int chunkI = 0; chunkI < BeepLiveGame.Map.Config.MapWidth; chunkI++)
+            {
                 for (int chunkJ = 0; chunkJ < BeepLiveGame.Map.Config.MapHeight; chunkJ++)
                 {
                     Chunk chunk = BeepLiveGame.Map.Chunks[chunkI, chunkJ];
                     chunk.Update();
                     Window.Draw(chunk.Sprite);
                 }
+            }
 
             Entity[] entities;
             lock (BeepLiveGame.Map.Entities) entities = BeepLiveGame.Map.Entities.Where(e => !(e is null)).ToArray();
@@ -358,7 +360,7 @@
 
         private void ExecutePlayerActionPacket(PlayerActionPacket packet)
         {
-            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid, StringComparison.Ordinal));
+            Player player = BeepLiveGame.Map.Players.Find(p => p.Guid == packet.PlayerGuid);
 
             switch (packet)
             {
@@ -388,14 +390,14 @@
 
         public void HandlePlayerSpawnAtPacket(PlayerSpawnAtPacket packet)
         {
-            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid, StringComparison.Ordinal));
+            Player player = BeepLiveGame.Map.Players.Find(p => p.Guid == packet.PlayerGuid);
 
             player.Position = packet.Position;
         }
 
         public void HandlePlayerShotPacket(PlayerShotPacket packet)
         {
-            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid, StringComparison.Ordinal));
+            Player player = BeepLiveGame.Map.Players.Find(p => p.Guid == packet.PlayerGuid);
 
             player.Shoot(BeepLiveGame.BeepConfig.ShotConfigs[packet.ShotConfigId], packet.Direction);
         }
@@ -424,8 +426,8 @@
         {
             PlayerMock playerMock =
                 PlayerMocks.Find(x =>
-                    string.Equals(x.PlayerGuid,
-                        packet.PlayerGuid, StringComparison.Ordinal))
+                    x.PlayerGuid
+                        == packet.PlayerGuid)
                 ?? new PlayerMock
                 {
                     PlayerGuid = packet.PlayerGuid,

@@ -4,13 +4,13 @@
     using BeepLive.Net;
     using BeepLive.Network;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
     using ProtoBuf;
+    using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Net.Sockets;
-    using System;
-    using Microsoft.Extensions.Logging;
     using System.Net;
+    using System.Net.Sockets;
 
     public class BeepServer
     {
@@ -72,15 +72,19 @@
                 case PlayerShotPacket playerShotPacket:
                     PacketHandlers.ProcessPacket(CreatePacketContext(playerShotPacket, client));
                     break;
+
                 case PlayerSpawnAtPacket playerSpawnAtPacket:
                     PacketHandlers.ProcessPacket(CreatePacketContext(playerSpawnAtPacket, client));
                     break;
+
                 case PlayerTeamJoinPacket playerTeamJoinPacket:
                     PacketHandlers.ProcessPacket(CreatePacketContext(playerTeamJoinPacket, client));
                     break;
+
                 case PlayerJumpPacket playerJumpPacket:
                     PacketHandlers.ProcessPacket(CreatePacketContext(playerJumpPacket, client));
                     break;
+
                 case PlayerFlowPacket playerFlowPacket:
                     PacketHandlers.ProcessPacket(CreatePacketContext(playerFlowPacket, client));
                     break;
@@ -91,19 +95,16 @@
             new PacketContext<TPacket>(packet, this, sender, Logger);
 
         public bool IsValid(PlayerActionPacket packet) =>
-            string.Equals(
-                Players.Find(p => string.Equals(
-                    p.PlayerGuid,
-                    packet.PlayerGuid,
-                    StringComparison.Ordinal)).Secret,
-                packet?.Secret,
-                StringComparison.Ordinal);
+            Players.Find(p =>
+                p.PlayerGuid
+                == packet.PlayerGuid).Secret
+            == packet?.Secret;
 
         public void BroadcastWithoutSecret(PlayerActionPacket packet)
         {
             if (packet == null) throw new ArgumentNullException(nameof(packet));
 
-            packet.Secret = null;
+            packet.Secret = default;
             GameServer.Broadcast(packet);
         }
 

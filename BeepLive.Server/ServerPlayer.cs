@@ -1,9 +1,11 @@
 ﻿namespace BeepLive.Server
 {
+    using System;
+
     public class ServerPlayer
     {
-        public string PlayerGuid { get; set; }
-        public string Secret { get; set; }
+        public Guid PlayerGuid { get; set; }
+        public Guid Secret { get; set; }
 
         public ServerPlayerState State { get; set; }
         public bool Finished { get; set; }

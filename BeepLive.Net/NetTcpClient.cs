@@ -1,10 +1,7 @@
 ﻿namespace BeepLive.Net
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
     using System.Net.Sockets;
-    using System.Text;
     using System.Threading.Tasks;
 
     public class NetTcpClient : IDisposable
@@ -40,6 +37,7 @@
         public override string ToString() => $"{nameof(Client)}: {Client}";
 
         #region IDisposable Support
+
         private bool _disposedValue = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
@@ -74,6 +72,7 @@
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
-        #endregion
+
+        #endregion IDisposable Support
     }
 }

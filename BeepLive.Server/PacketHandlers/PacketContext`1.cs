@@ -5,8 +5,6 @@
     using Net;
     using System;
     using System.Collections.Generic;
-    using System.Net.Sockets;
-    using System.Threading.Tasks;
 
     internal readonly struct PacketContext<TPacket> : IEquatable<PacketContext<TPacket>> where TPacket : Packet
     {

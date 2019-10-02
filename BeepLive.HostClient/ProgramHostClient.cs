@@ -3,7 +3,6 @@
     using BeepLive.Client;
     using BeepLive.Server;
     using System.Threading;
-    using System.Threading.Tasks;
 
     public static class ProgramHostClient
     {

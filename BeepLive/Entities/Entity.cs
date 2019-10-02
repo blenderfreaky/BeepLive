@@ -10,6 +10,8 @@
         protected bool Disposed;
         public Map Map;
         public Drawable Shape;
+        private readonly object _lockObject = new object();
+
         public virtual Vector2f Position { get; set; }
         public Vector2f Velocity { get; set; }
 
@@ -45,7 +47,7 @@
 
         protected virtual void Dispose(bool disposing)
         {
-            lock (this) if (!Disposed) Disposed = true;
+            lock (_lockObject) if (!Disposed) Disposed = true;
         }
 
         ~Entity()

@@ -23,16 +23,16 @@
                 typeof(PlayerActionPacket)
         };
 
-        [ProtoMember(1)] public string MessageGuid;
+        [ProtoMember(1)] public Guid MessageGuid;
         [ProtoMember(2)] public DateTime TimeSent;
 
         protected Packet()
         {
-            MessageGuid = Guid.NewGuid().ToString();
+            MessageGuid = Guid.NewGuid();
             TimeSent = DateTime.Now;
         }
 
-        protected Packet(string messageGuid, DateTime timeSent)
+        protected Packet(Guid messageGuid, DateTime timeSent)
         {
             MessageGuid = messageGuid;
             TimeSent = timeSent;

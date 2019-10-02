@@ -1,12 +1,5 @@
 ﻿namespace BeepLive.Net
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Net.Sockets;
-    using System.Text;
-    using System.Threading.Tasks;
-
     /// <summary>
     /// Represents the method that defines a set of criteria and determines whether the
     /// specified object meets those criteria.

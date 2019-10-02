@@ -41,6 +41,7 @@
         }
 
         public override bool Equals(object obj) => obj is Voxel voxel && EqualityComparer<Map>.Default.Equals(Map, voxel.Map) && EqualityComparer<VoxelType>.Default.Equals(VoxelType, voxel.VoxelType) && IsAir == voxel.IsAir && Color.Equals(voxel.Color);
+
         public override int GetHashCode() => HashCode.Combine(Map, VoxelType, IsAir, Color);
 
         public static bool operator ==(Voxel left, Voxel right) => left.Equals(right);
