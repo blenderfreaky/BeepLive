@@ -1,7 +1,7 @@
 ﻿{
   "Network": {
-    "TcpPort": 25565,
-    "Address": "localhost"
+    "TcpPort": 25567,
+    "Address": "127.0.0.1"
   },
   "Logging": {
     "LogLevel": {

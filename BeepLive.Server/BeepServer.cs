@@ -56,6 +56,8 @@
                 BeepConfig = XmlHelper.LoadFromXmlString<BeepConfig>(File.ReadAllText(beepConfigXml));
             }
 
+            tcpListener.Start();
+
             _ = server.AcceptClients(
                 (server, _) => server.Clients.Count < 20,
                 server => server.Clients.Count < 20);

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Net.Sockets;
     using System.Text;
@@ -12,7 +13,7 @@
         public TcpListener TcpListener { get; }
         public StreamProtobuf StreamProtobuf { get; }
 
-        public ICollection<NetTcpClient> Clients { get; }
+        public IProducerConsumerCollection<NetTcpClient> Clients { get; }
 
         public event ServerPacketReveivedEventHandler PacketReceivedEvent;
 
@@ -23,7 +24,7 @@
 
             StreamProtobuf = streamProtobuf;
 
-            Clients = new List<NetTcpClient>();
+            Clients = new ConcurrentBag<NetTcpClient>();
         }
 
         public async Task AcceptClients(Predicate<NetTcpServer, TcpClient> shouldAcceptClient,
@@ -31,7 +32,7 @@
         {
             var client = await TcpListener.AcceptTcpClientAsync().ConfigureAwait(false);
 
-            if (shouldAcceptClient(this, client)) Clients.Add(new NetTcpClient(client, StreamProtobuf));
+            if (shouldAcceptClient(this, client)) Clients.TryAdd(new NetTcpClient(client, StreamProtobuf));
 
             if (!keepAcceptingClients(this)) return;
 
@@ -42,9 +43,12 @@
         {
             await Task.Factory.StartNew(() =>
                 {
-                    foreach (var client in Clients)
+                    while (true)
                     {
-                        if (StreamProtobuf.ReadNext(client.Stream, out object value)) PacketReceivedEvent(this, client, value);
+                        foreach (var client in Clients)
+                        {
+                            if (StreamProtobuf.ReadNext(client.Stream, out object value)) PacketReceivedEvent(this, client, value);
+                        }
                     }
                 }, TaskCreationOptions.LongRunning).ConfigureAwait(false);
         }

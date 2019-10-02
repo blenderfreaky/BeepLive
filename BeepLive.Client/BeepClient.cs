@@ -28,18 +28,21 @@
 
             IConfigurationSection networkConfig = config.GetSection("Network");
 
-            IPAddress hostAddress = IPAddress.Parse("127.0.0.1");
+            IPAddress hostAddress = IPAddress.Parse(networkConfig.GetValue<string>("Address"));
+            int port = networkConfig.GetValue<int>("TcpPort");
 
-            TcpClient tcpClient = new TcpClient(networkConfig.GetValue<string>("Address"), networkConfig.GetValue<int>("TcpPort"));
+            //TcpClient tcpClient = new TcpClient(new IPEndPoint(hostAddress, port));
+            TcpClient tcpClient = new TcpClient(networkConfig.GetValue<string>("Address"), port);
 
             NetTcpClient client = new NetTcpClient(tcpClient, new StreamProtobuf(PrefixStyle.Base128, Packet.PacketTypes));
 
             client.PacketReceivedEvent += HandlePacket;
 
             BeepLiveSfml = new BeepLiveSfml(new MessageSender(client));
-            BeepLiveSfml.Run();
 
             _ = client.AcceptPackets();
+
+            BeepLiveSfml.Run();
         }
 
         public void HandlePacket(NetTcpClient client, object packet)
