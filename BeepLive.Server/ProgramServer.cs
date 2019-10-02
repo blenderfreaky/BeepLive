@@ -1,6 +1,6 @@
 namespace BeepLive.Server
 {
-    public class ProgramServer
+    public static class ProgramServer
     {
         private static void Main()
         {
