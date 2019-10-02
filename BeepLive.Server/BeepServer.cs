@@ -1,4 +1,7 @@
-﻿namespace BeepLive.Server
+﻿using System.Net;
+using System.Net.Sockets;
+using System;
+namespace BeepLive.Server
 {
     using BeepLive.Client;
     using BeepLive.Client.PacketHandlers;
@@ -22,6 +25,9 @@
         public static List<ServerPlayer> Players;
         public static BeepConfig BeepConfig;
 
+        private static readonly HttpListener fetcher = new HttpListener();
+        private static readonly Func<HttpListenerRequest, string> HandleRequest;
+
         static BeepServer()
         {
             IConfiguration config = new ConfigurationBuilder()
@@ -31,8 +37,9 @@
             IConfigurationSection networkerSettings = config.GetSection("Networker");
 
             Players = new List<ServerPlayer>();
-            using TcpClient client = new TcpClient("localhost", networkerSettings.GetValue<int>("TcpPort"));
-            var writer = new StreamProtobufWriter(client.GetStream(), PrefixStyle.Base128,
+            #if false
+            using TcpListener server = new TcpListener(networkerSettings.GetValue<int>("TcpPort"));
+            var writer = new StreamProtobufWriter(server.GetStream(), PrefixStyle.Base128,
                 typeof(SyncPacket));
 
             const string beepConfigXml = "BeepConfig.xml";
@@ -40,7 +47,46 @@
             if (!File.Exists(beepConfigXml))
                 File.WriteAllText(beepConfigXml, XmlHelper.ToXml(BeepConfig = new BeepConfig()));
             else BeepConfig = XmlHelper.LoadFromXmlString<BeepConfig>(File.ReadAllText(beepConfigXml));
+            while(AllPlayersInState(ServerPlayerState.InTeamSelection, false))
+            {
+                server.GetStream().
+            }
+            #endif
+            
         }
+        private static void ServerStop()
+        {
+            fetcher.Stop();
+            fetcher.Close();
+            Console.WriteLine("Server stoped");
+        }
+
+        private static void ServerListen(object stateInfo)
+        {
+            Console.WriteLine("Server started");
+            while (fetcher.IsListening)
+            {
+                ThreadPool.QueueUserWorkItem(call =>
+                {
+                    if (!(call is HttpListenerContext context)) return;
+
+                    try
+                    {
+                        byte[] ret = System.Text.Encoding.UTF8.GetBytes(HandleRequest(context.Request));
+                        context.Response.ContentLength64 = ret.Length;
+                        context.Response.OutputStream.Write(ret, 0, ret.Length);
+                    }
+                    finally
+                    {
+                        context.Response.OutputStream.Close();
+                    }
+
+                    GC.Collect();
+                },
+                fetcher.GetContext());
+            }
+        }
+
 
         public static IServer GameServer { get; set; }
 
