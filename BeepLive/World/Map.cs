@@ -56,7 +56,7 @@
             }
         }
 
-        public Vector2i GetChunkIndex(Vector2f position)
+        public static Vector2i GetChunkIndex(Vector2f position)
         {
             return new Vector2i((int)MathF.Floor(position.X), (int)MathF.Floor(position.Y));
         }
