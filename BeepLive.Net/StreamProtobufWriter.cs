@@ -28,17 +28,21 @@
             IndexByType = typesAndIndicies.ToDictionary(x => x.x, x => x.i);
         }
 
-        public void WriteNext(object obj)
-        {
-            int field = IndexByType[obj.GetType()];
+        public void WriteNext(object obj) =>
             Serializer.NonGeneric.SerializeWithLengthPrefix(
                 Stream,
                 obj,
                 PrefixStyle,
-                field);
-        }
+                IndexByType[obj.GetType()]);
 
-        public bool ReadNext(out object value) => 
+        public void WriteNext<T>(T obj) =>
+            Serializer.SerializeWithLengthPrefix(
+                Stream,
+                obj,
+                PrefixStyle,
+                IndexByType[typeof(T)]);
+
+        public bool ReadNext(out object value) =>
             Serializer.NonGeneric.TryDeserializeWithLengthPrefix(
                 Stream,
                 PrefixStyle,

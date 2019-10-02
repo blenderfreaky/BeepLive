@@ -12,15 +12,22 @@
     using System.Net.Sockets;
     using System.Threading;
     using System;
+    using Microsoft.Extensions.Logging;
+    using System.Net;
 
     public class BeepServer : IDisposable
     {
+        private readonly ILogger<BeepServer> _logger;
         public List<ServerPlayer> Players;
         public BeepConfig BeepConfig;
         public StreamProtobuf StreamProtobuf;
 
         public BeepServer()
         {
+            IPAddress hostAddress = IPAddress.Parse("127.0.0.1");
+
+            _logger = LoggerFactory.Create(x => x.AddConsole()).CreateLogger<BeepServer>();
+
             IConfiguration config = new ConfigurationBuilder()
                 .AddJsonFile("appSettings.json", false, true)
                 .Build();
@@ -29,6 +36,8 @@
 
             Players = new List<ServerPlayer>();
 
+            TcpListener listener = new Tcpl;
+            
             using TcpClient client = new TcpClient("localhost", networkerSettings.GetValue<int>("TcpPort"));
             _disposable = client.GetStream();
             StreamProtobuf = new StreamProtobuf(_disposable, PrefixStyle.Base128,
@@ -42,7 +51,7 @@
                 typeof(PlayerJumpPacket),
                 typeof(PlayerFlowPacket),
                 typeof(PlayerActionPacket));
-
+            
             const string beepConfigXml = "BeepConfig.xml";
 
             if (!File.Exists(beepConfigXml))
@@ -60,6 +69,21 @@
         {
             BeepClient.BeepClientInstance = new BeepClient();
             BeepClient.BeepClientInstance.Start();
+        }
+
+        public void HandlePacket(object packet)
+        {
+            switch (packet)
+            {
+                case SyncPacket syncPacket:
+                case ServerFlowPacket serverFlowPacket:
+                case PlayerShotPacket playerShotPacket:
+                case PlayerSpawnAtPacket playerSpawnAtPacket:
+                case PlayerTeamJoinPacket playerTeamJoinPacket:
+                case PlayerJumpPacket playerJumpPacket:
+                case PlayerFlowPacket playerFlowPacket:
+                    break;
+            }
         }
 
         public bool IsValid(PlayerActionPacket packet) =>

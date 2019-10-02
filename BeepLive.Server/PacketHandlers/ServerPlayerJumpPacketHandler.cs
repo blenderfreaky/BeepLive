@@ -8,7 +8,7 @@ namespace BeepLive.Server.PacketHandlers
     using Networker.Common.Abstractions;
     using System.Threading.Tasks;
 
-    public class ServerPlayerJumpPacketHandler : PacketHandlerBase<PlayerJumpPacket>
+    public class ServerPlayerJumpPacketHandler : IPacketHandler<PlayerJumpPacket>
     {
         private readonly ILogger<ServerPlayerJumpPacketHandler> _logger;
 

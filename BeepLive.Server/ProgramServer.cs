@@ -1,4 +1,4 @@
-﻿namespace BeepLive.Server
+namespace BeepLive.Server
 {
     public class ProgramServer
     {

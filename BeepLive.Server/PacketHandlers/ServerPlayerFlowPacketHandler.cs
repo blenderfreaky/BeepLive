@@ -1,6 +1,6 @@
 ﻿#pragma warning disable 1998
 
-namespace BeepLive.Server.PacketHandlers
+namespace BeepLive.Server
 {
     using BeepLive.Network;
     using Microsoft.Extensions.Logging;
@@ -11,23 +11,15 @@ namespace BeepLive.Server.PacketHandlers
     using System.Threading.Tasks;
     using static BeepLive.Server.BeepServer;
 
-    public class ServerPlayerFlowPacketHandler : PacketHandlerBase<PlayerFlowPacket>
+    public static class ServerPlayerFlowPacketHandler
     {
-        private readonly ILogger<ServerPlayerFlowPacketHandler> _logger;
-
-        public ServerPlayerFlowPacketHandler(ILogger<ServerPlayerFlowPacketHandler> logger)
+        public async Task ProcessPacket(PlayerFlowPacket packet, BeepServer server, IPacketContext packetContext, ILogger logger)
         {
-            _logger = logger;
-        }
-
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-        public override async Task Process(PlayerFlowPacket packet, IPacketContext packetContext)
-        {
-            _logger.LogDebug("Received: " + packet);
+            logger.LogDebug("Received: " + packet);
 
             if (packet.Type != PlayerFlowPacket.FlowType.Join && !IsValid(packet))
             {
-                _logger.LogWarning(
+                logger.LogWarning(
                     $"Received packet with invalid Secret: {packet}\nSent by: {packetContext.Sender.EndPoint}");
                 return;
             }
@@ -36,7 +28,7 @@ namespace BeepLive.Server.PacketHandlers
 
             if (player == null && packet.Type != PlayerFlowPacket.FlowType.Join)
             {
-                _logger.LogWarning(
+                logger.LogWarning(
                     $"Unknown player sent flow-packet: {packet}\nSent by: {packetContext.Sender.EndPoint}");
                 return;
             }
@@ -46,7 +38,7 @@ namespace BeepLive.Server.PacketHandlers
                 case PlayerFlowPacket.FlowType.Join:
                     if (!AllPlayersInState(ServerPlayerState.InTeamSelection, false))
                     {
-                        _logger.LogWarning($"Player joined late: {packet}\nPlayer: {player}");
+                        logger.LogWarning($"Player joined late: {packet}\nPlayer: {player}");
                         return;
                     }
 
@@ -94,12 +86,12 @@ namespace BeepLive.Server.PacketHandlers
                     break;
 
                 default:
-                    _logger.LogError("Received invalid player-flow packet: " + packet);
+                    logger.LogError("Received invalid player-flow packet: " + packet);
                     break;
             }
         }
 
-        internal void TryFlow(PlayerFlowPacket packet, ServerPlayer player, ServerPlayerState originState,
+        private void TryFlow(PlayerFlowPacket packet, BeepServer server, ILogger logger, ServerPlayer player, ServerPlayerState originState,
             ServerPlayerState targetState, ServerFlowType serverFlow)
         {
             if (!AllPlayersInState(originState, false))
