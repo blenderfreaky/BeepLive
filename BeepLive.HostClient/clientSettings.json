@@ -1,0 +1,16 @@
+﻿{
+  "Network": {
+    "TcpPort": 25565,
+    "Address": "localhost"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug"
+    },
+    "Console": {
+      "LogLevel": {
+        "Default": "Debug"
+      }
+    }
+  }
+}

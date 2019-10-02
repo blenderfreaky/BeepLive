@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeepLive.Server", "BeepLive
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeepLive.Client", "BeepLive.Client\BeepLive.Client.csproj", "{5527F9FB-88F9-4B86-BE7E-11F6FB100393}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeepLive.Net", "BeepLive.Net\BeepLive.Net.csproj", "{FEC3B311-B53F-4E5D-B24C-BCC7B3F72F6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeepLive.Net", "BeepLive.Net\BeepLive.Net.csproj", "{FEC3B311-B53F-4E5D-B24C-BCC7B3F72F6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeepLive.HostClient", "BeepLive.HostClient\BeepLive.HostClient.csproj", "{F7B62051-058B-4904-B644-7E21B138C0A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{FEC3B311-B53F-4E5D-B24C-BCC7B3F72F6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEC3B311-B53F-4E5D-B24C-BCC7B3F72F6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEC3B311-B53F-4E5D-B24C-BCC7B3F72F6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7B62051-058B-4904-B644-7E21B138C0A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7B62051-058B-4904-B644-7E21B138C0A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7B62051-058B-4904-B644-7E21B138C0A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7B62051-058B-4904-B644-7E21B138C0A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
