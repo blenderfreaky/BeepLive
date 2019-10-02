@@ -20,11 +20,11 @@ namespace BeepLive.Server
 
     public class BeepServer
     {
-        public ILogger<BeepServer> Logger;
-        public List<ServerPlayer> Players;
-        public BeepConfig BeepConfig;
-        public StreamProtobuf StreamProtobuf;
-        public NetTcpServer GameServer;
+        public ILogger<BeepServer> Logger { get; }
+        public List<ServerPlayer> Players { get; }
+        public BeepConfig BeepConfig { get; }
+        public StreamProtobuf StreamProtobuf { get; }
+        public NetTcpServer GameServer { get; }
 
         public BeepServer()
         {
@@ -46,9 +46,7 @@ namespace BeepLive.Server
 
             TcpListener listener = new TcpListener(hostAddress, networkConfig.GetValue<int>("TcpPort"));
 
-            NetTcpServer server = new NetTcpServer(listener);
-
-            StreamProtobuf = new StreamProtobuf(PrefixStyle.Base128,
+            NetTcpServer server = new NetTcpServer(listener, new StreamProtobuf(PrefixStyle.Base128,
                 typeof(SyncPacket),
                 typeof(ServerFlowPacket),
                 typeof(Packet),
@@ -58,7 +56,9 @@ namespace BeepLive.Server
                 typeof(Vector2FSerializable),
                 typeof(PlayerJumpPacket),
                 typeof(PlayerFlowPacket),
-                typeof(PlayerActionPacket));
+                typeof(PlayerActionPacket)));
+
+            server.PacketReceivedEvent += HandlePacket;
 
             const string beepConfigXml = "BeepConfig.xml";
 
@@ -71,6 +71,12 @@ namespace BeepLive.Server
             {
                 BeepConfig = XmlHelper.LoadFromXmlString<BeepConfig>(File.ReadAllText(beepConfigXml));
             }
+
+            _ = server.AcceptClients(
+                (server, _) => server.Clients.Count < 20,
+                server => server.Clients.Count < 20);
+
+            _ = server.AcceptPackets();
         }
 
         public static void Start()
@@ -79,55 +85,48 @@ namespace BeepLive.Server
             BeepClient.BeepClientInstance.Start();
         }
 
-        public void HandlePacket(object packet)
+        public void HandlePacket(NetTcpServer server, NetTcpClient client, object packet)
         {
             switch (packet)
             {
                 case PlayerShotPacket playerShotPacket:
+                    PacketHandlers.ProcessPacket(CreatePacketContext(playerShotPacket, client));
+                    break;
                 case PlayerSpawnAtPacket playerSpawnAtPacket:
+                    PacketHandlers.ProcessPacket(CreatePacketContext(playerSpawnAtPacket, client));
+                    break;
                 case PlayerTeamJoinPacket playerTeamJoinPacket:
+                    PacketHandlers.ProcessPacket(CreatePacketContext(playerTeamJoinPacket, client));
+                    break;
                 case PlayerJumpPacket playerJumpPacket:
+                    PacketHandlers.ProcessPacket(CreatePacketContext(playerJumpPacket, client));
+                    break;
                 case PlayerFlowPacket playerFlowPacket:
+                    PacketHandlers.ProcessPacket(CreatePacketContext(playerFlowPacket, client));
                     break;
             }
         }
 
+        private PacketContext<TPacket> CreatePacketContext<TPacket>(TPacket packet, NetTcpClient sender) where TPacket : Packet =>
+            new PacketContext<TPacket>(packet, this, sender, Logger);
+
         public bool IsValid(PlayerActionPacket packet) =>
-            string.Equals(Players.Find(p => string.Equals(p.PlayerGuid, packet.PlayerGuid)).Secret, packet.Secret);
+            string.Equals(
+                Players.Find(p => string.Equals(
+                    p.PlayerGuid,
+                    packet.PlayerGuid,
+                    StringComparison.Ordinal)).Secret,
+                packet?.Secret,
+                StringComparison.Ordinal);
 
         public void BroadcastWithoutSecret(PlayerActionPacket packet)
         {
+            if (packet == null) throw new ArgumentNullException(nameof(packet));
+
             packet.Secret = null;
             GameServer.Broadcast(packet);
         }
 
         public bool AllPlayersInState(ServerPlayerState state, bool finished) => Players.TrueForAll(p => (p.State == state && p.Finished) || !finished);
-    }
-
-    public class ServerPlayer
-    {
-        public string PlayerGuid, Secret;
-
-        public ServerPlayerState State;
-        public bool Finished;
-
-        public void MoveToState(ServerPlayerState state)
-        {
-            State = state;
-            Finished = false;
-        }
-
-        public override string ToString()
-        {
-            return $"{nameof(PlayerGuid)}: {PlayerGuid}, {nameof(Secret)}: {Secret}, {nameof(State)}: {State}, {nameof(Finished)}: {Finished}";
-        }
-    }
-
-    public enum ServerPlayerState
-    {
-        InTeamSelection,
-        InSpawning,
-        InPlanning,
-        InSimulation
     }
 }

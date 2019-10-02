@@ -7,7 +7,7 @@
 
     internal static partial class PacketHandlers
     {
-        internal static void Process(PacketContext<PlayerSpawnAtPacket> packetContext)
+        internal static void ProcessPacket(PacketContext<PlayerSpawnAtPacket> packetContext)
         {
             packetContext.Logger.LogDebug("Received: " + packetContext.Packet);
 

@@ -7,7 +7,7 @@
 
     internal static partial class PacketHandlers
     {
-        internal static void Process(PacketContext<PlayerTeamJoinPacket> packetContext)
+        internal static void ProcessPacket(PacketContext<PlayerTeamJoinPacket> packetContext)
         {
             packetContext.Logger.LogDebug("Received: " + packetContext.Packet);
 

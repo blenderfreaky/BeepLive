@@ -49,8 +49,8 @@
                         });
                     }
 
-                    packetContext.SendResponse(new SyncPacket(packetContext.Server.BeepConfig));
-                    packetContext.SendResponse(new ServerFlowPacket { Type = ServerFlowType.StartTeamSelection });
+                    packetContext.Sender.SendToStream(new SyncPacket(packetContext.Server.BeepConfig));
+                    packetContext.Sender.SendToStream(new ServerFlowPacket { Type = ServerFlowType.StartTeamSelection });
 
                     break;
 
