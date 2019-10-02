@@ -8,11 +8,11 @@
     internal static partial class PacketHandlers
     {
         internal static void Process(PacketContext<PlayerTeamJoinPacket> packetContext)
-    {
+        {
             packetContext.Logger.LogDebug("Received: " + packetContext.Packet);
 
-        if (!packetContext.Server.IsValid(packetContext.Packet))
-        {
+            if (!packetContext.Server.IsValid(packetContext.Packet))
+            {
                 packetContext.Logger.LogWarning($"Received packet with invalid Secret: {packetContext.Packet}\nSent by: {packetContext.Sender}");
                 return;
             }

@@ -11,13 +11,13 @@
         {
             packetContext.Logger.LogDebug("Received: " + packetContext.Packet);
 
-        if (!packetContext.Server.IsValid(packetContext.Packet))
-        {
+            if (!packetContext.Server.IsValid(packetContext.Packet))
+            {
                 packetContext.Logger.LogWarning($"Received packet with invalid Secret: {packetContext.Packet}\nSent by: {packetContext.Sender}");
                 return;
-        }
+            }
 
             packetContext.Server.BroadcastWithoutSecret(packetContext.Packet);
+        }
     }
-}
 }
