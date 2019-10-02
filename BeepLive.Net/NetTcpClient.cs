@@ -7,52 +7,40 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class NetTcpServer : IDisposable
+    public class NetTcpClient : IDisposable
     {
-        public TcpListener TcpListener { get; }
+        public TcpClient Client { get; }
         public StreamProtobuf StreamProtobuf { get; }
 
-        public ICollection<NetTcpClient> Clients { get; }
+        public NetTcpServer Server { get; }
+
+        public NetworkStream Stream { get; }
 
         public event PacketReveivedEventHandler PacketReceivedEvent;
 
-        public NetTcpServer(TcpListener tcpListener, StreamProtobuf streamProtobuf)
+        public NetTcpClient(TcpClient client, NetTcpServer server, StreamProtobuf streamProtobuf)
         {
-            TcpListener = tcpListener;
-            TcpListener.Start();
+            Client = client;
+            Stream = client.GetStream();
 
+            Server = server;
             StreamProtobuf = streamProtobuf;
-
-            Clients = new List<NetTcpClient>();
-        }
-
-        public async Task AcceptClients(Predicate<NetTcpServer, TcpClient> shouldAcceptClient,
-                                        Predicate<NetTcpServer> keepAcceptingClients)
-        {
-            var client = await TcpListener.AcceptTcpClientAsync().ConfigureAwait(false);
-
-            if (shouldAcceptClient(this, client)) Clients.Add(new NetTcpClient(client, this, StreamProtobuf));
-
-            if (!keepAcceptingClients(this)) return;
-
-            await AcceptClients(shouldAcceptClient, keepAcceptingClients).ConfigureAwait(false); // Stack overflow, yeet!
         }
 
         public async Task AcceptPackets()
         {
             await Task.Factory.StartNew(() =>
-                {
-                    foreach (var client in Clients)
-                    {
-                        if (StreamProtobuf.ReadNext(client.Stream, out object value)) PacketReceivedEvent(this, client, value);
-                    }
-                }, TaskCreationOptions.LongRunning).ConfigureAwait(false);
+            {
+                if (StreamProtobuf.ReadNext(Stream, out object value)) PacketReceivedEvent(Server, this, value);
+            }, TaskCreationOptions.LongRunning).ConfigureAwait(false);
         }
 
-        public void Broadcast<T>(T obj)
+        public void SendToStream<T>(T obj)
         {
-            foreach (var client in Clients) client.SendToStream(obj);
+            StreamProtobuf.WriteNext(Stream, obj);
         }
+
+        public override string ToString() => $"{nameof(Client)}: {Client}";
 
         #region IDisposable Support
         private bool _disposedValue = false; // To detect redundant calls
@@ -64,8 +52,7 @@
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects).
-                    foreach (var client in Clients) client.Dispose();
-                    TcpListener.Stop();
+                    Stream.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
@@ -76,7 +63,7 @@
         }
 
         // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~NetTcpServer()
+        // ~NetTcpClient()
         // {
         //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
         //   Dispose(false);
