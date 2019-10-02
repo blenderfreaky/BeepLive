@@ -6,31 +6,20 @@
     using System.Net.Sockets;
     using System.Threading.Tasks;
 
-    public readonly struct PacketContext<TPacket>
-        where TPacket : Packet
+    internal static partial class PacketHandlers
     {
-        public readonly BeepServer Server;
-        public readonly Action<Packet> SendResponse;
-        public readonly TcpClient Sender;
-        public readonly ILogger Logger;
-        public readonly TPacket Packet;
-    }
-
-    public static partial class PacketHandlers
-    {
-        public static void ProcessPacket(PacketContext<PlayerFlowPacket> packetContext)
+        internal static void ProcessPacket(PacketContext<PlayerFlowPacket> packetContext)
         {
             packetContext.Logger.LogDebug("Received: " + packetContext.Packet);
 
             if (packetContext.Packet.Type != PlayerFlowPacket.FlowType.Join && !packetContext.Server.IsValid(packetContext.Packet))
             {
-                packetContext.Logger.LogWarning(
-                    $"Received packet with invalid Secret: {packetContext.Packet}\nSent by: {packetContext.Sender}");
+                packetContext.Logger.LogWarning($"Received packet with invalid Secret: {packetContext.Packet}\nSent by: {packetContext.Sender}");
                 return;
             }
 
             ServerPlayer player = packetContext.Server.Players
-                .Find(p => string.Equals(p.PlayerGuid, 
+                .Find(p => string.Equals(p.PlayerGuid,
                     packetContext.Packet.PlayerGuid,
                     StringComparison.InvariantCulture));
 

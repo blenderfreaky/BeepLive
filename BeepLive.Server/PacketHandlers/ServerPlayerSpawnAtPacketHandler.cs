@@ -5,15 +5,19 @@
     using System;
     using System.Threading.Tasks;
 
-    public static partial class PacketHandlers
-            public override async Task Process(PlayerSpawnAtPacket packet, IPacketContext packetContext)
+    internal static partial class PacketHandlers
     {
-        _logger.LogDebug("Received: " + packet);
-
-        if (!BeepServer.IsValid(packet))
+        internal static void Process(PacketContext<PlayerSpawnAtPacket> packetContext)
         {
-            _logger.LogWarning($"Received packet with invalid Secret: {packet}\nSent by: {packetContext.Sender.EndPoint}");
+            packetContext.Logger.LogDebug("Received: " + packetContext.Packet);
+
+        if (!packetContext.Server.IsValid(packetContext.Packet))
+        {
+                packetContext.Logger.LogWarning($"Received packet with invalid Secret: {packetContext.Packet}\nSent by: {packetContext.Sender}");
+                return;
+            }
+
+            packetContext.Server.BroadcastWithoutSecret(packetContext.Packet);
         }
     }
-}
 }
