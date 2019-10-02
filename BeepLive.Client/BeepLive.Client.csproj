@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <ApplicationIcon />
     <StartupObject>BeepLive.Client.ProgramClient</StartupObject>
@@ -11,11 +11,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.0" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="3.0.0" />
-    <PackageReference Include="Networker" Version="3.0.20-rc" />
-    <PackageReference Include="Networker.Extensions.ProtobufNet" Version="3.0.20-rc" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BeepLive.Net\BeepLive.Net.csproj" />
     <ProjectReference Include="..\BeepLive\BeepLive.csproj" />
   </ItemGroup>
 

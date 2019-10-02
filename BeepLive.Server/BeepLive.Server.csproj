@@ -14,7 +14,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.0" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="3.0.0" />
-    <PackageReference Include="ObjectLayoutInspector" Version="0.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,9 +27,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="BioRhymeExpanded-ExtraBold.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Blocked-48.vlw">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

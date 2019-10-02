@@ -1,19 +1,13 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using System;
-namespace BeepLive.Server
+﻿namespace BeepLive.Server
 {
-    using BeepLive.Client;
     using BeepLive.Config;
     using BeepLive.Net;
     using BeepLive.Network;
     using Microsoft.Extensions.Configuration;
-    using Networker.Server.Abstractions;
     using ProtoBuf;
     using System.Collections.Generic;
     using System.IO;
     using System.Net.Sockets;
-    using System.Threading;
     using System;
     using Microsoft.Extensions.Logging;
     using System.Net;
@@ -44,19 +38,9 @@ namespace BeepLive.Server
 
             IPAddress hostAddress = IPAddress.Parse("127.0.0.1");
 
-            TcpListener listener = new TcpListener(hostAddress, networkConfig.GetValue<int>("TcpPort"));
+            TcpListener tcpListener = new TcpListener(hostAddress, networkConfig.GetValue<int>("TcpPort"));
 
-            NetTcpServer server = new NetTcpServer(listener, new StreamProtobuf(PrefixStyle.Base128,
-                typeof(SyncPacket),
-                typeof(ServerFlowPacket),
-                typeof(Packet),
-                typeof(PlayerShotPacket),
-                typeof(PlayerSpawnAtPacket),
-                typeof(PlayerTeamJoinPacket),
-                typeof(Vector2FSerializable),
-                typeof(PlayerJumpPacket),
-                typeof(PlayerFlowPacket),
-                typeof(PlayerActionPacket)));
+            NetTcpServer server = new NetTcpServer(tcpListener, new StreamProtobuf(PrefixStyle.Base128, Packet.PacketTypes));
 
             server.PacketReceivedEvent += HandlePacket;
 

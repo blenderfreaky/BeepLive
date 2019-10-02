@@ -14,7 +14,7 @@
 
         public ICollection<NetTcpClient> Clients { get; }
 
-        public event PacketReveivedEventHandler PacketReceivedEvent;
+        public event ServerPacketReveivedEventHandler PacketReceivedEvent;
 
         public NetTcpServer(TcpListener tcpListener, StreamProtobuf streamProtobuf)
         {
@@ -31,7 +31,7 @@
         {
             var client = await TcpListener.AcceptTcpClientAsync().ConfigureAwait(false);
 
-            if (shouldAcceptClient(this, client)) Clients.Add(new NetTcpClient(client, this, StreamProtobuf));
+            if (shouldAcceptClient(this, client)) Clients.Add(new NetTcpClient(client, StreamProtobuf));
 
             if (!keepAcceptingClients(this)) return;
 

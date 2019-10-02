@@ -21,7 +21,7 @@
             ServerPlayer player = packetContext.Server.Players
                 .Find(p => string.Equals(p.PlayerGuid,
                     packetContext.Packet.PlayerGuid,
-                    StringComparison.InvariantCulture));
+                    StringComparison.Ordinal));
 
             if (player == null && packetContext.Packet.Type != PlayerFlowPacket.FlowType.Join)
             {

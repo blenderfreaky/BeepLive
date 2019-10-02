@@ -1,23 +1,5 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using System;
-namespace BeepLive.Server
+﻿namespace BeepLive.Server
 {
-    using BeepLive.Client;
-    using BeepLive.Config;
-    using BeepLive.Net;
-    using BeepLive.Network;
-    using Microsoft.Extensions.Configuration;
-    using Networker.Server.Abstractions;
-    using ProtoBuf;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Net.Sockets;
-    using System.Threading;
-    using System;
-    using Microsoft.Extensions.Logging;
-    using System.Net;
-
     public class ServerPlayer
     {
         public string PlayerGuid { get; set; }

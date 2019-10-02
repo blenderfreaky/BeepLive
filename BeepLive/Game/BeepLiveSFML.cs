@@ -268,7 +268,7 @@
                                 .Find(tm =>
                                     string.Equals(
                                         t.TeamConfig.TeamGuid,
-                                        tm.TeamGuid, StringComparison.InvariantCulture))
+                                        tm.TeamGuid, StringComparison.Ordinal))
                                 .Players
                                 .Select(p =>
                                 {
@@ -338,6 +338,10 @@
                         HandlePlayerSpawnAtPacket(spawnAt);
                         break;
 
+                    case PlayerShotPacket shot:
+                        HandlePlayerShotPacket(shot);
+                        break;
+
                     case PlayerActionPacket action:
                         HandlePlayerActionPacket(action);
                         break;
@@ -354,7 +358,7 @@
 
         private void ExecutePlayerActionPacket(PlayerActionPacket packet)
         {
-            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid, StringComparison.InvariantCulture));
+            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid, StringComparison.Ordinal));
 
             switch (packet)
             {
@@ -384,9 +388,16 @@
 
         public void HandlePlayerSpawnAtPacket(PlayerSpawnAtPacket packet)
         {
-            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid, StringComparison.InvariantCulture));
+            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid, StringComparison.Ordinal));
 
             player.Position = packet.Position;
+        }
+
+        public void HandlePlayerShotPacket(PlayerShotPacket packet)
+        {
+            Player player = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, packet.PlayerGuid, StringComparison.Ordinal));
+
+            player.Shoot(BeepLiveGame.BeepConfig.ShotConfigs[packet.ShotConfigId], packet.Direction);
         }
 
         public void HandleSyncPacket(SyncPacket packet)
@@ -414,7 +425,7 @@
             PlayerMock playerMock =
                 PlayerMocks.Find(x =>
                     string.Equals(x.PlayerGuid,
-                        packet.PlayerGuid, StringComparison.InvariantCulture))
+                        packet.PlayerGuid, StringComparison.Ordinal))
                 ?? new PlayerMock
                 {
                     PlayerGuid = packet.PlayerGuid,
@@ -426,7 +437,7 @@
             TeamMock teamMock =
                 TeamMocks.Find(x =>
                     string.Equals(x.TeamGuid,
-                        packet.TeamGuid, StringComparison.InvariantCulture));
+                        packet.TeamGuid, StringComparison.Ordinal));
 
             playerMock.Team = teamMock;
             teamMock.Players.Add(playerMock);

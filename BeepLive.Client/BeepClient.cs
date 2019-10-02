@@ -1,63 +1,72 @@
 ﻿namespace BeepLive.Client
 {
-    using BeepLive.Client.PacketHandlers;
     using BeepLive.Game;
+    using BeepLive.Net;
     using BeepLive.Network;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
-    using Networker.Client;
-    using Networker.Client.Abstractions;
-    using Networker.Extensions.ProtobufNet;
+    using ProtoBuf;
+    using System.Net;
+    using System.Net.Sockets;
 
     public class BeepClient
     {
-        public BeepLiveSfml BeepLiveSfml;
+        public BeepLiveSfml BeepLiveSfml { get; }
+        public ILogger Logger { get; }
 
         public BeepClient()
         {
-            IConfigurationRoot config = new ConfigurationBuilder()
+            IConfiguration config = new ConfigurationBuilder()
                 .AddJsonFile("clientSettings.json", false, true)
                 .Build();
 
-            IConfigurationSection networkerSettings = config.GetSection("Networker");
+            using var loggerFactory = LoggerFactory.Create(x => x
+                .AddConfiguration(config.GetSection("Logging"))
+                .AddConsole());
 
-            Client = new ClientBuilder()
-                .UseIp(networkerSettings.GetValue<string>("Address"))
-                .UseTcp(networkerSettings.GetValue<int>("TcpPort"))
-                .UseUdp(networkerSettings.GetValue<int>("UdpPort"))
-                .ConfigureLogging(loggingBuilder =>
-                {
-                    loggingBuilder.AddConfiguration(config.GetSection("Logging"));
-                    loggingBuilder.AddConsole();
-                })
-                .UseProtobufNet()
-                .RegisterPacketHandler<PlayerShotPacket, ClientPlayerShotPacketHandler>()
-                .RegisterPacketHandler<PlayerJumpPacket, ClientPlayerJumpPacketHandler>()
-                .RegisterPacketHandler<PlayerSpawnAtPacket, ClientPlayerSpawnAtHandler>()
-                .RegisterPacketHandler<ServerFlowPacket, ClientServerFlowPacketHandler>()
-                .RegisterPacketHandler<SyncPacket, ClientSyncPacketHandler>()
-                .Build();
+            Logger = loggerFactory.CreateLogger<BeepClient>();
+
+            IConfigurationSection networkConfig = config.GetSection("Network");
+
+            IPAddress hostAddress = IPAddress.Parse("127.0.0.1");
+
+            TcpClient tcpClient = new TcpClient(networkConfig.GetValue<string>("Address"), networkConfig.GetValue<int>("TcpPort"));
+
+            NetTcpClient client = new NetTcpClient(tcpClient, new StreamProtobuf(PrefixStyle.Base128, Packet.PacketTypes));
+
+            client.PacketReceivedEvent += HandlePacket;
+
+            BeepLiveSfml = new BeepLiveSfml(new MessageSender(client));
+            BeepLiveSfml.Run();
+
+            _ = client.AcceptPackets();
         }
 
-        public IClient Client { get; set; }
-
-        public void Start()
+        public void HandlePacket(NetTcpClient client, object packet)
         {
-            Client.Connect();
-            BeepLiveSfml = new BeepLiveSfml(new MessageSender(Client));
-            BeepLiveSfml.Run();
+            switch (packet)
+            {
+                case PlayerJumpPacket _:
+                case PlayerShotPacket _:
+                case PlayerSpawnAtPacket _:
+                case PlayerTeamJoinPacket _:
+                case ServerFlowPacket _:
+                case SyncPacket _:
+                    BeepLiveSfml.HandlePacket((Packet)packet);
+                    break;
+            }
         }
 
         private class MessageSender : IMessageSender
         {
-            private readonly IClient _client;
+            private readonly NetTcpClient _client;
 
-            public MessageSender(IClient client)
+            public MessageSender(NetTcpClient client)
             {
                 _client = client;
             }
 
-            public void SendMessage<T>(T message) => _client.Send(message);
+            public void SendMessage<T>(T message) => _client.SendToStream(message);
         }
     }
 }

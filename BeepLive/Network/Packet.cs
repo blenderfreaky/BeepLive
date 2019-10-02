@@ -9,6 +9,20 @@
     [ProtoInclude(300, typeof(SyncPacket))]
     public abstract class Packet
     {
+        public static Type[] PacketTypes = new Type[]
+        {
+                typeof(SyncPacket),
+                typeof(ServerFlowPacket),
+                typeof(Packet),
+                typeof(PlayerShotPacket),
+                typeof(PlayerSpawnAtPacket),
+                typeof(PlayerTeamJoinPacket),
+                typeof(Vector2FSerializable),
+                typeof(PlayerJumpPacket),
+                typeof(PlayerFlowPacket),
+                typeof(PlayerActionPacket)
+        };
+
         [ProtoMember(1)] public string MessageGuid;
         [ProtoMember(2)] public DateTime TimeSent;
 

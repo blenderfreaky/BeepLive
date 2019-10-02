@@ -9,7 +9,6 @@ namespace BeepLive.Server
             var server = new BeepServer();
 
             var beepClient = new BeepClient();
-            beepClient.Start();
         }
     }
 }

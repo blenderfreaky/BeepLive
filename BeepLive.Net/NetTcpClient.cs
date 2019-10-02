@@ -12,18 +12,15 @@
         public TcpClient Client { get; }
         public StreamProtobuf StreamProtobuf { get; }
 
-        public NetTcpServer Server { get; }
-
         public NetworkStream Stream { get; }
 
-        public event PacketReveivedEventHandler PacketReceivedEvent;
+        public event ClientPacketReveivedEventHandler PacketReceivedEvent;
 
-        public NetTcpClient(TcpClient client, NetTcpServer server, StreamProtobuf streamProtobuf)
+        public NetTcpClient(TcpClient client, StreamProtobuf streamProtobuf)
         {
             Client = client;
             Stream = client.GetStream();
 
-            Server = server;
             StreamProtobuf = streamProtobuf;
         }
 
@@ -31,7 +28,7 @@
         {
             await Task.Factory.StartNew(() =>
             {
-                if (StreamProtobuf.ReadNext(Stream, out object value)) PacketReceivedEvent(Server, this, value);
+                if (StreamProtobuf.ReadNext(Stream, out object value)) PacketReceivedEvent(this, value);
             }, TaskCreationOptions.LongRunning).ConfigureAwait(false);
         }
 
