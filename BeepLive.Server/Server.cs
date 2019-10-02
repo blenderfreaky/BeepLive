@@ -25,7 +25,7 @@ namespace BeepLive.Server
 
         private void Listen(object stateInfo)
         {
-            while(Fetcher.IsListening)
+            while (Fetcher.IsListening)
             {
                 ThreadPool.QueueUserWorkItem(call =>
                 {

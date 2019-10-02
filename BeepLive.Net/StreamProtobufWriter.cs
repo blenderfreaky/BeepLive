@@ -8,19 +8,16 @@
 
     public class StreamProtobuf
     {
-        public readonly IReadOnlyCollection<Type> Types;
+        public readonly PrefixStyle PrefixStyle;
 
-        public readonly Stream Stream;
+        public readonly IReadOnlyCollection<Type> Types;
 
         private readonly IReadOnlyDictionary<int, Type> TypeByIndex;
         private readonly IReadOnlyDictionary<Type, int> IndexByType;
 
-        public readonly PrefixStyle PrefixStyle;
-
-        public StreamProtobuf(Stream stream, PrefixStyle prefixStyle, params Type[] types)
+        public StreamProtobuf(PrefixStyle prefixStyle, params Type[] types)
         {
             Types = types;
-            Stream = stream;
             PrefixStyle = prefixStyle;
 
             var typesAndIndicies = Types.Select((x, i) => (x, i)).ToArray();
@@ -28,23 +25,23 @@
             IndexByType = typesAndIndicies.ToDictionary(x => x.x, x => x.i);
         }
 
-        public void WriteNext(object obj) =>
+        public void WriteNext(Stream stream, object obj) =>
             Serializer.NonGeneric.SerializeWithLengthPrefix(
-                Stream,
+                stream,
                 obj,
                 PrefixStyle,
                 IndexByType[obj.GetType()]);
 
-        public void WriteNext<T>(T obj) =>
+        public void WriteNext<T>(Stream stream, T obj) =>
             Serializer.SerializeWithLengthPrefix(
-                Stream,
+                stream,
                 obj,
                 PrefixStyle,
                 IndexByType[typeof(T)]);
 
-        public bool ReadNext(out object value) =>
+        public bool ReadNext(Stream stream, out object value) =>
             Serializer.NonGeneric.TryDeserializeWithLengthPrefix(
-                Stream,
+                stream,
                 PrefixStyle,
                 field => TypeByIndex[field],
                 out value);

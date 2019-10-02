@@ -1,112 +1,122 @@
-﻿#pragma warning disable 1998
-
-namespace BeepLive.Server
+﻿namespace BeepLive.Server
 {
     using BeepLive.Network;
     using Microsoft.Extensions.Logging;
-    using Networker.Common;
-    using Networker.Common.Abstractions;
     using System;
-    using System.Diagnostics.CodeAnalysis;
+    using System.Net.Sockets;
     using System.Threading.Tasks;
-    using static BeepLive.Server.BeepServer;
 
-    public static class ServerPlayerFlowPacketHandler
+    public readonly struct PacketContext<TPacket>
+        where TPacket : Packet
     {
-        public async Task ProcessPacket(PlayerFlowPacket packet, BeepServer server, IPacketContext packetContext, ILogger logger)
+        public readonly BeepServer Server;
+        public readonly Action<Packet> SendResponse;
+        public readonly TcpClient Sender;
+        public readonly ILogger Logger;
+        public readonly TPacket Packet;
+    }
+
+    public static partial class PacketHandlers
+    {
+        public static void ProcessPacket(PacketContext<PlayerFlowPacket> packetContext)
         {
-            logger.LogDebug("Received: " + packet);
+            packetContext.Logger.LogDebug("Received: " + packetContext.Packet);
 
-            if (packet.Type != PlayerFlowPacket.FlowType.Join && !IsValid(packet))
+            if (packetContext.Packet.Type != PlayerFlowPacket.FlowType.Join && !packetContext.Server.IsValid(packetContext.Packet))
             {
-                logger.LogWarning(
-                    $"Received packet with invalid Secret: {packet}\nSent by: {packetContext.Sender.EndPoint}");
+                packetContext.Logger.LogWarning(
+                    $"Received packet with invalid Secret: {packetContext.Packet}\nSent by: {packetContext.Sender}");
                 return;
             }
 
-            ServerPlayer player = Players.Find(p => string.Equals(p.PlayerGuid, packet.PlayerGuid, StringComparison.InvariantCulture));
+            ServerPlayer player = packetContext.Server.Players
+                .Find(p => string.Equals(p.PlayerGuid, 
+                    packetContext.Packet.PlayerGuid,
+                    StringComparison.InvariantCulture));
 
-            if (player == null && packet.Type != PlayerFlowPacket.FlowType.Join)
+            if (player == null && packetContext.Packet.Type != PlayerFlowPacket.FlowType.Join)
             {
-                logger.LogWarning(
-                    $"Unknown player sent flow-packet: {packet}\nSent by: {packetContext.Sender.EndPoint}");
+                packetContext.Logger.LogWarning(
+                    $"Unknown player sent flow-packet: {packetContext.Packet}\nSent by: {packetContext.Sender}");
                 return;
             }
 
-            switch (packet.Type)
+            switch (packetContext.Packet.Type)
             {
                 case PlayerFlowPacket.FlowType.Join:
-                    if (!AllPlayersInState(ServerPlayerState.InTeamSelection, false))
+                    if (!packetContext.Server.AllPlayersInState(ServerPlayerState.InTeamSelection, false))
                     {
-                        logger.LogWarning($"Player joined late: {packet}\nPlayer: {player}");
+                        packetContext.Logger.LogWarning($"Player joined late: {packetContext.Packet}\nPlayer: {player}");
                         return;
                     }
 
                     if (player == null)
-                        Players.Add(new ServerPlayer
+                    {
+                        packetContext.Server.Players.Add(new ServerPlayer
                         {
-                            PlayerGuid = packet.PlayerGuid,
-                            Secret = packet.Secret,
+                            PlayerGuid = packetContext.Packet.PlayerGuid,
+                            Secret = packetContext.Packet.Secret,
                             State = ServerPlayerState.InTeamSelection
                         });
+                    }
 
-                    packetContext.Sender.Send(new SyncPacket(BeepConfig));
-                    packetContext.Sender.Send(new ServerFlowPacket { Type = ServerFlowType.StartTeamSelection });
+                    packetContext.SendResponse(new SyncPacket(packetContext.Server.BeepConfig));
+                    packetContext.SendResponse(new ServerFlowPacket { Type = ServerFlowType.StartTeamSelection });
 
                     break;
 
                 case PlayerFlowPacket.FlowType.Leave:
-                    Players.Remove(player);
-                    BroadcastWithoutSecret(packet);
+                    packetContext.Server.Players.Remove(player);
+                    packetContext.Server.BroadcastWithoutSecret(packetContext.Packet);
 
                     break;
 
                 case PlayerFlowPacket.FlowType.LockInTeam:
-                    TryFlow(packet, player, ServerPlayerState.InTeamSelection, ServerPlayerState.InSpawning,
+                    TryFlow(packetContext, player, ServerPlayerState.InTeamSelection, ServerPlayerState.InSpawning,
                         ServerFlowType.StartSpawning);
 
                     break;
 
                 case PlayerFlowPacket.FlowType.Spawn:
-                    TryFlow(packet, player, ServerPlayerState.InSpawning, ServerPlayerState.InSimulation,
+                    TryFlow(packetContext, player, ServerPlayerState.InSpawning, ServerPlayerState.InSimulation,
                         ServerFlowType.StartSimulation);
 
                     break;
 
                 case PlayerFlowPacket.FlowType.ReadyForSimulation:
-                    TryFlow(packet, player, ServerPlayerState.InSimulation, ServerPlayerState.InPlanning,
+                    TryFlow(packetContext, player, ServerPlayerState.InSimulation, ServerPlayerState.InPlanning,
                         ServerFlowType.StartPlanning);
 
                     break;
 
                 case PlayerFlowPacket.FlowType.FinishedSimulation:
-                    TryFlow(packet, player, ServerPlayerState.InPlanning, ServerPlayerState.InSimulation,
+                    TryFlow(packetContext, player, ServerPlayerState.InPlanning, ServerPlayerState.InSimulation,
                         ServerFlowType.StartSimulation);
 
                     break;
 
                 default:
-                    logger.LogError("Received invalid player-flow packet: " + packet);
+                    packetContext.Logger.LogError("Received invalid player-flow packet: " + packetContext.Packet);
                     break;
             }
         }
 
-        private void TryFlow(PlayerFlowPacket packet, BeepServer server, ILogger logger, ServerPlayer player, ServerPlayerState originState,
+        private static void TryFlow(PacketContext<PlayerFlowPacket> packetContext, ServerPlayer player, ServerPlayerState originState,
             ServerPlayerState targetState, ServerFlowType serverFlow)
         {
-            if (!AllPlayersInState(originState, false))
+            if (!packetContext.Server.AllPlayersInState(originState, false))
             {
-                _logger.LogWarning($"Player sent disallowed flow-packet: {packet}\nPlayer: {player}");
+                packetContext.Logger.LogWarning($"Player sent disallowed flow-packet: {packetContext.Packet}\nPlayer: {player}");
                 return;
             }
 
             player.Finished = true;
-            BroadcastWithoutSecret(packet);
+            packetContext.Server.BroadcastWithoutSecret(packetContext.Packet);
 
-            if (!AllPlayersInState(originState, true)) return;
+            if (!packetContext.Server.AllPlayersInState(originState, true)) return;
 
-            Players.ForEach(p => p.MoveToState(targetState));
-            GameServer.Broadcast(new ServerFlowPacket { Type = serverFlow });
+            packetContext.Server.Players.ForEach(p => p.MoveToState(targetState));
+            packetContext.Server.GameServer.Broadcast(new ServerFlowPacket { Type = serverFlow });
         }
     }
 }

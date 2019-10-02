@@ -20,30 +20,31 @@ namespace BeepLive.Server
 
     public class BeepServer : IDisposable
     {
-        private readonly ILogger<BeepServer> _logger;
+        public ILogger<BeepServer> Logger;
         public List<ServerPlayer> Players;
         public BeepConfig BeepConfig;
         public StreamProtobuf StreamProtobuf;
+        public NetTcpServer GameServer;
 
         public BeepServer()
         {
-            IPAddress hostAddress = IPAddress.Parse("127.0.0.1");
-
-            _logger = LoggerFactory.Create(x => x.AddConsole()).CreateLogger<BeepServer>();
+            Logger = LoggerFactory.Create(x => x.AddConsole()).CreateLogger<BeepServer>();
 
             IConfiguration config = new ConfigurationBuilder()
                 .AddJsonFile("appSettings.json", false, true)
                 .Build();
 
-            IConfigurationSection networkerSettings = config.GetSection("Networker");
+            IConfigurationSection networkerSettings = config.GetSection("Network");
 
             Players = new List<ServerPlayer>();
 
-            TcpListener listener = new Tcpl;
-            
-            using TcpClient client = new TcpClient("localhost", networkerSettings.GetValue<int>("TcpPort"));
-            _disposable = client.GetStream();
-            StreamProtobuf = new StreamProtobuf(_disposable, PrefixStyle.Base128,
+            IPAddress hostAddress = IPAddress.Parse("127.0.0.1");
+
+            TcpListener listener = new TcpListener(hostAddress, networkerSettings.GetValue<int>("TcpPort"));
+
+            NetTcpServer server = new NetTcpServer(listener);
+
+            StreamProtobuf = new StreamProtobuf(PrefixStyle.Base128,
                 typeof(SyncPacket),
                 typeof(ServerFlowPacket),
                 typeof(Packet),
@@ -54,7 +55,7 @@ namespace BeepLive.Server
                 typeof(PlayerJumpPacket),
                 typeof(PlayerFlowPacket),
                 typeof(PlayerActionPacket));
-            
+
             const string beepConfigXml = "BeepConfig.xml";
 
             if (!File.Exists(beepConfigXml))
@@ -78,8 +79,6 @@ namespace BeepLive.Server
         {
             switch (packet)
             {
-                case SyncPacket syncPacket:
-                case ServerFlowPacket serverFlowPacket:
                 case PlayerShotPacket playerShotPacket:
                 case PlayerSpawnAtPacket playerSpawnAtPacket:
                 case PlayerTeamJoinPacket playerTeamJoinPacket:
@@ -98,14 +97,7 @@ namespace BeepLive.Server
             GameServer.Broadcast(packet);
         }
 
-        public static bool AllPlayersInState(ServerPlayerState state, bool finished) => Players.TrueForAll(p => (p.State == state && p.Finished) || !finished);
-
-        private NetworkStream _disposable;
-
-        public void Dispose()
-        {
-            _disposable?.Dispose();
-        }
+        public bool AllPlayersInState(ServerPlayerState state, bool finished) => Players.TrueForAll(p => (p.State == state && p.Finished) || !finished);
     }
 
     public class ServerPlayer

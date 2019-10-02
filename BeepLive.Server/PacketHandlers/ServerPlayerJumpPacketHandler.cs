@@ -1,29 +1,19 @@
-﻿#pragma warning disable 1998
-
-namespace BeepLive.Server.PacketHandlers
+﻿namespace BeepLive.Server
 {
     using BeepLive.Network;
     using Microsoft.Extensions.Logging;
-    using Networker.Common;
-    using Networker.Common.Abstractions;
+    using System;
     using System.Threading.Tasks;
 
-    public class ServerPlayerJumpPacketHandler : IPacketHandler<PlayerJumpPacket>
+    public static partial class PacketHandlers
     {
-        private readonly ILogger<ServerPlayerJumpPacketHandler> _logger;
-
-        public ServerPlayerJumpPacketHandler(ILogger<ServerPlayerJumpPacketHandler> logger)
+        public static [void Process(PacketContext<PlayerJumpPacket> packetContext)
         {
-            _logger = logger;
-        }
+            packetContext.Logger.LogDebug("Received: " + packetContext.Packet);
 
-        public override async Task Process(PlayerJumpPacket packet, IPacketContext packetContext)
-        {
-            _logger.LogDebug("Received: " + packet);
-
-            if (!BeepServer.IsValid(packet))
+            if (!packetContext.Server.IsValid(packetContext.Packet))
             {
-                _logger.LogWarning($"Received packet with invalid Secret: {packet}\nSent by: {packetContext.Sender.EndPoint}");
+                packetContext.Logger.LogWarning($"Received packet with invalid Secret: {packetContext.Packet}\nSent by: {packetContext.Sender}");
             }
         }
     }
