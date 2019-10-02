@@ -79,12 +79,6 @@ namespace BeepLive.Server
             _ = server.AcceptPackets();
         }
 
-        public static void Start()
-        {
-            BeepClient.BeepClientInstance = new BeepClient();
-            BeepClient.BeepClientInstance.Start();
-        }
-
         public void HandlePacket(NetTcpServer server, NetTcpClient client, object packet)
         {
             switch (packet)

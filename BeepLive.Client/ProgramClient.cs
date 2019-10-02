@@ -1,11 +1,11 @@
 ﻿namespace BeepLive.Client
 {
-    public class ProgramClient
+    public static class ProgramClient
     {
         private static void Main()
         {
-            BeepClient.BeepClientInstance = new BeepClient();
-            BeepClient.BeepClientInstance.Start();
+            var beepClient = new BeepClient();
+            beepClient.Start();
         }
     }
 }

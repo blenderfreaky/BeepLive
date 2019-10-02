@@ -11,7 +11,6 @@
 
     public class BeepClient
     {
-        public static BeepClient BeepClientInstance;
         public BeepLiveSfml BeepLiveSfml;
 
         public BeepClient()
