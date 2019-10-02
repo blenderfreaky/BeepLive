@@ -18,7 +18,7 @@ namespace BeepLive.Server
     using Microsoft.Extensions.Logging;
     using System.Net;
 
-    public class BeepServer : IDisposable
+    public class BeepServer
     {
         public ILogger<BeepServer> Logger;
         public List<ServerPlayer> Players;
@@ -28,19 +28,23 @@ namespace BeepLive.Server
 
         public BeepServer()
         {
-            Logger = LoggerFactory.Create(x => x.AddConsole()).CreateLogger<BeepServer>();
-
             IConfiguration config = new ConfigurationBuilder()
                 .AddJsonFile("appSettings.json", false, true)
                 .Build();
 
-            IConfigurationSection networkerSettings = config.GetSection("Network");
+            using var loggerFactory = LoggerFactory.Create(x => x
+                .AddConfiguration(config.GetSection("Logging"))
+                .AddConsole());
+
+            Logger = loggerFactory.CreateLogger<BeepServer>();
+
+            IConfigurationSection networkConfig = config.GetSection("Network");
 
             Players = new List<ServerPlayer>();
 
             IPAddress hostAddress = IPAddress.Parse("127.0.0.1");
 
-            TcpListener listener = new TcpListener(hostAddress, networkerSettings.GetValue<int>("TcpPort"));
+            TcpListener listener = new TcpListener(hostAddress, networkConfig.GetValue<int>("TcpPort"));
 
             NetTcpServer server = new NetTcpServer(listener);
 
