@@ -4,7 +4,7 @@
     {
         private static void Main()
         {
-            var client = new BeepClient();
+            _ = new BeepClient();
         }
     }
 }

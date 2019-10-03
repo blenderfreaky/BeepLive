@@ -6,9 +6,7 @@ namespace BeepLive.Server
     {
         private static void Main()
         {
-            var server = new BeepServer();
-
-            var beepClient = new BeepClient();
+            _ = new BeepServer();
         }
     }
 }

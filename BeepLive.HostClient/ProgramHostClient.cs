@@ -8,9 +8,9 @@
     {
         public static void Main()
         {
-            var server = new BeepServer();
-            Thread.Sleep(1000);
-            var client = new BeepClient();
+            _ = new BeepServer();
+
+            _ = new BeepClient();
         }
     }
 }
