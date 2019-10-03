@@ -29,10 +29,18 @@
         {
             for (int i = 0; i < ShotConfig.ChildCount; i++)
             {
-                Vector2f direction = new Vector2f((float)((Map.Random.NextDouble() * 2) - 1) * ShotConfig.ExplosionPower,
-                    (float)((Map.Random.NextDouble() * 2) - 1) * ShotConfig.ExplosionPower);
-                Map.Entities.Add(Activator.CreateInstance(typeof(TProjectile), Map, Position, Velocity + direction,
-                    ShotConfig.ChildShotConfig) as TProjectile);
+                Vector2f direction = new Vector2f(
+                    (float)((Map.Random.NextDouble() * 2) - 1),
+                    (float)((Map.Random.NextDouble() * 2) - 1))
+                    * ShotConfig.ExplosionPower;
+
+                Map.Entities.Add(Activator.CreateInstance(typeof(TProjectile),
+                    Map,
+                    Position,
+                    Velocity + direction,
+                    ShotConfig.ChildShotConfig,
+                    Owner)
+                    as TProjectile);
             }
 
             OnExplodeEvent?.Invoke(this);

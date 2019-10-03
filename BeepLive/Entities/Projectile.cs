@@ -31,7 +31,7 @@
             Shape = new CircleShape
             {
                 Position = position,
-                Radius = ShotConfig.Radius,
+                Radius = ShotConfig.Radius,//THIS IS SOMEHOW ZERO ------------------------------------------------------- 
                 FillColor = VoxelTypeToPlace == null ?
                 new Color(255, 255, 255) :
                     new Color(

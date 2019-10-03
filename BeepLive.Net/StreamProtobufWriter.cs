@@ -20,7 +20,7 @@
             Types = types;
             PrefixStyle = prefixStyle;
 
-            var typesAndIndicies = Types.Select((x, i) => (x, i+1)).ToArray();
+            var typesAndIndicies = Types.Select((x, i) => (x, i + 1)).ToArray();
             _typeByIndex = typesAndIndicies.ToDictionary(x => x.Item2, x => x.x);
             _indexByType = typesAndIndicies.ToDictionary(x => x.x, x => x.Item2);
         }

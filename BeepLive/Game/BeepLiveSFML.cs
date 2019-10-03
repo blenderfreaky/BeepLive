@@ -123,7 +123,8 @@
                 if (BeepGameState.Connecting) Window.Draw(_connectingText);
 
                 _debugText.DisplayedString = $"Physics Step Rate: {BeepLiveGame?.Map.ActualFrameRate} / {60}\n" +
-                                             $"Steps Queued: {BeepLiveGame?.Map.StepsQueued} Steps Finished: {BeepLiveGame?.Map.StepsFinished}";
+                                             $"Steps Queued: {BeepLiveGame?.Map.StepsQueued}\n" +
+                                             $"Steps Finished: {BeepLiveGame?.Map.StepsFinished}";
                 Window.Draw(_debugText);
 
                 Window.Display();
@@ -134,20 +135,28 @@
 
         private void ApplyShake()
         {
-            if (!_shakeTimer.IsRunning) return;
+            const float lerp = 0.8f;
+            Vector2f lerpedCenter() => (_view.Center * lerp) + (_center * (1 - lerp));
+
+            if (!_shakeTimer.IsRunning)
+            {
+                if (!BeepGameState.Spawning) _view.Center = lerpedCenter();
+                return;
+            }
 
             float fulfillment = (float)(_shakeTimer.ElapsedMilliseconds / (double)_shakeDuration);
             if (fulfillment < 1f)
             {
-                Vector2f direction = new Vector2f((float)((_random.NextDouble() * 2) - 1),
+                Vector2f direction = new Vector2f(
+                    (float)((_random.NextDouble() * 2) - 1),
                     (float)((_random.NextDouble() * 2) - 1));
                 direction /= direction.Magnitude();
-                _view.Center = _center + (direction * _shakeMagnitude * (1f - fulfillment));
+                _view.Center = lerpedCenter() + (direction * _shakeMagnitude * (1f - fulfillment));
             }
             else
             {
                 _shakeTimer.Reset();
-                _view.Center = _center;
+                _view.Center = lerpedCenter();
             }
         }
 
@@ -257,7 +266,7 @@
             Entity[] entities;
             lock (BeepLiveGame.Map.Entities) entities = BeepLiveGame.Map.Entities.Where(e => !(e is null)).ToArray();
 
-            foreach (Entity entity in entities.Where(entity => !entity.Alive)) Window.Draw(entity.Shape);
+            foreach (Entity entity in entities.Where(entity => entity.Alive)) Window.Draw(entity.Shape);
         }
 
         public void HandlePlayerActionPacket(PlayerActionPacket packet)
@@ -279,7 +288,7 @@
                 case ServerFlowType.StartSpawning:
                     while (!BeepLiveGame.Teams.TrueForAll(t => t.Players.Count == t.TeamConfig.MaxPlayers))
                     {
-                        foreach(Team team in BeepLiveGame.Teams)
+                        foreach (Team team in BeepLiveGame.Teams)
                         {
                             team.Players = TeamMocks
                                 .Find(tm =>
@@ -397,7 +406,7 @@
                     {
                         case ClusterShotConfig clusterShotConfig:
                             player.Shoot(clusterShotConfig, shotPacket.Direction).OnExplodeEvent +=
-                                _ => TriggerShake(clusterShotConfig.ExplosionPower, 1000);
+                                clusterShot => TriggerShake(clusterShot.ShotConfig.ExplosionPower / 100, 100);
                             break;
 
                         default:
@@ -423,7 +432,7 @@
         {
             BeepLiveGame = new BeepLiveGame(packet.BeepConfig, PlayerGuid);
 
-            BeepLiveGame.Map.OnSimulationStop += () => 
+            BeepLiveGame.Map.OnSimulationStop += () =>
             Flow(PlayerFlowPacket.FlowType.FinishedSimulation);
 
             BeepGameState.Connecting = false;

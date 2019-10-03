@@ -31,7 +31,7 @@
 
         public TeamRelation GetTeamRelation(Team team)
         {
-            return    VoxelType == null
+            return VoxelType == null
                     ? TeamRelation.Air
                     : VoxelType.OwnerTeam == null
                     ? TeamRelation.Neutral

@@ -17,7 +17,7 @@
 
         public bool Alive
         {
-            get => Disposed;
+            get => !Disposed;
             set { if (!value) Die(); }
         }
 
