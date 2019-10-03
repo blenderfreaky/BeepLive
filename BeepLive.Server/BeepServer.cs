@@ -40,9 +40,9 @@
 
             TcpListener tcpListener = new TcpListener(hostAddress, networkConfig.GetValue<int>("TcpPort"));
 
-            NetTcpServer server = new NetTcpServer(tcpListener, new StreamProtobuf(PrefixStyle.Base128, Packet.PacketTypes));
+            GameServer = new NetTcpServer(tcpListener, new StreamProtobuf(PrefixStyle.Base128, Packet.PacketTypes));
 
-            server.PacketReceivedEvent += HandlePacket;
+            GameServer.PacketReceivedEvent += HandlePacket;
 
             const string beepConfigXml = "BeepConfig.xml";
 
@@ -58,11 +58,11 @@
 
             tcpListener.Start();
 
-            _ = server.AcceptClients(
+            _ = GameServer.AcceptClients(
                 (server, _) => server.Clients.Count < 20,
                 server => server.Clients.Count < 20);
 
-            _ = server.AcceptPackets();
+            _ = GameServer.AcceptPackets();
         }
 
         public void HandlePacket(NetTcpServer server, NetTcpClient client, object packet)

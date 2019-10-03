@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-16"?>
+<BeepConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <MapConfig>
+    <BackgroundColor>
+      <R>0</R>
+      <G>0</G>
+      <B>0</B>
+      <A>0</A>
+    </BackgroundColor>
+    <ChunkSize>0</ChunkSize>
+    <FloatingNoiseScale>0</FloatingNoiseScale>
+    <FloatingNoiseThreshold>0</FloatingNoiseThreshold>
+    <FloatingNoiseFalloff>0</FloatingNoiseFalloff>
+    <GroundLevel>0</GroundLevel>
+    <GroundVoxelType>
+      <Color>
+        <R>0</R>
+        <G>0</G>
+        <B>0</B>
+        <A>0</A>
+      </Color>
+      <Resistance>0</Resistance>
+    </GroundVoxelType>
+    <HorizontalNoiseScale>0</HorizontalNoiseScale>
+    <VerticalNoiseScale>0</VerticalNoiseScale>
+    <MapHeight>0</MapHeight>
+    <MapWidth>0</MapWidth>
+    <PhysicalEnvironment>
+      <AirResistance>0</AirResistance>
+      <CollisionResponseMode>NoClip</CollisionResponseMode>
+      <Gravity>
+        <X>0</X>
+        <Y>0</Y>
+      </Gravity>
+      <MovementThreshold>0</MovementThreshold>
+    </PhysicalEnvironment>
+    <EntityBoundaryChunkOffset>
+      <Min>
+        <X>0</X>
+        <Y>0</Y>
+      </Min>
+      <Max>
+        <X>0</X>
+        <Y>0</Y>
+      </Max>
+    </EntityBoundaryChunkOffset>
+  </MapConfig>
+  <TeamConfigs />
+  <ShotConfigs />
+  <AllowTimelyReLock>false</AllowTimelyReLock>
+</BeepConfig>

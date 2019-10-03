@@ -150,7 +150,6 @@
             if (!_shakeTimer.IsRunning) _shakeTimer.Start();
         }
 
-        [SuppressMessage("ReSharper", "SwitchStatementMissingSomeCases")]
         private void Window_KeyPressed(object sender, KeyEventArgs e)
         {
             if (e.Code == Keyboard.Key.Escape) ((Window)sender).Close();
@@ -320,7 +319,10 @@
 
         private void ExecutePackets()
         {
-            foreach (var packet in QueuedPackets.OrderBy(p => p.TimeSent))
+            Packet[] packets;
+            lock (QueuedPackets) packets = QueuedPackets.OrderBy(p => p.TimeSent).ToArray();
+
+            foreach (var packet in packets)
             {
                 switch (packet)
                 {
@@ -352,11 +354,19 @@
                         throw new InvalidOperationException($"Invalid packet: {packet}");
                 }
             }
+
+            lock (QueuedPackets) QueuedPackets.Clear();
         }
 
-        private void ExecutePlayerActionPackets() =>
-            QueuedPlayerActionPackets.OrderBy(x => x.MessageGuid).ThenBy(x => x.PlayerGuid)
-                .ForEach(ExecutePlayerActionPacket);
+        private void ExecutePlayerActionPackets()
+        {
+            PlayerActionPacket[] packets;
+            lock (QueuedPlayerActionPackets) packets = QueuedPlayerActionPackets.OrderBy(x => x.MessageGuid).ThenBy(x => x.PlayerGuid).ToArray();
+
+            foreach (var packet in packets) ExecutePlayerActionPacket(packet);
+
+            lock (QueuedPlayerActionPackets) QueuedPlayerActionPackets.Clear();
+        }
 
         private void ExecutePlayerActionPacket(PlayerActionPacket packet)
         {

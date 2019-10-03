@@ -26,6 +26,9 @@
     <None Update="appSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="BeepConfig.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="BioRhymeExpanded-ExtraBold.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
