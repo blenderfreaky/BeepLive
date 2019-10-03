@@ -33,7 +33,7 @@
                 Position = position,
                 Radius = ShotConfig.Radius,
                 FillColor = VoxelTypeToPlace == null ?
-                new Color(1, 1, 1) :
+                new Color(255, 255, 255) :
                     new Color(
                         (byte)(VoxelTypeToPlace.Color.R * .8),
                         (byte)(VoxelTypeToPlace.Color.G * .8),
@@ -113,7 +113,9 @@
                     uint yFloored = (uint)MathF.Floor(position.Y - chunkPosition.Y);
 
                     if ((ShotConfig.Damages & chunk[xFloored, yFloored].GetTeamRelation(Owner.Team)) != TeamRelation.Air)
+                    {
                         chunk[xFloored, yFloored] = new Voxel(Map, VoxelTypeToPlace);
+                    }
                 }
             }
 

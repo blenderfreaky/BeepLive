@@ -5,9 +5,11 @@
     using SFML.System;
     using SimplexNoise;
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Threading;
 
     public class Map
     {
@@ -24,6 +26,20 @@
             Players = new List<Player>();
 
             Random = new Random();
+
+            _stepTimes = new ConcurrentQueue<DateTime>();
+
+            _stepTimeClearer = new Timer(map =>
+            {
+                ConcurrentQueue<DateTime> stepTimes = ((Map)map)._stepTimes;
+                while (stepTimes.TryPeek(out var time))
+                {
+                    if (DateTime.UtcNow.Subtract(time).TotalSeconds > 1)
+                    {
+                        _ = stepTimes.TryDequeue(out _);
+                    }
+                }
+            }, this, 1000, 1000);
         }
 
         public Map(MapConfig config) : this()
@@ -34,22 +50,41 @@
         }
 
         public bool Simulating;
-        public Action OnSimulationStop;
+        public delegate void OnSimulationStopEventHandler();
+        public event OnSimulationStopEventHandler OnSimulationStop;
+        public int StepsQueued, StepsFinished;
+
+        private readonly ConcurrentQueue<DateTime> _stepTimes;
+        private readonly Timer _stepTimeClearer;
+
+        public float ActualFrameRate => _stepTimes.Count;
+
+        public int FramesSinceMovementTresholdMet;
 
         public void Step()
         {
             if (!Simulating) return;
 
+            StepsQueued++;
+
             lock (Entities)
             {
+                _stepTimes.Enqueue(DateTime.UtcNow);
                 // Make array to avoid concurrent modification exception; Make temporary clone to be able to modify the original
                 Entity[] entities = Entities.ToArray();
 
                 entities.ForEach(e => e.Step());
 
-                float maxVelocity = entities.Max(e => (e.Velocity.X * e.Velocity.X) + (e.Velocity.Y * e.Velocity.Y));
+                float maxVelocity = entities.Length > 0
+                    ? entities.Max(e => (e.Velocity.X * e.Velocity.X) + (e.Velocity.Y * e.Velocity.Y))
+                    : 0;
 
-                if (maxVelocity > Config.PhysicalEnvironment.MovementThreshold) return;
+                StepsFinished++;
+
+                if (!Entities.TrueForAll(x => x is Player)) return;
+                if (maxVelocity < Config.PhysicalEnvironment.MovementThreshold) FramesSinceMovementTresholdMet++;
+                else FramesSinceMovementTresholdMet = 0;
+                if (FramesSinceMovementTresholdMet < Config.PhysicalEnvironment.MovementThresholdMinDuration) return;
 
                 Simulating = false;
                 OnSimulationStop?.Invoke();

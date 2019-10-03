@@ -13,6 +13,7 @@
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Threading;
 
     public class BeepLiveSfml
@@ -64,6 +65,10 @@
             _connectingText = new Text("Connecting to Server", _font)
             {
                 Position = _center
+            };
+            _debugText = new Text("", _font, 10)
+            {
+                Position = new Vector2f(10, 10)
             };
 
             QueuedPlayerActionPackets = new List<PlayerActionPacket>();
@@ -117,6 +122,10 @@
 
                 if (BeepGameState.Connecting) Window.Draw(_connectingText);
 
+                _debugText.DisplayedString = $"Physics Step Rate: {BeepLiveGame?.Map.ActualFrameRate} / {60}\n" +
+                                             $"Steps Queued: {BeepLiveGame?.Map.StepsQueued} Steps Finished: {BeepLiveGame?.Map.StepsFinished}";
+                Window.Draw(_debugText);
+
                 Window.Display();
             }
 
@@ -127,13 +136,12 @@
         {
             if (!_shakeTimer.IsRunning) return;
 
-            // ReSharper disable once PossibleLossOfFraction
             float fulfillment = (float)(_shakeTimer.ElapsedMilliseconds / (double)_shakeDuration);
             if (fulfillment < 1f)
             {
                 Vector2f direction = new Vector2f((float)((_random.NextDouble() * 2) - 1),
                     (float)((_random.NextDouble() * 2) - 1));
-                direction /= MathF.Sqrt((direction.X * direction.X) + (direction.Y * direction.Y));
+                direction /= direction.Magnitude();
                 _view.Center = _center + (direction * _shakeMagnitude * (1f - fulfillment));
             }
             else
@@ -158,7 +166,11 @@
             if (BeepLiveGame == null) return;//throw new InvalidOperationException();
 
             Vector2f mouse = Window.MapPixelToCoords(Mouse.GetPosition(Window));
-            Vector2f direction = mouse - (BeepLiveGame.LocalPlayer?.Position ?? new Vector2f()) - new Vector2f(BeepLiveGame.LocalPlayer?.Size / 2f ?? 0, BeepLiveGame.LocalPlayer?.Size / 2f ?? 0);
+            Vector2f direction = (mouse
+                - (BeepLiveGame.LocalPlayer?.Position ?? new Vector2f())
+                - new Vector2f(BeepLiveGame.LocalPlayer?.Size / 2f ?? 0,
+                               BeepLiveGame.LocalPlayer?.Size / 2f ?? 0))
+                / 10f;
 
             switch (e.Code)
             {
@@ -194,7 +206,6 @@
         {
             action.PlayerGuid = PlayerGuid;
             action.Secret = Secret;
-            action.MessageGuid = Guid.NewGuid();
 
             MessageSender.SendMessage(action);
         }
@@ -268,11 +279,12 @@
                 case ServerFlowType.StartSpawning:
                     while (!BeepLiveGame.Teams.TrueForAll(t => t.Players.Count == t.TeamConfig.MaxPlayers))
                     {
-                        BeepLiveGame.Teams
-                            .ForEach(t => t.Players = TeamMocks
+                        foreach(Team team in BeepLiveGame.Teams)
+                        {
+                            team.Players = TeamMocks
                                 .Find(tm =>
                                     string.Equals(
-                                        t.TeamConfig.TeamGuid,
+                                        team.TeamConfig.TeamGuid,
                                         tm.TeamGuid, StringComparison.Ordinal))
                                 .Players
                                 .Select(p =>
@@ -280,17 +292,18 @@
                                     Player player = new Player(
                                         BeepLiveGame.Map,
                                         new Vector2f(0, 0),
-                                        t.TeamConfig.PlayerSize,
-                                        t,
+                                        team.TeamConfig.PlayerSize,
+                                        team,
                                         p.PlayerGuid,
                                         p.UserName);
                                     BeepLiveGame.Map.Entities.Add(player);
                                     BeepLiveGame.Map.Players.Add(player);
                                     return player;
-                                }).ToList());
+                                }).ToList();
+                        }
                     }
 
-                    BeepLiveGame.LocalPlayer = BeepLiveGame.Map.Players.Find(p => string.Equals(p.Guid, PlayerGuid));
+                    BeepLiveGame.LocalPlayer = BeepLiveGame.Map.Players.Find(p => p.Guid == PlayerGuid);
                     BeepLiveGame.LocalTeam = BeepLiveGame.LocalPlayer.Team;
 
                     BeepGameState.SelectingTeams = false;
@@ -309,7 +322,7 @@
                     break;
 
                 case ServerFlowType.StartPlanning:
-                    Debug.Assert(BeepLiveGame.Map.Simulating);
+                    //Debug.Assert(BeepLiveGame.Map.Simulating);
 
                     BeepGameState.Simulating = false;
                     BeepGameState.InputsAllowed = true;
@@ -344,10 +357,6 @@
 
                     case PlayerSpawnAtPacket spawnAt:
                         HandlePlayerSpawnAtPacket(spawnAt);
-                        break;
-
-                    case PlayerShotPacket shot:
-                        HandlePlayerShotPacket(shot);
                         break;
 
                     case PlayerActionPacket action:
@@ -398,7 +407,8 @@
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    HandlePacket(packet);
+                    break;
             }
         }
 
@@ -409,19 +419,12 @@
             player.Position = packet.Position;
         }
 
-        public void HandlePlayerShotPacket(PlayerShotPacket packet)
-        {
-            Player player = BeepLiveGame.Map.Players.Find(p => p.Guid == packet.PlayerGuid);
-
-            player.Shoot(BeepLiveGame.BeepConfig.ShotConfigs[packet.ShotConfigId], packet.Direction);
-        }
-
         public void HandleSyncPacket(SyncPacket packet)
         {
-            BeepLiveGame = new BeepLiveGame(packet.BeepConfig, PlayerGuid)
-            {
-                Map = { OnSimulationStop = () => Flow(PlayerFlowPacket.FlowType.FinishedSimulation) }
-            };
+            BeepLiveGame = new BeepLiveGame(packet.BeepConfig, PlayerGuid);
+
+            BeepLiveGame.Map.OnSimulationStop += () => 
+            Flow(PlayerFlowPacket.FlowType.FinishedSimulation);
 
             BeepGameState.Connecting = false;
 
@@ -472,17 +475,20 @@
         private long _shakeDuration; // In milliseconds
         private float _shakeMagnitude;
         private readonly Random _random;
-        private readonly Font _font;
-        private readonly Text _connectingText;
-        private Timer _physicsTimer;
 
         #endregion Shake
+
+        private readonly Font _font;
+        private readonly Text _connectingText;
+        private readonly Text _debugText;
+        private Timer _physicsTimer;
 
         #endregion Camera
 
         public void HandlePacket(Packet packet)
         {
-            lock (QueuedPackets) QueuedPackets.Add(packet);
+            if (packet is PlayerShotPacket shot) HandlePlayerActionPacket(shot);
+            else lock (QueuedPackets) QueuedPackets.Add(packet);
         }
     }
 }

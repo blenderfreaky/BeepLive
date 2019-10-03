@@ -10,6 +10,7 @@
         public CollisionResponseMode CollisionResponseMode;
         public Vector2f Gravity;
         public float MovementThreshold;
+        public int MovementThresholdMinDuration;
 
         [XmlIgnore] public List<VoxelType> VoxelTypes;
 

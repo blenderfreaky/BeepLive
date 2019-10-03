@@ -108,6 +108,6 @@
             GameServer.Broadcast(packet);
         }
 
-        public bool AllPlayersInState(ServerPlayerState state, bool finished) => Players.TrueForAll(p => (p.State == state && p.Finished) || !finished);
+        public bool AllPlayersInState(ServerPlayerState state, bool finished) => Players.TrueForAll(p => p.State == state && (p.Finished || !finished));
     }
 }
