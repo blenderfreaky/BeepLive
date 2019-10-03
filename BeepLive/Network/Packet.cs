@@ -17,7 +17,7 @@
                 typeof(PlayerShotPacket),
                 typeof(PlayerSpawnAtPacket),
                 typeof(PlayerTeamJoinPacket),
-                typeof(Vector2FSerializable),
+                typeof(Vector2fSerializable),
                 typeof(PlayerJumpPacket),
                 typeof(PlayerFlowPacket),
                 typeof(PlayerActionPacket)

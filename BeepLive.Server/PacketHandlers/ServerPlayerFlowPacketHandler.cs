@@ -64,20 +64,20 @@
                     break;
 
                 case PlayerFlowPacket.FlowType.Spawn:
-                    TryFlow(packetContext, player, ServerPlayerState.InSpawning, ServerPlayerState.InSimulation,
+                    TryFlow(packetContext, player, ServerPlayerState.InSpawning, ServerPlayerState.InPlanning,
                         ServerFlowType.StartSimulation);
 
                     break;
 
                 case PlayerFlowPacket.FlowType.ReadyForSimulation:
-                    TryFlow(packetContext, player, ServerPlayerState.InSimulation, ServerPlayerState.InPlanning,
-                        ServerFlowType.StartPlanning);
+                    TryFlow(packetContext, player, ServerPlayerState.InPlanning, ServerPlayerState.InSimulation,
+                        ServerFlowType.StartSimulation);
 
                     break;
 
                 case PlayerFlowPacket.FlowType.FinishedSimulation:
-                    TryFlow(packetContext, player, ServerPlayerState.InPlanning, ServerPlayerState.InSimulation,
-                        ServerFlowType.StartSimulation);
+                    TryFlow(packetContext, player, ServerPlayerState.InSimulation, ServerPlayerState.InPlanning,
+                        ServerFlowType.StartPlanning);
 
                     break;
 

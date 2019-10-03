@@ -5,7 +5,7 @@
     [ProtoContract]
     public class PlayerShotPacket : PlayerActionPacket
     {
-        [ProtoMember(3)] public Vector2FSerializable Direction;
+        [ProtoMember(3)] public Vector2fSerializable Direction;
 
         [ProtoMember(1)] public int ShotConfigId;
 

@@ -31,13 +31,13 @@
 
         public TeamRelation GetTeamRelation(Team team)
         {
-            return VoxelType.OwnerTeam == null
-                ? TeamRelation.Neutral
-                : VoxelType == null
+            return    VoxelType == null
                     ? TeamRelation.Air
+                    : VoxelType.OwnerTeam == null
+                    ? TeamRelation.Neutral
                     : VoxelType.OwnerTeam == team
-                        ? TeamRelation.Friendly
-                        : TeamRelation.Hostile;
+                    ? TeamRelation.Friendly
+                    : TeamRelation.Hostile;
         }
 
         public override bool Equals(object obj) => obj is Voxel voxel && EqualityComparer<Map>.Default.Equals(Map, voxel.Map) && EqualityComparer<VoxelType>.Default.Equals(VoxelType, voxel.VoxelType) && IsAir == voxel.IsAir && Color.Equals(voxel.Color);

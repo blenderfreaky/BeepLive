@@ -176,7 +176,8 @@
                     break;
 
                 case Keyboard.Key.Enter:
-                    Flow(PlayerFlowPacket.FlowType.ReadyForSimulation);
+                    if (BeepGameState.Spawning) Flow(PlayerFlowPacket.FlowType.Spawn);
+                    else Flow(PlayerFlowPacket.FlowType.ReadyForSimulation);
                     break;
             }
         }

@@ -56,7 +56,7 @@
         public Projectile<ShotConfig> Shoot(ShotConfig shotConfig, Vector2f velocity)
         {
             var projectile =
-                new Projectile<ShotConfig>(Map, Position, velocity, shotConfig);
+                new Projectile<ShotConfig>(Map, Position + (velocity.Normalized() * Size * 2), velocity, shotConfig, this);
             Map.Entities.Add(projectile);
             return projectile;
         }
@@ -64,7 +64,7 @@
         public ClusterProjectile Shoot(ClusterShotConfig shotConfig, Vector2f velocity)
         {
             var projectile =
-                new ClusterProjectile(Map, Position, velocity, shotConfig);
+                new ClusterProjectile(Map, Position + (velocity.Normalized() * Size * 2), velocity, shotConfig, this);
             Map.Entities.Add(projectile);
             return projectile;
         }

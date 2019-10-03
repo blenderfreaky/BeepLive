@@ -15,17 +15,9 @@
         public TShotConfig ShotConfig;
         public VoxelType VoxelTypeToPlace;
 
-        public Projectile(Map map, Vector2f position, Vector2f velocity, TShotConfig shotConfig, Player owner = null)
+        public Projectile(Map map, Vector2f position, Vector2f velocity, TShotConfig shotConfig, Player owner)
         {
-            Shape = new CircleShape
-            {
-                Position = position,
-                Radius = shotConfig.Radius,
-                FillColor = new Color((byte)(VoxelTypeToPlace.Color.R * .8), (byte)(VoxelTypeToPlace.Color.G * .8), (byte)(VoxelTypeToPlace.Color.B * .8))
-            };
-
             Map = map;
-            Position = position;
             Velocity = velocity;
             ShotConfig = shotConfig;
 
@@ -35,6 +27,20 @@
                 ShotConfig.Destructive ? null :
                 ShotConfig.Neutral ? Map.Config.GroundVoxelType :
                 Owner == null ? null : Owner.Team?.VoxelType ?? Map.Config.GroundVoxelType;
+
+            Shape = new CircleShape
+            {
+                Position = position,
+                Radius = ShotConfig.Radius,
+                FillColor = VoxelTypeToPlace == null ?
+                new Color(1, 1, 1) :
+                    new Color(
+                        (byte)(VoxelTypeToPlace.Color.R * .8),
+                        (byte)(VoxelTypeToPlace.Color.G * .8),
+                        (byte)(VoxelTypeToPlace.Color.B * .8))
+            };
+
+            Position = position;
         }
 
         public CircleShape CircleShape
