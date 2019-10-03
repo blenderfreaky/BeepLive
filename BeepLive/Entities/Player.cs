@@ -6,6 +6,7 @@
     using SFML.Graphics;
     using SFML.System;
     using System;
+    using System.Numerics;
 
     public class Player : Entity
     {
@@ -20,12 +21,13 @@
 
         public Player(Map map, Vector2f position, int size, Team team, Guid guid, string userName)
         {
-            GenerateShape();
+            Size = size;
+            Team = team;
+
+            GenerateShape(position);
 
             Map = map;
             Position = position;
-            Size = size;
-            Team = team;
 
             Guid = guid;
             UserName = userName;
@@ -41,11 +43,11 @@
             set => ((RectangleShape)Shape).Position = value;
         }
 
-        internal void GenerateShape()
+        internal void GenerateShape(Vector2f position)
         {
             Shape = new RectangleShape
             {
-                Position = Position,
+                Position = position,
                 Size = new Vector2f(Size, Size),
                 FillColor = Team.VoxelType.Color
             };

@@ -248,7 +248,10 @@
             foreach (Entity entity in entities.Where(entity => !entity.Alive)) Window.Draw(entity.Shape);
         }
 
-        public void HandlePlayerActionPacket(PlayerActionPacket packet) => QueuedPlayerActionPackets.Add(packet);
+        public void HandlePlayerActionPacket(PlayerActionPacket packet)
+        {
+            lock (QueuedPlayerActionPackets) QueuedPlayerActionPackets.Add(packet);
+        }
 
         public void HandleServerFlowPacket(ServerFlowPacket packet)
         {
@@ -476,6 +479,9 @@
 
         #endregion Camera
 
-        public void HandlePacket(Packet packet) => QueuedPackets.Add(packet);
+        public void HandlePacket(Packet packet)
+        {
+            lock (QueuedPackets) QueuedPackets.Add(packet);
+        }
     }
 }

@@ -9,6 +9,10 @@
         [ProtoMember(1)] public float X;
         [ProtoMember(2)] public float Y;
 
+        public Vector2FSerializable()
+        {
+        }
+
         public Vector2FSerializable(float x, float y)
         {
             X = x;
