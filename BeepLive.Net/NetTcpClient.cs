@@ -25,7 +25,10 @@
         {
             await Task.Factory.StartNew(() =>
             {
-                if (StreamProtobuf.ReadNext(Stream, out object value)) PacketReceivedEvent(this, value);
+                while (true)
+                {
+                    if (StreamProtobuf.ReadNext(Stream, out object value)) PacketReceivedEvent(this, value);
+                }
             }, TaskCreationOptions.LongRunning).ConfigureAwait(false);
         }
 
