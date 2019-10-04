@@ -17,7 +17,7 @@
             IsAir = color == map.Config.BackgroundColor;
             VoxelType = IsAir
                 ? null
-                : map.Config.PhysicalEnvironment.VoxelTypes.Find(t => t.Color == color);
+                : map.Config.PhysicalEnvironment.VoxelTypesByColor[color];
         }
 
         public Voxel(Map map, VoxelType voxelType = null)

@@ -10,19 +10,20 @@
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     public class Map
     {
         public Chunk[,] Chunks;
 
         public MapConfig Config;
-        public List<Entity> Entities;
+        public SynchronizedCollection<Entity> Entities;
         public List<Player> Players;
         public Random Random;
 
         public Map()
         {
-            Entities = new List<Entity>();
+            Entities = new SynchronizedCollection<Entity>();
             Players = new List<Player>();
 
             Random = new Random();
@@ -37,6 +38,10 @@
                     if (DateTime.UtcNow.Subtract(time).TotalSeconds > 1)
                     {
                         _ = stepTimes.TryDequeue(out _);
+                    }
+                    else
+                    {
+                        return;
                     }
                 }
             }, this, 1000, 1000);
@@ -73,7 +78,7 @@
                 // Make array to avoid concurrent modification exception; Make temporary clone to be able to modify the original
                 Entity[] entities = Entities.ToArray();
 
-                entities.ForEach(e => e.Step());
+                Parallel.ForEach(entities, e => e.Step());
 
                 float maxVelocity = entities.Length > 0
                     ? entities.Max(e => (e.Velocity.X * e.Velocity.X) + (e.Velocity.Y * e.Velocity.Y))
@@ -81,7 +86,7 @@
 
                 StepsFinished++;
 
-                if (!Entities.TrueForAll(x => x is Player)) return;
+                if (!Entities.All(x => x is Player)) return;
                 if (maxVelocity < Config.PhysicalEnvironment.MovementThreshold) FramesSinceMovementTresholdMet++;
                 else FramesSinceMovementTresholdMet = 0;
                 if (FramesSinceMovementTresholdMet < Config.PhysicalEnvironment.MovementThresholdMinDuration) return;

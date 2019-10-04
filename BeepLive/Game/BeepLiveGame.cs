@@ -27,6 +27,11 @@
             Teams = beepConfig.TeamConfigs.Select(x => new Team(this, x)).ToList();
         }
 
-        public Timer Run() => new Timer(_ => Map?.Step(), null, 1000, 1000 / 60);
+        public Timer Run()
+        {
+            Map.Config.PhysicalEnvironment.CalculateVoxelTypesByColor();
+
+            return new Timer(_ => Map.Step(), null, 1000, 1000 / 60);
+        }
     }
 }

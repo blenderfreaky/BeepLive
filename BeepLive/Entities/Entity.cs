@@ -9,8 +9,7 @@
     {
         protected bool Disposed;
         public Map Map;
-        public Drawable Shape;
-        private readonly object _lockObject = new object();
+        public Shape Shape;
 
         public virtual Vector2f Position { get; set; }
         public Vector2f Velocity { get; set; }
@@ -47,7 +46,11 @@
 
         protected virtual void Dispose(bool disposing)
         {
-            lock (_lockObject) if (!Disposed) Disposed = true;
+            if (!Disposed)
+            {
+                Disposed = true;
+                Shape.Dispose();
+            }
         }
 
         ~Entity()

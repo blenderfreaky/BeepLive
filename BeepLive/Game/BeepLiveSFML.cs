@@ -15,6 +15,7 @@
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Threading;
+    using System.Threading.Tasks;
 
     public class BeepLiveSfml
     {
@@ -160,6 +161,24 @@
             }
         }
 
+        private void DrawMap()
+        {
+            for (int chunkI = 0; chunkI < BeepLiveGame.Map.Config.MapWidth; chunkI++)
+            {
+                for (int chunkJ = 0; chunkJ < BeepLiveGame.Map.Config.MapHeight; chunkJ++)
+                {
+                    Chunk chunk = BeepLiveGame.Map.Chunks[chunkI, chunkJ];
+                    chunk.Update();
+                    Window.Draw(chunk.Sprite);
+                }
+            }
+
+            Entity[] entities;
+            lock (BeepLiveGame.Map.Entities) entities = BeepLiveGame.Map.Entities.Where(e => !(e is null)).ToArray();
+
+            Parallel.ForEach(entities.Where(entity => entity.Alive), entity => Window.Draw(entity.Shape));
+        }
+
         private void TriggerShake(float magnitude, long duration)
         {
             _shakeDuration += duration;
@@ -250,24 +269,6 @@
             {
                 Position = position
             });
-
-        private void DrawMap()
-        {
-            for (int chunkI = 0; chunkI < BeepLiveGame.Map.Config.MapWidth; chunkI++)
-            {
-                for (int chunkJ = 0; chunkJ < BeepLiveGame.Map.Config.MapHeight; chunkJ++)
-                {
-                    Chunk chunk = BeepLiveGame.Map.Chunks[chunkI, chunkJ];
-                    chunk.Update();
-                    Window.Draw(chunk.Sprite);
-                }
-            }
-
-            Entity[] entities;
-            lock (BeepLiveGame.Map.Entities) entities = BeepLiveGame.Map.Entities.Where(e => !(e is null)).ToArray();
-
-            foreach (Entity entity in entities.Where(entity => entity.Alive)) Window.Draw(entity.Shape);
-        }
 
         public void HandlePlayerActionPacket(PlayerActionPacket packet)
         {
