@@ -34,7 +34,7 @@
 
         public virtual void Die()
         {
-            Map.Entities.Remove(this);
+            Map.EntitiesBuffer.TryRemove(this, out _);
             Dispose(true);
         }
 

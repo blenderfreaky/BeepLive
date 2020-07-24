@@ -11,6 +11,8 @@
             _ = new BeepServer();
 
             _ = new BeepClient();
+
+            Thread.Sleep(-1);
         }
     }
 }

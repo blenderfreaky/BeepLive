@@ -31,7 +31,7 @@
         {
             Map.Config.PhysicalEnvironment.CalculateVoxelTypesByColor();
 
-            return new Timer(_ => Map.Step(), null, 1000, 1000 / 60);
+            return new Timer(_ => Map.Step(), null, 10, 1000 / 60);
         }
     }
 }

@@ -6,8 +6,6 @@
     using SFML.Graphics;
     using SFML.System;
     using System;
-    using System.Collections.Generic;
-    using System.Numerics;
 
     public class Player : Entity
     {
@@ -58,7 +56,7 @@
         {
             var projectile =
                 new Projectile<ShotConfig>(Map, Position + (velocity.Normalized() * Size * 2), velocity, shotConfig, this);
-            Map.Entities.Add(projectile);
+            Map.EntitiesBuffer.TryAdd(projectile, 0);
             return projectile;
         }
 
@@ -66,7 +64,7 @@
         {
             var projectile =
                 new ClusterProjectile(Map, Position + (velocity.Normalized() * Size * 2), velocity, shotConfig, this);
-            Map.Entities.Add(projectile);
+            Map.EntitiesBuffer.TryAdd(projectile, 0);
             return projectile;
         }
 

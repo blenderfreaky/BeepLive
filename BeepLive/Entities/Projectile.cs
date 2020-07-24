@@ -101,7 +101,7 @@
             Vector2f front = Velocity / velocity;
             Vector2f left = new Vector2f(front.Y, -front.X);
 
-            for (float x = 0; x < velocity; x += .5f)
+            for (float x = 0; x < velocity; x += 1.5f)
             {
                 for (float y = -ShotConfig.Radius; y <= ShotConfig.Radius; y++)
                 {

@@ -10,10 +10,8 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
-    using System.Runtime.CompilerServices;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -32,7 +30,7 @@
 
         public BeepLiveSfml(IMessageSender messageSender)
         {
-            VideoMode mode = new VideoMode(800, 600);
+            VideoMode mode = new VideoMode(1080, 720);
             Window = new RenderWindow(mode, "Map");
 
             _center = new Vector2f(Window.Size.X / 2f, Window.Size.Y / 2f);
@@ -74,13 +72,15 @@
 
             QueuedPlayerActionPackets = new List<PlayerActionPacket>();
             QueuedPackets = new List<Packet>();
+
+            Window.SetActive(false);
         }
 
         public BeepLiveGame BeepLiveGame;
 
         public BeepLiveGameState BeepGameState;
 
-        private void Window_MouseWheelScrolled(object sender, MouseWheelScrollEventArgs e) => _zoom *= (float)Math.Pow(2, e.Delta);
+        private void Window_MouseWheelScrolled(object sender, MouseWheelScrollEventArgs e) => _zoom /= (float)Math.Pow(2, e.Delta);
 
         public void Run()
         {
@@ -129,6 +129,7 @@
                 Window.Draw(_debugText);
 
                 Window.Display();
+                Task.Delay(1000 / 60);
             }
 
             _physicsTimer?.Dispose();
@@ -173,10 +174,7 @@
                 }
             }
 
-            Entity[] entities;
-            lock (BeepLiveGame.Map.Entities) entities = BeepLiveGame.Map.Entities.Where(e => !(e is null)).ToArray();
-
-            Parallel.ForEach(entities.Where(entity => entity.Alive), entity => Window.Draw(entity.Shape));
+            BeepLiveGame.Map.Entities.Where(entity => entity?.Alive == true).ForEach(entity => Window.Draw(entity.Shape));
         }
 
         private void TriggerShake(float magnitude, long duration)
@@ -306,7 +304,7 @@
                                         team,
                                         p.PlayerGuid,
                                         p.UserName);
-                                    BeepLiveGame.Map.Entities.Add(player);
+                                    BeepLiveGame.Map.EntitiesBuffer.TryAdd(player, 0);
                                     BeepLiveGame.Map.Players.Add(player);
                                     return player;
                                 }).ToList();
@@ -492,13 +490,24 @@
         private readonly Text _connectingText;
         private readonly Text _debugText;
         private Timer _physicsTimer;
+        private Timer _drawTimer;
 
         #endregion Camera
 
         public void HandlePacket(Packet packet)
         {
-            if (packet is PlayerShotPacket shot) HandlePlayerActionPacket(shot);
-            else lock (QueuedPackets) QueuedPackets.Add(packet);
+            if (packet is PlayerActionPacket shot)
+            {
+                if (packet is PlayerTeamJoinPacket join) HandleClientTeamJoinPacket(join);
+                else HandlePlayerActionPacket(shot);
+            }
+            else
+            {
+                lock (QueuedPackets)
+                {
+                    QueuedPackets.Add(packet);
+                }
+            }
         }
     }
 }

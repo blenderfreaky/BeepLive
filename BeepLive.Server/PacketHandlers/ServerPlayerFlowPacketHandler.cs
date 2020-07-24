@@ -2,7 +2,6 @@
 {
     using BeepLive.Network;
     using Microsoft.Extensions.Logging;
-    using System;
 
     internal static partial class PacketHandlers
     {
@@ -17,8 +16,7 @@
             }
 
             ServerPlayer player = packetContext.Server.Players
-                .Find(p => p.PlayerGuid
-                    == packetContext.Packet.PlayerGuid);
+                .Find(p => p.PlayerGuid == packetContext.Packet.PlayerGuid);
 
             if (player == null && packetContext.Packet.Type != PlayerFlowPacket.FlowType.Join)
             {

@@ -6,30 +6,45 @@
 
     public class Chunk
     {
-        public Map Map;
+        public readonly Map Map;
 
-        public Sprite Sprite;
+        public readonly Sprite Sprite;
 
-        //public Voxel[,] Voxels;
-        public Image Voxels;
+        private readonly byte[] _pixels;
 
         public Chunk(Map map, Vector2f offset)
         {
             Map = map;
 
-            Voxels = new Image(map.Config.ChunkSize, map.Config.ChunkSize);
-            Sprite = new Sprite(new Texture(Voxels)) { Texture = { Smooth = true }, Position = offset };
+            _pixels = new byte[Map.Config.ChunkSize * Map.Config.ChunkSize * 4];
+            Sprite = new Sprite(new Texture(Map.Config.ChunkSize, Map.Config.ChunkSize)) { Texture = { Smooth = true }, Position = offset };
         }
 
         public Voxel this[uint x, uint y]
         {
-            get => new Voxel(Map, Voxels.GetPixel(x, y));
-            set => Voxels.SetPixel(x, y, value.Color);
+            get
+            {
+                var pos = (x + (y * Map.Config.ChunkSize)) * 4;
+                return new Voxel(Map, new Color(
+                    _pixels[pos + 0],
+                    _pixels[pos + 1],
+                    _pixels[pos + 2],
+                    _pixels[pos + 3]));
+            }
+
+            set
+            {
+                var pos = (x + (y * Map.Config.ChunkSize)) * 4;
+                _pixels[pos + 0] = value.Color.R;
+                _pixels[pos + 1] = value.Color.G;
+                _pixels[pos + 2] = value.Color.B;
+                _pixels[pos + 3] = value.Color.A;
+            }
         }
 
         public void Update()
         {
-            Sprite.Texture.Update(Voxels);
+            Sprite.Texture.Update(_pixels);
         }
 
         public static Vector2u GetVoxelIndex(Vector2f position)

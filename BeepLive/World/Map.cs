@@ -17,13 +17,15 @@
         public Chunk[,] Chunks;
 
         public MapConfig Config;
-        public SynchronizedCollection<Entity> Entities;
+        public Entity[] Entities;
+        public ConcurrentDictionary<Entity, byte> EntitiesBuffer;
         public List<Player> Players;
         public Random Random;
 
         public Map()
         {
-            Entities = new SynchronizedCollection<Entity>();
+            Entities = new Entity[0];
+            EntitiesBuffer = new ConcurrentDictionary<Entity, byte>();
             Players = new List<Player>();
 
             Random = new Random();
@@ -72,16 +74,17 @@
 
             StepsQueued++;
 
-            lock (Entities)
+            lock (EntitiesBuffer)
             {
                 _stepTimes.Enqueue(DateTime.UtcNow);
+
                 // Make array to avoid concurrent modification exception; Make temporary clone to be able to modify the original
-                Entity[] entities = Entities.ToArray();
+                Entities = EntitiesBuffer.Keys.ToArray();
 
-                Parallel.ForEach(entities, e => e.Step());
+                Parallel.ForEach(Entities, e => e.Step());
 
-                float maxVelocity = entities.Length > 0
-                    ? entities.Max(e => (e.Velocity.X * e.Velocity.X) + (e.Velocity.Y * e.Velocity.Y))
+                float maxVelocity = Entities.Length > 0
+                    ? Entities.Max(e => (e.Velocity.X * e.Velocity.X) + (e.Velocity.Y * e.Velocity.Y))
                     : 0;
 
                 StepsFinished++;

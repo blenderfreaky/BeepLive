@@ -34,13 +34,13 @@
                     (float)((Map.Random.NextDouble() * 2) - 1))
                     * ShotConfig.ExplosionPower;
 
-                Map.Entities.Add(Activator.CreateInstance(typeof(TProjectile),
+                Map.EntitiesBuffer.TryAdd(Activator.CreateInstance(typeof(TProjectile),
                     Map,
                     Position,
                     Velocity + direction,
                     ShotConfig.ChildShotConfig,
                     Owner)
-                    as TProjectile);
+                    as TProjectile, 0);
             }
 
             OnExplodeEvent?.Invoke(this);
